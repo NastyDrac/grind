@@ -1,0 +1,33 @@
+[gd_scene load_steps=5 format=3 uid="uid://vun5mwhqc014"]
+
+[ext_resource type="Script" uid="uid://qb2kyhu1kbb1" path="res://Scripts/card_handler.gd" id="1_rom71"]
+
+[sub_resource type="Curve" id="Curve_rom71"]
+_data = [Vector2(0, 0), 0.0, 1.0, 0, 1, Vector2(1, 1), 1.0, 0.0, 1, 0]
+point_count = 2
+
+[sub_resource type="Curve" id="Curve_sdc1o"]
+_limits = [-1.0, 1.0, 0.0, 1.0]
+_data = [Vector2(0, -1), 0.0, 0.0, 0, 0, Vector2(1, 1), 0.0, 0.0, 0, 0]
+point_count = 2
+
+[sub_resource type="Curve" id="Curve_r6eh0"]
+_data = [Vector2(0, 0), 0.0, 5.0216084, 0, 0, Vector2(0.5, 1), 0.0, 0.0, 0, 0, Vector2(1, 0), -4.9737782, 0.0, 0, 0]
+point_count = 3
+
+[node name="CardHandler" type="Node"]
+script = ExtResource("1_rom71")
+spacing_curve = SubResource("Curve_rom71")
+rotation_curve = SubResource("Curve_sdc1o")
+height_curve = SubResource("Curve_r6eh0")
+max_y_offset = -50.0
+metadata/_custom_type_script = "uid://qb2kyhu1kbb1"
+
+[node name="Hand" type="Node2D" parent="."]
+position = Vector2(526, 425)
+
+[node name="DrawPile" type="Node2D" parent="."]
+position = Vector2(-210, 604)
+
+[node name="DiscardPile" type="Node2D" parent="."]
+position = Vector2(1253, 597)

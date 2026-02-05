@@ -1,0 +1,25 @@
+[gd_resource type="Resource" script_class="CardData" load_steps=7 format=3 uid="uid://btueh7oj6cv7u"]
+
+[ext_resource type="Script" uid="uid://dhxff5egnsgrv" path="res://Scripts/action.gd" id="1_wgud5"]
+[ext_resource type="Script" uid="uid://cgrxhw8vqenhu" path="res://Scripts/ValueCalculator.gd" id="2_jpisu"]
+[ext_resource type="Script" uid="uid://0gsjrx47no8b" path="res://Scripts/card_data.gd" id="2_wgewl"]
+[ext_resource type="Script" uid="uid://clvjn77csx1a0" path="res://Scripts/AttackAction.gd" id="3_8b8bg"]
+
+[sub_resource type="Resource" id="Resource_wkm1s"]
+script = ExtResource("2_jpisu")
+formula = "bang + marbles"
+metadata/_custom_type_script = "uid://cgrxhw8vqenhu"
+
+[sub_resource type="Resource" id="Resource_pw3xh"]
+script = ExtResource("3_8b8bg")
+damage_calculator = SubResource("Resource_wkm1s")
+target_type = 2
+max_range = 2
+metadata/_custom_type_script = "uid://clvjn77csx1a0"
+
+[resource]
+script = ExtResource("2_wgewl")
+card_name = "Grenade"
+card_cost = 3
+actions = Array[ExtResource("1_wgud5")]([SubResource("Resource_pw3xh")])
+metadata/_custom_type_script = "uid://0gsjrx47no8b"

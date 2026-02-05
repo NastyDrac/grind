@@ -1,0 +1,36 @@
+[gd_resource type="Resource" script_class="CardData" load_steps=10 format=3 uid="uid://bcyo1vpisqc4w"]
+
+[ext_resource type="Script" uid="uid://dhxff5egnsgrv" path="res://Scripts/action.gd" id="1_lab80"]
+[ext_resource type="Script" uid="uid://cgrxhw8vqenhu" path="res://Scripts/ValueCalculator.gd" id="2_0svjq"]
+[ext_resource type="Script" uid="uid://0gsjrx47no8b" path="res://Scripts/card_data.gd" id="2_046qo"]
+[ext_resource type="Script" uid="uid://clvjn77csx1a0" path="res://Scripts/AttackAction.gd" id="3_64umj"]
+[ext_resource type="Script" uid="uid://c3g4jmcp7xiqk" path="res://Scripts/pushpull_action.gd" id="4_64umj"]
+
+[sub_resource type="Resource" id="Resource_xfp30"]
+script = ExtResource("2_0svjq")
+formula = "hustle * 2"
+metadata/_custom_type_script = "uid://cgrxhw8vqenhu"
+
+[sub_resource type="Resource" id="Resource_01g44"]
+script = ExtResource("3_64umj")
+damage_calculator = SubResource("Resource_xfp30")
+max_range = 1
+metadata/_custom_type_script = "uid://clvjn77csx1a0"
+
+[sub_resource type="Resource" id="Resource_5mjdj"]
+script = ExtResource("2_0svjq")
+formula = "marbles"
+metadata/_custom_type_script = "uid://cgrxhw8vqenhu"
+
+[sub_resource type="Resource" id="Resource_55lqd"]
+script = ExtResource("4_64umj")
+distance_calculator = SubResource("Resource_5mjdj")
+max_range = 1
+metadata/_custom_type_script = "uid://c3g4jmcp7xiqk"
+
+[resource]
+script = ExtResource("2_046qo")
+card_name = "Cascading Blow"
+card_cost = 5
+actions = Array[ExtResource("1_lab80")]([SubResource("Resource_01g44"), SubResource("Resource_55lqd")])
+metadata/_custom_type_script = "uid://0gsjrx47no8b"

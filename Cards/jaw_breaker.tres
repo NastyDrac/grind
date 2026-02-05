@@ -1,0 +1,29 @@
+[gd_resource type="Resource" script_class="CardData" load_steps=8 format=3 uid="uid://c60d8phs1yq30"]
+
+[ext_resource type="Script" uid="uid://dhxff5egnsgrv" path="res://Scripts/action.gd" id="1_0sxt8"]
+[ext_resource type="Script" uid="uid://cgrxhw8vqenhu" path="res://Scripts/ValueCalculator.gd" id="2_4nr0p"]
+[ext_resource type="Script" uid="uid://0gsjrx47no8b" path="res://Scripts/card_data.gd" id="2_bcf8u"]
+[ext_resource type="Script" uid="uid://clvjn77csx1a0" path="res://Scripts/AttackAction.gd" id="3_8y6d7"]
+
+[sub_resource type="Resource" id="Resource_rlk1y"]
+script = ExtResource("2_4nr0p")
+formula = "marbles"
+metadata/_custom_type_script = "uid://cgrxhw8vqenhu"
+
+[sub_resource type="Resource" id="Resource_ogsfj"]
+script = ExtResource("2_4nr0p")
+formula = "1"
+metadata/_custom_type_script = "uid://cgrxhw8vqenhu"
+
+[sub_resource type="Resource" id="Resource_12knx"]
+script = ExtResource("3_8y6d7")
+damage_calculator = SubResource("Resource_rlk1y")
+enemy_count_calculator = SubResource("Resource_ogsfj")
+max_range = 1
+metadata/_custom_type_script = "uid://clvjn77csx1a0"
+
+[resource]
+script = ExtResource("2_bcf8u")
+card_name = "Jawbreaker"
+actions = Array[ExtResource("1_0sxt8")]([SubResource("Resource_12knx")])
+metadata/_custom_type_script = "uid://0gsjrx47no8b"

@@ -1,0 +1,23 @@
+[gd_resource type="Resource" script_class="CardData" load_steps=7 format=3 uid="uid://cvqhq6lox34l2"]
+
+[ext_resource type="Script" uid="uid://dhxff5egnsgrv" path="res://Scripts/action.gd" id="1_qaha7"]
+[ext_resource type="Script" uid="uid://0gsjrx47no8b" path="res://Scripts/card_data.gd" id="2_n5ofs"]
+[ext_resource type="Script" uid="uid://cgrxhw8vqenhu" path="res://Scripts/ValueCalculator.gd" id="2_yff0i"]
+[ext_resource type="Script" uid="uid://clvjn77csx1a0" path="res://Scripts/AttackAction.gd" id="3_e4iak"]
+
+[sub_resource type="Resource" id="Resource_dp0l1"]
+script = ExtResource("2_yff0i")
+formula = "guts"
+metadata/_custom_type_script = "uid://cgrxhw8vqenhu"
+
+[sub_resource type="Resource" id="Resource_78x70"]
+script = ExtResource("3_e4iak")
+damage_calculator = SubResource("Resource_dp0l1")
+max_range = 1
+metadata/_custom_type_script = "uid://clvjn77csx1a0"
+
+[resource]
+script = ExtResource("2_n5ofs")
+card_name = "Smash"
+actions = Array[ExtResource("1_qaha7")]([SubResource("Resource_78x70")])
+metadata/_custom_type_script = "uid://0gsjrx47no8b"

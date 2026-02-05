@@ -1,0 +1,12 @@
+[gd_resource type="Resource" script_class="ItemData" load_steps=3 format=3 uid="uid://dj6ttthval7yo"]
+
+[ext_resource type="Script" uid="uid://d2bewqoltjljo" path="res://Scripts/itemData.gd" id="1_3onu5"]
+[ext_resource type="Texture2D" uid="uid://djuhw2u6q4ql4" path="res://Art/gold-bar.png" id="1_pat8s"]
+
+[resource]
+script = ExtResource("1_3onu5")
+item_name = "Gold"
+icon = ExtResource("1_pat8s")
+min_amount = 1
+max_amount = 5
+metadata/_custom_type_script = "uid://d2bewqoltjljo"

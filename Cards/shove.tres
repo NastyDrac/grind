@@ -1,0 +1,24 @@
+[gd_resource type="Resource" script_class="CardData" load_steps=7 format=3 uid="uid://cbqh0adhu4wkg"]
+
+[ext_resource type="Script" uid="uid://dhxff5egnsgrv" path="res://Scripts/action.gd" id="1_rnsco"]
+[ext_resource type="Script" uid="uid://0gsjrx47no8b" path="res://Scripts/card_data.gd" id="2_63kow"]
+[ext_resource type="Script" uid="uid://cgrxhw8vqenhu" path="res://Scripts/ValueCalculator.gd" id="2_pfj7a"]
+[ext_resource type="Script" uid="uid://c3g4jmcp7xiqk" path="res://Scripts/pushpull_action.gd" id="3_21lex"]
+
+[sub_resource type="Resource" id="Resource_42ohh"]
+script = ExtResource("2_pfj7a")
+formula = "1"
+metadata/_custom_type_script = "uid://cgrxhw8vqenhu"
+
+[sub_resource type="Resource" id="Resource_2pfhn"]
+script = ExtResource("3_21lex")
+distance_calculator = SubResource("Resource_42ohh")
+target_type = 2
+max_range = 1
+metadata/_custom_type_script = "uid://c3g4jmcp7xiqk"
+
+[resource]
+script = ExtResource("2_63kow")
+card_name = "Shove"
+actions = Array[ExtResource("1_rnsco")]([SubResource("Resource_2pfhn")])
+metadata/_custom_type_script = "uid://0gsjrx47no8b"

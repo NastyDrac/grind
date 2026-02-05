@@ -1,0 +1,43 @@
+[gd_resource type="Resource" script_class="CardData" load_steps=11 format=3 uid="uid://cccg3sg1byx10"]
+
+[ext_resource type="Script" uid="uid://dhxff5egnsgrv" path="res://Scripts/action.gd" id="1_l6qur"]
+[ext_resource type="Script" uid="uid://0gsjrx47no8b" path="res://Scripts/card_data.gd" id="2_fe0db"]
+[ext_resource type="Script" uid="uid://cgrxhw8vqenhu" path="res://Scripts/ValueCalculator.gd" id="2_k6skc"]
+[ext_resource type="Script" uid="uid://clvjn77csx1a0" path="res://Scripts/AttackAction.gd" id="3_mbfye"]
+[ext_resource type="Script" uid="uid://bc8y3uqk02xnl" path="res://Scripts/draw_action.gd" id="4_o5vvt"]
+
+[sub_resource type="Resource" id="Resource_58xvx"]
+script = ExtResource("2_k6skc")
+formula = "swag"
+metadata/_custom_type_script = "uid://cgrxhw8vqenhu"
+
+[sub_resource type="Resource" id="Resource_kbbbq"]
+script = ExtResource("2_k6skc")
+formula = "mojo"
+metadata/_custom_type_script = "uid://cgrxhw8vqenhu"
+
+[sub_resource type="Resource" id="Resource_3l50r"]
+script = ExtResource("3_mbfye")
+damage_calculator = SubResource("Resource_58xvx")
+enemy_count_calculator = SubResource("Resource_kbbbq")
+target_type = 3
+max_range = 1
+metadata/_custom_type_script = "uid://clvjn77csx1a0"
+
+[sub_resource type="Resource" id="Resource_5hume"]
+script = ExtResource("2_k6skc")
+formula = "1"
+metadata/_custom_type_script = "uid://cgrxhw8vqenhu"
+
+[sub_resource type="Resource" id="Resource_t05b6"]
+script = ExtResource("4_o5vvt")
+card_count_calculator = SubResource("Resource_5hume")
+target_type = 4
+metadata/_custom_type_script = "uid://bc8y3uqk02xnl"
+
+[resource]
+script = ExtResource("2_fe0db")
+card_name = "Flourish"
+card_cost = 3
+actions = Array[ExtResource("1_l6qur")]([SubResource("Resource_3l50r"), SubResource("Resource_t05b6")])
+metadata/_custom_type_script = "uid://0gsjrx47no8b"

@@ -1,0 +1,29 @@
+[gd_resource type="Resource" script_class="CardData" load_steps=8 format=3 uid="uid://c1ov23ykjr6tk"]
+
+[ext_resource type="Script" uid="uid://dhxff5egnsgrv" path="res://Scripts/action.gd" id="1_ffd2y"]
+[ext_resource type="Script" uid="uid://0gsjrx47no8b" path="res://Scripts/card_data.gd" id="2_3w5dh"]
+[ext_resource type="Script" uid="uid://cgrxhw8vqenhu" path="res://Scripts/ValueCalculator.gd" id="2_8fbks"]
+[ext_resource type="Script" uid="uid://clvjn77csx1a0" path="res://Scripts/AttackAction.gd" id="3_ggn2u"]
+
+[sub_resource type="Resource" id="Resource_xhgn2"]
+script = ExtResource("2_8fbks")
+formula = "3"
+metadata/_custom_type_script = "uid://cgrxhw8vqenhu"
+
+[sub_resource type="Resource" id="Resource_0105s"]
+script = ExtResource("2_8fbks")
+metadata/_custom_type_script = "uid://cgrxhw8vqenhu"
+
+[sub_resource type="Resource" id="Resource_y6pws"]
+script = ExtResource("3_ggn2u")
+damage_calculator = SubResource("Resource_xhgn2")
+enemy_count_calculator = SubResource("Resource_0105s")
+max_range = 3
+metadata/_custom_type_script = "uid://clvjn77csx1a0"
+
+[resource]
+script = ExtResource("2_3w5dh")
+card_name = "Brick Toss"
+card_cost = 2
+actions = Array[ExtResource("1_ffd2y")]([SubResource("Resource_y6pws")])
+metadata/_custom_type_script = "uid://0gsjrx47no8b"
