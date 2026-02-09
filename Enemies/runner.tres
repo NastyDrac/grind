@@ -1,0 +1,12 @@
+[gd_resource type="Resource" script_class="EnemyData" load_steps=3 format=3 uid="uid://byxygfcotqt5s"]
+
+[ext_resource type="Script" uid="uid://tnxg66jw03v3" path="res://Scripts/enemy_data.gd" id="1_3s7dc"]
+[ext_resource type="Texture2D" uid="uid://dh3ghgo4uvj2i" path="res://Art/runner.png" id="2_u23b3"]
+
+[resource]
+script = ExtResource("1_3s7dc")
+enemy_name = "Runner"
+texture = ExtResource("2_u23b3")
+damage = 2
+move_speed = 2
+metadata/_custom_type_script = "uid://tnxg66jw03v3"

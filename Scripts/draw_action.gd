@@ -22,7 +22,6 @@ func execute(target) -> void:
 	# Calculate how many cards to draw
 	var cards_to_draw = _calculate_card_count()
 	
-	print("Drawing %d cards" % cards_to_draw)
 	
 	# Draw cards without passing time
 	for i in cards_to_draw:

@@ -30,8 +30,6 @@ func execute(target: Enemy) -> void:
 	# Max range is typically 5, min is 0 (at player)
 	var new_range = clamp(current_range + distance, 0, 5)
 	
-	print("Push/Pull: Enemy at range %d moved to range %d (distance: %d)" % [old_range, new_range, distance])
-	
 	# If range actually changed, emit the movement signal
 	if new_range != old_range:
 		target.current_range = new_range

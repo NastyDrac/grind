@@ -12,12 +12,10 @@ var block : int = 0
 @onready var sprite = $Sprite2D
 @onready var block_display = $TextureProgressBar/ColorRect if has_node("TextureProgressBar/ColorRect") else null
 @onready var block_label = $TextureProgressBar/ColorRect/Label if has_node("TextureProgressBar/ColorRect/Label") else null
-
 var run_manager : RunManager
 
 func _ready() -> void:
 	Global.item_picked_up.connect(collect_item.bind())
-	print(Global.item_picked_up.is_connected(collect_item))
 func position_character():
 	# Get the range manager to use its positioning logic
 	sprite.texture = character_data.character_image
@@ -55,10 +53,8 @@ func position_character():
 		
 		var health_bar_width = health_bar.size.x
 		health_bar.global_position = Vector2(left_x - health_bar_width / 2, center_y + 100)
-
-func take_hit(who : Enemy, damage : int):
-	print("You've been hit by " + who.data.enemy_name + " for " + str(damage) + " damage.")
 	
+func take_hit(who : Enemy, damage : int):
 	for con : Condition in character_data.special_effects:
 		if con.has_method("modify_damage"):
 			damage = con.modify_damage(damage)

@@ -45,7 +45,10 @@ var targeting_arrow : Line2D
 
 # Deck management
 var deck_cards : Array[CardData] = []
-var draw_amount : int = 1
+
+@export_category("Draw Mode")
+@export var discard_and_draw_mode : bool = false ## When true, discards hand and draws X cards. When false, draws 1 card per time pass.
+@export var cards_to_draw : int = 5 ## Number of cards to draw when in discard_and_draw_mode
 
 func _ready():
 	pass
@@ -264,7 +267,6 @@ func _process_next_action():
 	# Check if this action requires player targeting
 	if current_action.requires_player_target():
 		if _can_reuse_targets(current_action):
-			print("reusing targets from previous action")
 			_execute_action_on_targets(current_action, stored_targets)
 			current_action_index += 1
 			_process_next_action()
@@ -387,8 +389,51 @@ func discard(card : Card):
 
 func pass_time():
 	Global.time_passed.emit()
+	
+	if discard_and_draw_mode:
+		# Discard entire hand (with animation)
+		await discard_hand()
+		# Draw X cards one at a time
+		await draw_multiple_cards(cards_to_draw)
+	else:
+		# Draw single card (original behavior)
+		if draw_stack.is_empty():
+			reshuffle_discard_into_draw()
+			
+		# Check again after reshuffle - deck might be truly empty
+		if not draw_stack.is_empty():
+			var card = draw_stack.pop_front()
+			draw_cards(card)
 
-	for i in draw_amount:
+func draw_cards(card : Card):
+	if card:
+		add_card_to_hand(card)
+
+func discard_hand():
+	"""Discards all cards currently in hand"""
+	var cards_to_discard = cards_in_hand.duplicate()
+	cards_in_hand.clear()
+	card_position.clear()
+	
+	# Start all discard animations and wait for them to complete
+	var discard_tweens = []
+	for card in cards_to_discard:
+		card.reparent(self)
+		var tween = create_tween()
+		tween.tween_property(card, "position", discard_pile.global_position, .5)
+		discard_tweens.append(tween)
+	
+	# Wait for all discards to finish
+	for tween in discard_tweens:
+		await tween.finished
+	
+	# Now move cards to discard pile
+	for card in cards_to_discard:
+		card.reparent(discard_pile)
+
+func draw_multiple_cards(amount: int):
+	"""Draws multiple cards from the draw pile, one at a time with animation"""
+	for i in amount:
 		if draw_stack.is_empty():
 			reshuffle_discard_into_draw()
 		
@@ -396,13 +441,12 @@ func pass_time():
 		if not draw_stack.is_empty():
 			var card = draw_stack.pop_front()
 			draw_cards(card)
+			# Wait for the card animation to complete before drawing next
+			await get_tree().create_timer(0.2).timeout
 		else:
-			print("Cannot draw - no cards available in deck or discard pile")
+			# If still empty after reshuffle, no more cards exist
+			print("No more cards to draw - deck is empty")
 			break
-
-func draw_cards(card : Card):
-	if card:
-		add_card_to_hand(card)
 	
 func reshuffle_discard_into_draw():
 	for card in discard_pile.get_children():

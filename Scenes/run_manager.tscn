@@ -1,4 +1,4 @@
-[gd_scene load_steps=19 format=3 uid="uid://cssup3trfa1rg"]
+[gd_scene load_steps=22 format=3 uid="uid://cssup3trfa1rg"]
 
 [ext_resource type="Script" uid="uid://nami4xhnpwrm" path="res://Scripts/run_manager.gd" id="1_u1n32"]
 [ext_resource type="Script" uid="uid://0gsjrx47no8b" path="res://Scripts/card_data.gd" id="2_0y178"]
@@ -9,11 +9,14 @@
 [ext_resource type="Script" uid="uid://clvjn77csx1a0" path="res://Scripts/AttackAction.gd" id="5_4clwt"]
 [ext_resource type="Resource" uid="uid://bupn6mkodwnrl" path="res://Cards/suppressing_fire.tres" id="5_fqwpn"]
 [ext_resource type="Resource" uid="uid://bcyo1vpisqc4w" path="res://Cards/cascading_blow.tres" id="6_df7m0"]
+[ext_resource type="Resource" uid="uid://cbqh0adhu4wkg" path="res://Cards/shove.tres" id="7_0c4k1"]
 [ext_resource type="Resource" uid="uid://c2xwf8l4o67yn" path="res://Characters/regalur_guy.tres" id="7_712fo"]
 [ext_resource type="Script" uid="uid://tnxg66jw03v3" path="res://Scripts/enemy_data.gd" id="8_obnx0"]
 [ext_resource type="Resource" uid="uid://bfr5bliq5oiih" path="res://Enemies/crawler.tres" id="8_qhjl3"]
 [ext_resource type="Script" uid="uid://c8bk1dof3250" path="res://Scripts/event_data.gd" id="10_obnx0"]
 [ext_resource type="Resource" uid="uid://ctuj8hs6x6q5q" path="res://events/gas_station.tres" id="11_rqa6y"]
+[ext_resource type="PackedScene" uid="uid://dc08wv3l8mie2" path="res://Scenes/character_sheet.tscn" id="12_4nan2"]
+[ext_resource type="Resource" uid="uid://byxygfcotqt5s" path="res://Enemies/runner.tres" id="15_dic3b"]
 
 [sub_resource type="Resource" id="Resource_obnx0"]
 script = ExtResource("4_6jyer")
@@ -41,7 +44,8 @@ metadata/_custom_type_script = "uid://0gsjrx47no8b"
 
 [node name="RunManager" type="Node2D"]
 script = ExtResource("1_u1n32")
-deck = Array[ExtResource("2_0y178")]([ExtResource("3_obnx0"), ExtResource("4_rqa6y"), ExtResource("5_fqwpn"), ExtResource("6_df7m0"), SubResource("Resource_4nan2"), SubResource("Resource_4nan2")])
+deck = Array[ExtResource("2_0y178")]([ExtResource("3_obnx0"), ExtResource("4_rqa6y"), ExtResource("5_fqwpn"), ExtResource("6_df7m0"), ExtResource("7_0c4k1"), SubResource("Resource_4nan2")])
 character = ExtResource("7_712fo")
-horde = Array[ExtResource("8_obnx0")]([ExtResource("8_qhjl3"), ExtResource("8_qhjl3"), ExtResource("8_qhjl3"), ExtResource("8_qhjl3"), ExtResource("8_qhjl3")])
+character_sheet_scene = ExtResource("12_4nan2")
+horde = Array[ExtResource("8_obnx0")]([ExtResource("8_qhjl3"), ExtResource("8_qhjl3"), ExtResource("8_qhjl3"), ExtResource("15_dic3b"), ExtResource("15_dic3b")])
 available_events = Array[ExtResource("10_obnx0")]([ExtResource("11_rqa6y")])

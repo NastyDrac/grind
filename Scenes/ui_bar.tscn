@@ -27,7 +27,6 @@ layout_mode = 2
 
 [node name="hp label" type="Label" parent="UI Bar/HBoxContainer"]
 layout_mode = 2
-text = "42/64"
 
 [node name="gold icon" type="TextureRect" parent="UI Bar/HBoxContainer"]
 layout_mode = 2

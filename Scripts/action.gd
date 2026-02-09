@@ -56,18 +56,21 @@ func _get_stat_value(character: Character, stat_type: Stat.STAT) -> int:
 # Helper to format formula for display with stat names (not values)
 func _format_formula_display(formula: String) -> String:
 	var display = formula
-	
-	# Capitalize stat names
-	display = display.replace("grit", "Grit")
-	display = display.replace("rugged", "Rugged")
-	display = display.replace("iconic", "Iconic")
-	display = display.replace("nerd", "Nerd")
-	display = display.replace("daring", "Daring")
-	
+
+		# Capitalize stat names
+		 
+	#display = display.replace("swag", "[img]res://Art/swag.png[/img]")
+	#display = display.replace("marbles", "[img]res://Art/marbles.png[/img]")
+	#display = display.replace("guts", "[img]res://Art/guts.png[/img]")
+	#display = display.replace("hustle", "[img]res://Art/hustle.png[/img]")
+	#display = display.replace("bang", "[img]res://Art/bang.png[/img]")
+	#display = display.replace("mojo", "[img]res://Art/mojo.png[/img]")
+
+
+
 	# Replace operators with symbols
 	display = display.replace("*", " x ")
 	display = display.replace("/", " / ")
 	display = display.replace("+", " + ")
 	display = display.replace("-", " - ")
-	
 	return display

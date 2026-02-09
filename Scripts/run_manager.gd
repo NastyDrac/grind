@@ -13,6 +13,10 @@ var range_manager : RangeManager
 var ui_bar : UIBar
 @export var character : CharacterData
 
+# Character sheet reference
+@export var character_sheet_scene : PackedScene  # Assign in editor: res://Scenes/character_sheet.tscn
+var current_character_sheet : PopupPanel = null
+
 # Initial wave setup
 @export var initial_enemy_count : int = 3
 @export var initial_spawn_range : int = 5
@@ -75,6 +79,7 @@ func begin_wave():
 	create_range_manager()    # Create range_manager FIRST
 	create_player()           # Then create player - now range_manager exists
 	create_card_handler()
+	ui_bar.set_health()
 
 func spawn_initial_enemies():
 	if range_manager.enemy_pool.is_empty():
@@ -117,6 +122,85 @@ func create_ui():
 	ui.run_manager = self
 	add_child(ui)
 	ui_bar = ui
+
+# ===== CHARACTER SHEET METHODS =====
+
+func show_base_character_sheet():
+	"""
+	Shows the character sheet with BASE stats (unmodified).
+	Call this from events or outside of combat.
+	"""
+	if not character_sheet_scene:
+		push_error("Character sheet scene not assigned! Assign it in the RunManager inspector.")
+		return
+	
+	# Close existing sheet if open
+	if current_character_sheet:
+		current_character_sheet.queue_free()
+	
+	# Create new sheet
+	current_character_sheet = character_sheet_scene.instantiate()
+	add_child(current_character_sheet)
+	
+	# Connect to popup_hide signal to track when sheet is closed
+	current_character_sheet.popup_hide.connect(_on_character_sheet_closed)
+	
+	# Setup with base stats
+	current_character_sheet.setup_base_stats(character)
+	
+	# Show the popup
+	current_character_sheet.popup_centered()
+	
+	return current_character_sheet
+
+func show_combat_character_sheet():
+	"""
+	Shows the character sheet with LIVE combat stats (including modifications).
+	Call this during combat to see current buffed/debuffed stats.
+	"""
+	if not character_sheet_scene:
+		push_error("Character sheet scene not assigned! Assign it in the RunManager inspector.")
+		return
+	
+	if not player:
+		push_error("Cannot show combat character sheet - no player instance exists!")
+		return
+	
+	# Close existing sheet if open
+	if current_character_sheet:
+		current_character_sheet.queue_free()
+	
+	# Create new sheet
+	current_character_sheet = character_sheet_scene.instantiate()
+	add_child(current_character_sheet)
+	
+	# Connect to popup_hide signal to track when sheet is closed
+	current_character_sheet.popup_hide.connect(_on_character_sheet_closed)
+	
+	# Setup with combat stats
+	current_character_sheet.setup_combat_stats(player)
+	
+	# Show the popup
+	current_character_sheet.popup_centered()
+	
+	return current_character_sheet
+
+func close_character_sheet():
+	"""Closes the currently open character sheet"""
+	if current_character_sheet:
+		current_character_sheet.queue_free()
+		current_character_sheet = null
+		_on_character_sheet_closed()
+
+func _on_character_sheet_closed():
+	"""Called when character sheet is closed (either by user or programmatically)"""
+	current_character_sheet = null
+	# Notify UI bar that sheet is closed
+	if ui_bar:
+		ui_bar.is_character_sheet_open = false
+
+# ===== END CHARACTER SHEET METHODS =====
+	
 # Called when combat is won
 func on_combat_won():
 	# Clean up combat
