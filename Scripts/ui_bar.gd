@@ -8,10 +8,6 @@ var run_manager : RunManager
 # Track if character sheet is open
 var is_character_sheet_open : bool = false
 
-func _ready() -> void:
-	set_gold()
-	set_health()
-
 func set_health():
 	if run_manager and run_manager.player:
 		var max_hp = run_manager.character.max_health.calculate(run_manager.player)

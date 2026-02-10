@@ -1,0 +1,19 @@
+[gd_resource type="Resource" script_class="EnemyData" load_steps=6 format=3 uid="uid://2omyroag2mcs"]
+
+[ext_resource type="Script" uid="uid://b1ogi3xh5xakp" path="res://Scripts/condition.gd" id="1_ta775"]
+[ext_resource type="Script" uid="uid://tnxg66jw03v3" path="res://Scripts/enemy_data.gd" id="1_xh5ad"]
+[ext_resource type="Script" uid="uid://bgw241a265wyo" path="res://Scripts/bloated.gd" id="2_humab"]
+[ext_resource type="Texture2D" uid="uid://4hxb8t3bka1x" path="res://Art/bloater.png" id="4_humab"]
+
+[sub_resource type="Resource" id="Resource_pheru"]
+script = ExtResource("2_humab")
+stacks = 5
+metadata/_custom_type_script = "uid://bgw241a265wyo"
+
+[resource]
+script = ExtResource("1_xh5ad")
+enemy_name = "Bloater"
+texture = ExtResource("4_humab")
+max_health = 15
+conditions = Array[ExtResource("1_ta775")]([SubResource("Resource_pheru")])
+metadata/_custom_type_script = "uid://tnxg66jw03v3"

@@ -87,7 +87,6 @@ func take_hit(who : Enemy, damage : int):
 
 func set_health_bar():
 	if health_bar:
-		print(str(health) + "/" + str(character_data.max_health.calculate(self)))
 		health_bar.max_value = character_data.max_health.calculate(self)
 		health_bar.value = max(0, health)
 

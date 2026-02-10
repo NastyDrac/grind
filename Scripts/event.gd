@@ -102,11 +102,13 @@ func _process_option_results(option: EventOption):
 		return
 	
 	# Apply gold changes
+	print(run_manager.character.gold)
 	if option.gold_cost > 0:
-		run_manager.gold -= option.gold_cost
+		run_manager.character.gold -= option.gold_cost
+		print(run_manager.character.gold)
 	if option.gold_reward > 0:
 		run_manager.character.gold += option.gold_reward
-	
+	run_manager.ui_bar.set_gold()
 	# Apply health changes
 	if option.health_change != 0:
 		run_manager.character.current_health += option.health_change
@@ -114,9 +116,9 @@ func _process_option_results(option: EventOption):
 		run_manager.character.current_health = clamp(
 			run_manager.character.current_health,
 			0,
-			run_manager.character.max_health
+			run_manager.character.max_health.calculate(run_manager.player)
 		)
-	
+	run_manager.ui_bar.hp_label
 	# Add cards to deck
 	for card in option.cards_to_add:
 		run_manager.deck.append(card)

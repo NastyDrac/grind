@@ -22,6 +22,10 @@ var current_character_sheet : PopupPanel = null
 @export var initial_spawn_range : int = 5
 @export var horde : Array[EnemyData]
 
+# Win condition system
+@export var win_condition: WinCondition  # Assign in inspector or set in code
+var current_win_condition: WinCondition = null
+
 # Event system
 @export var available_events: Array[EventData] = []  # Pool of events to choose from
 var current_event_scene: EventScene = null
@@ -80,8 +84,39 @@ func begin_wave():
 	create_player()           # Then create player - now range_manager exists
 	create_card_handler()
 	ui_bar.set_health()
+	
+	# Initialize win condition
+	setup_win_condition()
+
+func setup_win_condition():
+	"""Initialize the win condition for this combat"""
+	if win_condition:
+		# Create a fresh instance of the win condition
+		current_win_condition = win_condition.duplicate(true)
+		current_win_condition.initialize(self)
+		
+		# Update UI if it has a method to show win condition
+		if ui_bar and ui_bar.has_method("set_win_condition"):
+			ui_bar.set_win_condition(current_win_condition)
+	else:
+		push_warning("No win condition set! Combat will not have a win condition.")
 
 func spawn_initial_enemies():
+	"""
+	Only spawn initial enemies if the win condition doesn't handle spawning itself.
+	For example, DefeatAllEnemies spawns its own wave.
+	"""
+	# Check if win condition handles its own spawning
+	if current_win_condition is DefeatAllEnemies:
+		# DefeatAllEnemies spawns its own wave, skip initial spawn
+		return
+	
+	if current_win_condition is SurviveXTurns:
+		# SurviveXTurns spawns enemies each turn, but we might want some initial enemies
+		# You can customize this behavior
+		pass
+	
+	# Default: spawn initial enemies from pool
 	if range_manager.enemy_pool.is_empty():
 		push_warning("No enemies in enemy_pool - cannot spawn initial enemies")
 		return
@@ -122,7 +157,8 @@ func create_ui():
 	ui.run_manager = self
 	add_child(ui)
 	ui_bar = ui
-
+	ui.set_gold()
+	ui.set_health()
 # ===== CHARACTER SHEET METHODS =====
 
 func show_base_character_sheet():
@@ -203,6 +239,11 @@ func _on_character_sheet_closed():
 	
 # Called when combat is won
 func on_combat_won():
+	# Clean up win condition
+	if current_win_condition:
+		current_win_condition.cleanup()
+		current_win_condition = null
+	
 	# Clean up combat
 	if range_manager:
 		range_manager.queue_free()
@@ -219,6 +260,11 @@ func on_combat_won():
 
 # Called when player dies
 func on_player_death():
+	# Clean up win condition
+	if current_win_condition:
+		current_win_condition.cleanup()
+		current_win_condition = null
+	
 	# Handle game over
 	print("Game Over!")
 	# You'll want to show a game over screen here

@@ -10,7 +10,7 @@ var target_position : Vector2
 var movement_speed : float = 10.0
 var selectable : bool = false
 var is_targeted : bool = false
-
+var conditions : Array[Condition] = []
 
 signal enemy_attack_player(enemy : Enemy, damage : int)
 signal enemy_moved(enemy : Enemy, old_range : int, new_range : int)
@@ -46,6 +46,9 @@ func set_data(enemy_data: EnemyData, spawn_range : int = 5):
 	sprite.texture = data.texture
 	resize_collision_shape()
 	set_health_bar()
+	if data.conditions and data.conditions.size() > 0:
+		for condition in data.conditions:
+			condition.apply_condition(self, condition)
 
 func take_damgage(amount : int):
 	current_health -= amount
@@ -70,7 +73,8 @@ func move_toward_player():
 	
 	# Otherwise, move closer
 	var old_range = current_range
-	current_range = max(0, current_range - data.move_speed)
+	# FIX: Changed max(0, ...) to max(1, ...) to prevent enemies from reaching range 0
+	current_range = max(1, current_range - data.move_speed)
 	
 	# Get new target position from range manager
 	if range_manager:

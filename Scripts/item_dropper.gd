@@ -12,6 +12,8 @@ func apply_condition(who, condition : Condition) -> void:
 		player = who
 		
 		# Connect to enemy death signal when condition is applied
+		if Global.enemy_dies.is_connected(_on_enemy_death):
+			return
 		Global.enemy_dies.connect(_on_enemy_death)
 
 

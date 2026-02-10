@@ -95,6 +95,5 @@ character_name = "Regalur Guy"
 character_image = ExtResource("1_8k2ij")
 max_health = SubResource("Resource_sjutl")
 stats = Array[ExtResource("1_8ety0")]([SubResource("Resource_8ety0"), SubResource("Resource_82thg"), SubResource("Resource_ml0kd"), SubResource("Resource_o2qd2"), SubResource("Resource_8k2ij"), SubResource("Resource_dvkhi")])
-gold = 15
 special_effects = Array[ExtResource("4_rw86x")]([SubResource("Resource_x6t1t")])
 metadata/_custom_type_script = "uid://dpayg0f6j5y2n"

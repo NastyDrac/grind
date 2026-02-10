@@ -8,3 +8,4 @@ class_name EnemyData
 @export var damage : int = 1
 @export var move_speed : int = 1
 @export var attack_range : int = 1
+@export var conditions : Array[Condition] = []
