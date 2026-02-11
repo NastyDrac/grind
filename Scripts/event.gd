@@ -341,6 +341,8 @@ func _finish_event(option: EventOption):
 	# Check if this triggers combat
 	if option.triggers_combat:
 		_start_combat(option)
+		if option.win_con:
+			run_manager.win_condition = option.win_con
 	else:
 		# No combat - just continue
 		event_completed.emit()

@@ -1,13 +1,13 @@
 extends Node2D
 class_name RangeManager
-@export var spread_multiplier : float = 1
+@export var spread_multiplier : float = .5
 @export var range_spacing: float = 200.0
 @export var y_spread_min: float = -300.0
-@export var y_spread_max: float = 300.0
+@export var y_spread_max: float = 100.0
 @export var enemy_scene: PackedScene = preload("res://Scenes/enemy.tscn")
 @export var screen_buffer_y : float = 50.0
 @export var wobble_speed := 1.0
-@export var wobble_amplitude := 5.0
+@export var wobble_amplitude := 2.5
 # Enemy pool for random spawning
 @export var enemy_pool: Array[EnemyData] = []
 @export var tiered_enemy_pools: Dictionary = {}  # tier (int) -> Array[EnemyData]
@@ -99,7 +99,7 @@ func spawn_enemy(enemy_data: EnemyData, spawn_range: int = 5) -> Enemy:
 		return null
 	
 	var enemy: Enemy = enemy_scene.instantiate()
-	
+	enemy.data = enemy_data
 	add_child(enemy)
 	enemy.set_data(enemy_data, spawn_range)
 	
@@ -304,8 +304,6 @@ func _input(event: InputEvent) -> void:
 				confirm_targets()
 				get_viewport().set_input_as_handled()
 
-func _process(delta: float) -> void:
-	pass
 
 func toggle_target(enemy: Enemy):
 	if not enemy:

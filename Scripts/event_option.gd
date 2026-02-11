@@ -34,7 +34,7 @@ enum CardSelectionType {
 @export var triggers_combat: bool = true  # Does this option lead to a fight?
 @export var combat_horde: Array[EnemyData] = []  # Which zombies appear if combat is triggered
 @export var combat_difficulty_modifier: float = 1.0  # Multiplier for enemy count/strength
-
+@export var win_con : WinCondition
 # Requirements (optional)
 @export_group("Requirements")
 @export var gold_cost: int = 0

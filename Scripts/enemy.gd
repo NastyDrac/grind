@@ -119,6 +119,7 @@ func get_visual_height() -> float:
 func set_health_bar():
 	health_bar.max_value = data.max_health
 	health_bar.value = current_health
+	$health_bar/Label.text = str(current_health)
 # ============================================================================
 # TARGETING VISUAL FEEDBACK
 # ============================================================================

@@ -13,6 +13,3 @@ class_name EventData
 
 # Optional: Gold cost to enter this event (if any)
 @export var gold_cost: int = 0
-
-# Optional: Can be used to categorize events (mall, gas_station, rest_stop, etc.)
-@export_enum("Mall", "Gas Station", "Rest Stop", "Abandoned Vehicle", "Roadblock", "Other") var event_type: String = "Other"
