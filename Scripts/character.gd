@@ -147,3 +147,37 @@ func collect_item(item : Item):
 		var amount = run_manager.rng.randi_range(item.item.min_amount, item.item.max_amount)
 		character_data.gold += amount
 		run_manager.ui_bar.set_gold()
+
+func toggle_visible(visible : bool):
+	sprite.visible = visible
+	health_bar.visible = visible  # FIXED!
+	if block_display:
+		block_display.visible = visible and block > 0
+
+func reset_for_new_wave():
+	"""Reset character to base state at the beginning of a new wave"""
+	# Reset block to 0
+	block = 0
+	display_block()
+	
+	# Reset health to current stored value (in case it was modified)
+	health = character_data.current_health
+	set_health_bar()
+	
+	# Clear any temporary conditions
+	# Note: This assumes all conditions in special_effects during combat are temporary
+	# If you have permanent conditions, you'll need to track them separately
+	if character_data.special_effects:
+		# Remove all current conditions
+		for condition in character_data.special_effects:
+			if condition.has_method("remove_condition"):
+				condition.remove_condition(self)
+		
+		# Clear the array (you may want to keep base conditions instead)
+		# If you have base conditions that should persist, create a separate
+		# base_special_effects array on CharacterData and restore from that
+		character_data.special_effects.clear()
+	
+	# Update UI if available
+	if run_manager and run_manager.ui_bar:
+		run_manager.ui_bar.set_health()

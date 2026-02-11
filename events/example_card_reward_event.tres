@@ -1,0 +1,24 @@
+[gd_resource type="Resource" script_class="EventData" load_steps=7 format=3 uid="uid://dc6blxo3bgxci"]
+
+[ext_resource type="Script" uid="uid://ccujthovl5rv7" path="res://Scripts/event_option.gd" id="1_option"]
+[ext_resource type="Script" uid="uid://0gsjrx47no8b" path="res://Scripts/card_data.gd" id="2_7vva7"]
+[ext_resource type="Script" uid="uid://c8bk1dof3250" path="res://Scripts/event_data.gd" id="2_event"]
+[ext_resource type="Script" uid="uid://tnxg66jw03v3" path="res://Scripts/enemy_data.gd" id="3_2tj5m"]
+
+[sub_resource type="Resource" id="Resource_card_reward"]
+script = ExtResource("1_option")
+option_text = "Search the abandoned vehicle"
+result_text = "You find some useful supplies in the trunk!"
+triggers_combat = false
+
+[sub_resource type="Resource" id="Resource_leave"]
+script = ExtResource("1_option")
+option_text = "Keep moving"
+result_text = "You decide not to waste time and continue on your way."
+triggers_combat = false
+
+[resource]
+script = ExtResource("2_event")
+event_title = "Abandoned Car"
+event_description = "You spot an abandoned car on the side of the road. The doors are unlocked and it looks like it was left in a hurry."
+options = Array[ExtResource("1_option")]([SubResource("Resource_card_reward"), SubResource("Resource_leave")])

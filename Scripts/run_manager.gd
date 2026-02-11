@@ -7,7 +7,7 @@ var rng : RandomNumberGenerator
 
 var card_handler : CardHandler 
 var player : Character
-
+var draft_amount : int = 3
 @export var deck : Array[CardData]
 var range_manager : RangeManager 
 var ui_bar : UIBar
@@ -30,6 +30,9 @@ var current_win_condition: WinCondition = null
 @export var available_events: Array[EventData] = []  # Pool of events to choose from
 var current_event_scene: EventScene = null
 
+# Draft screen reference
+var current_draft_screen: DraftScreen = null
+
 # Game state
 enum GameState { EVENT, COMBAT }
 var current_state: GameState = GameState.EVENT
@@ -42,6 +45,10 @@ func begin_run(seed : int = -1):
 		run_seed = seed
 	rng.seed = run_seed
 	create_ui()
+	
+	# Create player at start so it exists for card descriptions during events
+	create_player()
+	player.toggle_visible(false)  # Keep hidden during events
 
 func _ready() -> void:
 	begin_run()
@@ -81,7 +88,16 @@ func begin_combat():
 
 func begin_wave():
 	create_range_manager()    # Create range_manager FIRST
-	create_player()           # Then create player - now range_manager exists
+	
+	# Player now exists from begin_run(), just show and reset it
+	if player:
+		player.toggle_visible(true)
+		player.reset_for_new_wave()  # Reset player state for new wave
+	else:
+		# Fallback: create player if somehow it doesn't exist
+		create_player()
+		player.toggle_visible(true)
+		
 	create_card_handler()
 	ui_bar.set_health()
 	
@@ -252,8 +268,8 @@ func on_combat_won():
 		card_handler.queue_free()
 		card_handler = null
 	if player:
-		player.queue_free()
-		player = null
+		player.toggle_visible(false)
+		
 	
 	# Show next event
 	show_random_event()
@@ -268,3 +284,60 @@ func on_player_death():
 	# Handle game over
 	print("Game Over!")
 	# You'll want to show a game over screen here
+	
+func get_random_card_data() -> CardData:
+	var dir := DirAccess.open("res://Cards/")
+	if dir == null:
+		push_error("Could not open Cards directory")
+		return null
+	var card_paths := []
+
+	dir.list_dir_begin()
+	var file_name := dir.get_next()
+
+	while file_name != "":
+		if not dir.current_is_dir() and file_name.ends_with(".tres"):
+			card_paths.append("res://Cards/" + file_name)
+		file_name = dir.get_next()
+
+	dir.list_dir_end()
+
+	if card_paths.is_empty():
+		push_error("No CardData files found in Cards directory")
+		return null
+
+	var random_path = card_paths[randi() % card_paths.size()]
+	var new_card : CardData = load(random_path)
+	return new_card
+
+# ===== DRAFT SCREEN METHODS =====
+
+func create_draft_screen():
+	"""Creates and displays a draft screen with random card options"""
+	# Close any existing draft screen
+	if current_draft_screen:
+		current_draft_screen.queue_free()
+	
+	# Load and instantiate the draft screen scene
+	var draft_screen_scene = load("res://Scenes/draft_screen.tscn")
+	if not draft_screen_scene:
+		push_error("Could not load draft_screen.tscn - make sure the scene exists at res://Scenes/draft_screen.tscn")
+		return
+	
+	current_draft_screen = draft_screen_scene.instantiate()
+	add_child(current_draft_screen)
+	
+	# Display the card options (this will show 3 random cards by default)
+	current_draft_screen.display_card_options(self)
+	
+	# Optional: Connect to any signals you need
+	# For example, if you want to know when the draft is complete:
+	# current_draft_screen.draft_completed.connect(_on_draft_completed)
+
+func close_draft_screen():
+	"""Closes the currently open draft screen"""
+	if current_draft_screen:
+		current_draft_screen.queue_free()
+		current_draft_screen = null
+
+# ===== END DRAFT SCREEN METHODS =====

@@ -7,6 +7,7 @@
 
 [sub_resource type="Resource" id="Resource_102ou"]
 script = ExtResource("2_6floy")
+formula = "guts"
 metadata/_custom_type_script = "uid://cgrxhw8vqenhu"
 
 [sub_resource type="Resource" id="Resource_jkusx"]

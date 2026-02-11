@@ -1,0 +1,60 @@
+[gd_scene load_steps=3 format=3 uid="uid://bs3jsnqv11ogm"]
+
+[ext_resource type="Script" uid="uid://dq5t6xgporfgu" path="res://Scripts/draftable_card.gd" id="1_sy0bn"]
+[ext_resource type="Texture2D" uid="uid://cvje2yu82wwpk" path="res://Art/blank_card.png" id="6_v8mr2"]
+
+[node name="DraftableCard" type="AspectRatioContainer"]
+offset_right = 200.0
+offset_bottom = 300.0
+scale = Vector2(0.75, 0.75)
+pivot_offset = Vector2(100, 150)
+size_flags_horizontal = 3
+size_flags_vertical = 3
+script = ExtResource("1_sy0bn")
+metadata/_edit_use_anchors_ = true
+
+[node name="BlankCard" type="TextureRect" parent="."]
+layout_mode = 2
+texture = ExtResource("6_v8mr2")
+
+[node name="title" type="RichTextLabel" parent="BlankCard"]
+layout_mode = 0
+offset_left = 10.666667
+offset_top = 14.0
+offset_right = 191.66667
+offset_bottom = 46.0
+mouse_filter = 2
+theme_override_font_sizes/normal_font_size = 14
+text = "Card Name"
+fit_content = true
+scroll_active = false
+autowrap_mode = 2
+
+[node name="description" type="RichTextLabel" parent="BlankCard"]
+layout_mode = 0
+offset_left = 12.0
+offset_top = 183.33334
+offset_right = 186.0
+offset_bottom = 288.33334
+mouse_filter = 2
+theme_override_font_sizes/normal_font_size = 12
+bbcode_enabled = true
+autowrap_mode = 2
+horizontal_alignment = 1
+
+[node name="cost" type="RichTextLabel" parent="BlankCard"]
+custom_minimum_size = Vector2(200, 300)
+layout_mode = 0
+offset_left = 169.33333
+offset_top = 3.3333335
+offset_right = 369.33337
+offset_bottom = 303.33334
+mouse_filter = 2
+theme_override_colors/default_color = Color(1, 0, 0, 1)
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_override_constants/outline_size = 5
+theme_override_font_sizes/normal_font_size = 30
+text = "2"
+
+[connection signal="mouse_entered" from="." to="." method="_on_mouse_entered"]
+[connection signal="mouse_exited" from="." to="." method="_on_mouse_exited"]
