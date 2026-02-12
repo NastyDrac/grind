@@ -44,7 +44,7 @@ horizontal_alignment = 1
 vertical_alignment = 1
 
 [node name="IntentIndicator" type="Sprite2D" parent="." node_paths=PackedStringArray("enemy")]
-position = Vector2(-76, -31)
+position = Vector2(-62, -31)
 script = ExtResource("4_287tu")
 enemy = NodePath("..")
 metadata/_custom_type_script = "uid://c6expubttir7l"

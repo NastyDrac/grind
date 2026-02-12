@@ -1,17 +1,17 @@
 extends Node2D
 class_name RangeManager
-@export var spread_multiplier : float = .5
+@export var spread_multiplier : float = .6
 @export var range_spacing: float = 200.0
 @export var y_spread_min: float = -300.0
 @export var y_spread_max: float = 100.0
 @export var enemy_scene: PackedScene = preload("res://Scenes/enemy.tscn")
-@export var screen_buffer_y : float = 50.0
+@export var screen_buffer_y : float = 75.0
 @export var wobble_speed := 1.0
 @export var wobble_amplitude := 2.5
 # Enemy pool for random spawning
 @export var enemy_pool: Array[EnemyData] = []
 @export var tiered_enemy_pools: Dictionary = {}  # tier (int) -> Array[EnemyData]
-@export var center_ratio := .33
+@export var center_ratio := .4
 # Spawn mode configuration
 enum SpawnMode {
 	IMMEDIATE,      # Spawn enemies instantly when card is played
@@ -258,7 +258,7 @@ func _get_y_for_enemy(enemy: Enemy, range_num: int) -> float:
 	var spacing = total_spread / (enemy_count - 1)
 	var half_spread = total_spread / 2.0
 
-	var base_y = center_y - half_spread + (enemy_index * spacing)
+	var base_y = center_y - half_spread + (enemy_index * spacing) 
 
 	# Wobble
 	var wobble = sin(Time.get_ticks_msec() / 1000.0 * wobble_speed + enemy.get_instance_id()) * wobble_amplitude
