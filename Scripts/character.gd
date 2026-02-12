@@ -13,9 +13,22 @@ var block : int = 0
 @onready var block_display = $TextureProgressBar/ColorRect if has_node("TextureProgressBar/ColorRect") else null
 @onready var block_label = $TextureProgressBar/ColorRect/Label if has_node("TextureProgressBar/ColorRect/Label") else null
 var run_manager : RunManager
+var conditions : Array[Condition] = []
 
 func _ready() -> void:
 	Global.item_picked_up.connect(collect_item.bind())
+	Global.apply_condition.connect(_on_apply_condition)  # FIXED: Changed method name for clarity
+
+# FIXED: Proper signal handler that lets the condition manage itself
+func _on_apply_condition(target, condition_to_apply: Condition):
+	# Only process if this character is the target
+	if target != self:
+		return
+	
+	# Let the condition handle its own application logic
+	# The condition will check for existing instances, manage stacks, etc.
+	condition_to_apply.apply_condition(self, condition_to_apply)
+
 func position_character():
 	# Get the range manager to use its positioning logic
 	sprite.texture = character_data.character_image

@@ -1,4 +1,4 @@
-[gd_resource type="Resource" script_class="CharacterData" load_steps=23 format=3 uid="uid://c2xwf8l4o67yn"]
+[gd_resource type="Resource" script_class="CharacterData" load_steps=24 format=3 uid="uid://c2xwf8l4o67yn"]
 
 [ext_resource type="Script" uid="uid://dpayg0f6j5y2n" path="res://Scripts/character_data.gd" id="1_5j4wt"]
 [ext_resource type="Script" uid="uid://b2h1ochum01o" path="res://Scripts/stat.gd" id="1_8ety0"]
@@ -7,6 +7,7 @@
 [ext_resource type="Resource" uid="uid://dj6ttthval7yo" path="res://items/gold.tres" id="4_dvkhi"]
 [ext_resource type="Script" uid="uid://b1ogi3xh5xakp" path="res://Scripts/condition.gd" id="4_rw86x"]
 [ext_resource type="Script" uid="uid://dfo48c3dx2d7" path="res://Scripts/item_dropper.gd" id="5_p2jjl"]
+[ext_resource type="Texture2D" uid="uid://djuhw2u6q4ql4" path="res://Art/gold-bar.png" id="5_rw86x"]
 
 [sub_resource type="Resource" id="Resource_sjutl"]
 script = ExtResource("2_8k2ij")
@@ -22,6 +23,10 @@ metadata/_custom_type_script = "uid://cgrxhw8vqenhu"
 script = ExtResource("5_p2jjl")
 chance = SubResource("Resource_nsmxn")
 item = ExtResource("4_dvkhi")
+condition_name = "Gold Digger"
+stacks = 1
+icon = ExtResource("5_rw86x")
+description = "enemies have a chance to drop gold"
 metadata/_custom_type_script = "uid://dfo48c3dx2d7"
 
 [sub_resource type="Resource" id="Resource_rw86x"]

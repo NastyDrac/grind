@@ -1,7 +1,7 @@
 @abstract
 extends Resource
 class_name Condition
-
+@export var condition_name : String
 @export var stacks : int = 0
 
 # Optional: Icon or texture for UI display
@@ -11,7 +11,7 @@ class_name Condition
 @export var description: String = ""
 
 # Reference to the enemy this condition is attached to
-var enemy : Enemy
+var entity 
 
 # Apply this condition to an enemy or character
 # Override this in subclasses to implement specific condition logic
@@ -40,6 +40,9 @@ func get_existing_condition(who: Enemy, condition_type) -> Condition:
 
 # Get the display name of this condition
 func get_condition_name() -> String:
+	if condition_name:
+		return condition_name
+		
 	var script = get_script()
 	if script:
 		var this_class = script.get_global_name()

@@ -1,0 +1,10 @@
+[gd_scene load_steps=2 format=3 uid="uid://bbkuvbcc140cr"]
+
+[ext_resource type="Script" uid="uid://tx05aeu75a0s" path="res://Scripts/condition_container.gd" id="1_7ebu0"]
+
+[node name="ConditionContainer" type="HBoxContainer"]
+offset_right = 200.0
+offset_bottom = 40.0
+script = ExtResource("1_7ebu0")
+
+[connection signal="mouse_entered" from="." to="." method="_on_mouse_entered"]

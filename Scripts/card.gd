@@ -57,15 +57,14 @@ func refresh_description():
 	var regex = RegEx.new()
 	regex.compile("§(\\d+)§")
 	desc = regex.sub(desc, "[color=green]$1[/color]", true)
-	desc = desc.replace("swag", "[img=36x36]res://Art/swag.png[/img]")
-	desc = desc.replace("marbles", "[img=36x36]res://Art/marbles.png[/img]")
-	desc = desc.replace("guts", "[img=36x36]res://Art/guts.png[/img]")
-	desc = desc.replace("hustle", "[img=36x36]res://Art/hustle.png[/img]")
-	desc = desc.replace("bang", "[img=36x36]res://Art/bang.png[/img]")
-	desc = desc.replace("mojo", "[img=36x36]res://Art/mojo.png[/img]")
+	desc = desc.replace("swag", "[img=24x24]res://Art/swag.png[/img]")
+	desc = desc.replace("marbles", "[img=24x24]res://Art/marbles.png[/img]")
+	desc = desc.replace("guts", "[img=24x24]res://Art/guts.png[/img]")
+	desc = desc.replace("hustle", "[img=24x24]res://Art/hustle.png[/img]")
+	desc = desc.replace("bang", "[img=24x24]res://Art/bang.png[/img]")
+	desc = desc.replace("mojo", "[img=24x24]res://Art/mojo.png[/img]")
 	
-	#if not description:
-	#	return
+
 	
 	description.parse_bbcode(desc) 
 

@@ -3,7 +3,7 @@ extends Node
 # Card actions
 signal card_played(card_data: CardData)  # When player plays a card
 signal time_passed()
-
+signal apply_condition(target, condition : Condition)
 # Enemy actions
 signal enemy_advanced(enemy : Enemy, new_range : int)  # All enemies move forward or attack
 signal enemy_spawned(enemy: Enemy)

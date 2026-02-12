@@ -11,26 +11,38 @@ var movement_speed : float = 10.0
 var selectable : bool = false
 var is_targeted : bool = false
 var conditions : Array[Condition] = []
+var run_manager  # Add this so conditions can access it (for ItemDropper)
 
 signal enemy_attack_player(enemy : Enemy, damage : int)
 signal enemy_moved(enemy : Enemy, old_range : int, new_range : int)
 
 @onready var sprite := $Sprite2D
-var condition : Array[Condition]
+
 # Visual feedback nodes (you'll add these to your enemy scene)
 # These can be null if you haven't created them yet
 @onready var selection_highlight = $SelectionHighlight if has_node("SelectionHighlight") else null
 @onready var target_highlight = $TargetHighlight if has_node("TargetHighlight") else null
 @onready var health_bar = $health_bar
+
 func _ready():
-	# Connect to global signal
+	# Connect to global signals
 	Global.time_passed.connect(_on_enemies_advance)
+	Global.apply_condition.connect(_on_apply_condition)  # ADDED: Connect to apply_condition signal
 	
 	# Initialize visual feedback
 	if selection_highlight:
 		selection_highlight.visible = false
 	if target_highlight:
 		target_highlight.visible = false
+
+# ADDED: Handler for apply_condition signal
+func _on_apply_condition(target, condition_to_apply: Condition):
+	# Only process if this enemy is the target
+	if target != self:
+		return
+	
+	# Let the condition handle its own application logic
+	condition_to_apply.apply_condition(self, condition_to_apply)
 
 func resize_collision_shape():
 	$Sprite2D/Area2D/CollisionShape2D.shape.size = data.texture.get_size()
@@ -57,7 +69,6 @@ func take_damgage(amount : int):
 		die()
 
 func die():
-
 	Global.enemy_dies.emit(self)
 	queue_free()
 
@@ -120,6 +131,7 @@ func set_health_bar():
 	health_bar.max_value = data.max_health
 	health_bar.value = current_health
 	$health_bar/Label.text = str(current_health)
+
 # ============================================================================
 # TARGETING VISUAL FEEDBACK
 # ============================================================================

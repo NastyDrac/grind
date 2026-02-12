@@ -1,9 +1,10 @@
-[gd_scene load_steps=6 format=3 uid="uid://cywrpc6rwp61b"]
+[gd_scene load_steps=7 format=3 uid="uid://cywrpc6rwp61b"]
 
 [ext_resource type="Script" uid="uid://cwk187k7dxx42" path="res://Scripts/enemy.gd" id="1_hghv2"]
 [ext_resource type="Texture2D" uid="uid://cxdbsw4i5raf4" path="res://Art/test health bar.png" id="2_1f0kj"]
 [ext_resource type="Texture2D" uid="uid://b2rjhiy4rifig" path="res://icon.svg" id="2_afpow"]
 [ext_resource type="Script" uid="uid://c6expubttir7l" path="res://Scripts/intent_indicator.gd" id="4_287tu"]
+[ext_resource type="Script" uid="uid://tx05aeu75a0s" path="res://Scripts/condition_container.gd" id="5_0830c"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_hghv2"]
 
@@ -48,6 +49,13 @@ position = Vector2(-62, -31)
 script = ExtResource("4_287tu")
 enemy = NodePath("..")
 metadata/_custom_type_script = "uid://c6expubttir7l"
+
+[node name="ConditionContainer" type="HBoxContainer" parent="." node_paths=PackedStringArray("entity")]
+offset_right = 40.0
+offset_bottom = 40.0
+script = ExtResource("5_0830c")
+entity = NodePath("..")
+metadata/_custom_type_script = "uid://tx05aeu75a0s"
 
 [connection signal="mouse_entered" from="Sprite2D/Area2D" to="." method="_on_area_2d_mouse_entered"]
 [connection signal="mouse_exited" from="Sprite2D/Area2D" to="." method="_on_area_2d_mouse_exited"]

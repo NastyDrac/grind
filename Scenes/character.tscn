@@ -1,8 +1,9 @@
-[gd_scene load_steps=5 format=3 uid="uid://cbl8iajlurx01"]
+[gd_scene load_steps=6 format=3 uid="uid://cbl8iajlurx01"]
 
 [ext_resource type="Script" uid="uid://bg47q17trvyam" path="res://Scripts/character.gd" id="1_owm7s"]
 [ext_resource type="Resource" uid="uid://c2xwf8l4o67yn" path="res://Characters/regalur_guy.tres" id="2_nytcm"]
 [ext_resource type="Texture2D" uid="uid://b2rjhiy4rifig" path="res://icon.svg" id="3_owm7s"]
+[ext_resource type="Script" uid="uid://tx05aeu75a0s" path="res://Scripts/condition_container.gd" id="4_ejsiy"]
 [ext_resource type="Texture2D" uid="uid://cxdbsw4i5raf4" path="res://Art/test health bar.png" id="4_nytcm"]
 
 [node name="Character" type="Node" groups=["player"]]
@@ -46,3 +47,12 @@ offset_bottom = 44.0
 theme_override_colors/font_color = Color(0, 0, 0, 1)
 theme_override_font_sizes/font_size = 34
 text = "7"
+
+[node name="ConditionContainer" type="HBoxContainer" parent="TextureProgressBar" node_paths=PackedStringArray("entity")]
+layout_mode = 0
+offset_top = 14.46
+offset_right = 40.0
+offset_bottom = 54.46
+script = ExtResource("4_ejsiy")
+entity = NodePath("../..")
+metadata/_custom_type_script = "uid://tx05aeu75a0s"

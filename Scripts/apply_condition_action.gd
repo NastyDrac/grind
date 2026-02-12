@@ -15,14 +15,6 @@ func execute(target: Variant) -> void:
 		push_error("ApplyConditionAction requires valid player")
 		return
 	
-	if not condition_resource:
-		push_error("ApplyConditionAction requires a condition_resource")
-		return
-	
-	if not stacks_calculator:
-		push_error("ApplyConditionAction requires a stacks_calculator")
-		return
-	
 	# Calculate stacks
 	var stacks_to_apply = stacks_calculator.calculate(player)
 	
@@ -31,10 +23,7 @@ func execute(target: Variant) -> void:
 	condition_to_apply.stacks = stacks_to_apply
 	
 	# Apply condition to target (target should be an Enemy)
-	if target is Enemy:
-		condition_to_apply.apply_condition(target, condition_to_apply)
-	else:
-		push_warning("ApplyConditionAction can only target Enemy types")
+	Global.apply_condition.emit(target, condition_to_apply)
 
 func get_description_with_values(character: Variant) -> String:
 	if not character or not stacks_calculator or not condition_resource:
