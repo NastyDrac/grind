@@ -12,7 +12,7 @@ var sprite: Sprite2D
 signal item_collected(item: Item)
 
 func _ready():
-	# Create sprite programmatically if it doesn't exist
+	
 	if not has_node("Sprite2D"):
 		sprite = Sprite2D.new()
 		sprite.name = "Sprite2D"
@@ -20,16 +20,16 @@ func _ready():
 	else:
 		sprite = $Sprite2D
 	
-	# Set the texture if we have item data
+	
 	if item and item.icon:
 		sprite.texture = item.icon
 	
-	# Connect to time passed signal for movement
+	
 	Global.time_passed.connect(_on_time_passed)
 	
-	# Auto-pickup if item has auto_pickup flag
+	
 	if item and item.auto_pickup:
-		# Collect immediately on next frame
+		
 		call_deferred("collect_item")
 
 func set_item(data: ItemData):
@@ -37,7 +37,7 @@ func set_item(data: ItemData):
 	if sprite and item.icon:
 		sprite.texture = item.icon
 	
-	# Check for auto-pickup when item is set
+	
 	if item and item.auto_pickup and is_inside_tree():
 		call_deferred("collect_item")
 
@@ -48,7 +48,7 @@ func get_current_range() -> int:
 	return current_range
 
 func _process(delta: float) -> void:
-	# Smoothly lerp to target position
+	
 	global_position = global_position.lerp(target_position, movement_speed * delta)
 
 func update_target_position():
@@ -57,39 +57,39 @@ func update_target_position():
 		target_position = range_manager.get_position_for_item(self)
 
 func _on_time_passed():
-	# Don't advance if auto-pickup (already collected)
+	
 	if item and item.auto_pickup:
 		return
 	
 	advance_toward_player()
 
 func advance_toward_player():
-	# Move one range closer to player
+	
 	var old_range = current_range
 	current_range = max(0, current_range - 1)
 	
-	# If we reach range 0, collect the item
+	
 	if current_range == 0:
 		collect_item()
 	else:
-		# Update position in range manager
+		
 		if range_manager:
-			# Remove from old range
+			
 			if range_manager.items_by_range.has(old_range):
 				range_manager.items_by_range[old_range].erase(self)
 			
-			# Add to new range
+		
 			if not range_manager.items_by_range.has(current_range):
 				range_manager.items_by_range[current_range] = []
 			
 			if not range_manager.items_by_range[current_range].has(self):
 				range_manager.items_by_range[current_range].append(self)
 			
-			# Update positions for both ranges (so other items reposition)
+			
 			range_manager._update_item_positions(old_range)
 			range_manager._update_item_positions(current_range)
 			
-			# Update OUR target position for smooth lerp to new range
+			
 			update_target_position()
 
 func collect_item():

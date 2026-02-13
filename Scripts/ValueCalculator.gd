@@ -3,7 +3,7 @@ class_name ValueCalculator
 
 @export_multiline var formula: String = "grit"
 
-# Cached expression
+
 var _expression: Expression = null
 var _compiled: bool = false
 
@@ -15,7 +15,7 @@ func calculate(player : Character) -> int:
 
 
 func _calculate_formula(player : Character) -> int:
-	# Compile expression if needed
+	
 	if not _compiled:
 		_compile_expression()
 	
@@ -23,7 +23,7 @@ func _calculate_formula(player : Character) -> int:
 		push_error("Expression failed to compile")
 		return 0
 	
-	# Build stat values array - find actual stat values from player
+	
 	var swag_stat = _find_stat_from_character(player, Stat.STAT.SWAG)
 	var guts_stat = _find_stat_from_character(player, Stat.STAT.GUTS)
 	var bang_stat = _find_stat_from_character(player, Stat.STAT.BANG)
@@ -31,7 +31,7 @@ func _calculate_formula(player : Character) -> int:
 	var marbles_stat = _find_stat_from_character(player, Stat.STAT.MARBLES)
 	var mojo_stat = _find_stat_from_character(player, Stat.STAT.MOJO)
 	
-	# Execute expression with values as array
+	
 	var result = _expression.execute([swag_stat, guts_stat, bang_stat, hustle_stat, marbles_stat, mojo_stat])
 	
 	if _expression.has_execute_failed():

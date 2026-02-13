@@ -20,16 +20,15 @@ func set_data(card_data : CardData):
 	title.text = data.card_name
 	cost.text = str(data.card_cost)
 	
-	# Enable BBCode for colored text
 	if description is RichTextLabel:
 		description.bbcode_enabled = true
 	
 	refresh_description()
 	
-	# Connect to player stats AFTER setting data
+
 	_connect_to_player_stats()
 
-# Refresh the description with current stat values
+
 func refresh_description():
 	var swag = preload("res://Art/swag.png")
 	var marbles = preload("res://Art/marbles.png")
@@ -53,7 +52,7 @@ func refresh_description():
 		desc += action.get_description_with_values(player)
 	
 	
-	# Convert § markers to green colored values using regex
+	
 	var regex = RegEx.new()
 	regex.compile("§(\\d+)§")
 	desc = regex.sub(desc, "[color=green]$1[/color]", true)

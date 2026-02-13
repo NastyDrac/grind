@@ -17,7 +17,6 @@ func execute(target : Enemy) -> void:
 	target.take_damgage(damage_calculator.calculate(player))
 	var damage = _calculate_damage()
 	
-	# Emit attack signal - the system will handle armor/block/etc
 	if target:
 		Global.player_attacks.emit(player, target, damage)
 
@@ -28,13 +27,13 @@ func get_description_with_values(character: Character) -> String:
 	if not damage_calculator:
 		return ""
 	
-	# Calculate damage value
+
 	var damage = damage_calculator.calculate(character)
 	
-	# Format the formula with stat names (not values)
+
 	var formula_display = _format_formula_display(damage_calculator.formula)
 	
-	# Build description based on targeting
+
 	var desc = ""
 	
 	match target_type:
@@ -80,7 +79,7 @@ func _calculate_enemy_count_from_character(character: Character) -> int:
 		return enemy_count_calculator.calculate(character)
 	return 1
 
-# Helper method for CardData to know how many enemies to target
+
 func get_enemy_count(character: Character) -> int:
 	if target_type == TargetType.X_ENEMIES_UP_TO_RANGE:
 		return _calculate_enemy_count_from_character(character)
@@ -89,6 +88,6 @@ func get_enemy_count(character: Character) -> int:
 func get_max_range() -> int:
 	return max_range
 
-# Override from Action base class
+
 func get_num_targets(character: Character) -> int:
 	return _calculate_enemy_count_from_character(character)

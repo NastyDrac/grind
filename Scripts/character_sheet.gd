@@ -1,14 +1,14 @@
 extends PopupPanel
 
-# Mode: determines what data source to use
+
 enum DisplayMode { BASE_STATS, COMBAT_STATS }
 var display_mode : DisplayMode = DisplayMode.BASE_STATS
 
-# References to data sources
-var character_data : CharacterData  # Base character data (unmodified)
-var character_instance : Character  # Live character during combat (with modifications)
 
-# Node references (cached for performance)
+var character_data : CharacterData  
+var character_instance : Character 
+
+
 @onready var character_image = $VBoxContainer/HBoxContainer/TextureRect
 @onready var health_bar = $VBoxContainer/HBoxContainer/Control/TextureProgressBar
 @onready var swag_label = $VBoxContainer/HBoxContainer/VBoxContainer/VBoxContainer/guts_label
@@ -20,7 +20,6 @@ var character_instance : Character  # Live character during combat (with modific
 @onready var effects_label = $VBoxContainer/VBoxContainer/Label2
 
 func _ready():
-	# Wait for setup before populating
 	pass
 
 func setup_base_stats(data: CharacterData):
@@ -35,29 +34,29 @@ func setup_combat_stats(character: Character):
 	character_instance = character
 	character_data = character.character_data
 	
-	# Connect to stats changed signal to auto-update during combat
+
 	if not character_instance.stats_changed.is_connected(refresh):
 		character_instance.stats_changed.connect(refresh)
 	
 	populate_character_sheet()
 
 func populate_character_sheet():
-	"""Populates all UI elements with data based on display mode"""
+
 	if not character_data:
-		push_error("No character data assigned to character sheet!")
+
 		return
 	
-	# Set character image
+
 	if character_data.character_image:
 		character_image.texture = character_data.character_image
 	
-	# Set health bar
+
 	update_health_bar()
 	
-	# Set stats
+
 	update_stats()
 	
-	# Set special effects
+
 	update_effects()
 
 func update_health_bar():
@@ -67,8 +66,7 @@ func update_health_bar():
 	
 	match display_mode:
 		DisplayMode.BASE_STATS:
-			# Show base max health - use a temporary character reference for calculation
-			# Since we're showing base stats, current_health from character_data is fine
+			
 			var max_hp = _calculate_base_max_health()
 			var current_hp = character_data.current_health
 			
@@ -76,26 +74,23 @@ func update_health_bar():
 			health_bar.value = current_hp
 			
 		DisplayMode.COMBAT_STATS:
-			# Show live combat health from character instance
 			if character_instance:
 				health_bar.max_value = character_data.max_health.calculate(character_instance)
 				health_bar.value = character_instance.health
 
 func _calculate_base_max_health() -> int:
 	"""Calculate max health using base stats only"""
-	# For base stats, we need to create a temporary calculation
-	# This is a simplified version - adjust based on your formula
+
 	if character_instance:
-		# If we have an instance, use it
+
 		return character_data.max_health.calculate(character_instance)
 	else:
-		# Create temporary stat values for calculation
+
 		var stat_dict = {}
 		for stat in character_data.stats:
 			stat_dict[stat.stat_type] = stat.value
 		
-		# Simple fallback: return a base value or calculated value
-		# You may need to adjust this based on your max_health formula
+		
 		return character_data.max_health.calculate(null) if character_data.max_health else 100
 
 func update_stats():
@@ -105,10 +100,10 @@ func update_stats():
 	
 	match display_mode:
 		DisplayMode.BASE_STATS:
-			# Show base stats from character_data
+
 			_update_base_stats()
 		DisplayMode.COMBAT_STATS:
-			# Show modified stats from character instance
+
 			_update_combat_stats()
 
 func _update_base_stats():
@@ -117,7 +112,7 @@ func _update_base_stats():
 		return
 	
 	for stat in character_data.stats:
-		# For base stats, just use the value directly
+
 		var base_value = stat.value
 		match stat.stat_type:
 			Stat.STAT.SWAG:
@@ -139,11 +134,10 @@ func _update_combat_stats():
 		return
 	
 	for stat in character_instance.stats:
-		var current_value = stat.value  # This includes all modifications
+		var current_value = stat.value  
 		var display_text = str(current_value)
 		
-		# Optionally show base value too if modified
-		# Check if base_value property exists using "in" operator
+	
 		if "base_value" in stat and stat.value != stat.base_value:
 			display_text = "%d (%d)" % [current_value, stat.base_value]
 		
@@ -173,7 +167,7 @@ func update_effects():
 		for effect in character_data.special_effects:
 			if effects_text != "":
 				effects_text += "\n"
-			# Assuming Condition has a description or name property
+			
 			if "description" in effect:
 				effects_text += effect.description
 			elif "name" in effect:

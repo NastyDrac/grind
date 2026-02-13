@@ -13,27 +13,27 @@ var range_manager : RangeManager
 var ui_bar : UIBar
 @export var character : CharacterData
 
-# Character sheet reference
-@export var character_sheet_scene : PackedScene  # Assign in editor: res://Scenes/character_sheet.tscn
+
+@export var character_sheet_scene : PackedScene  
 var current_character_sheet : PopupPanel = null
 
-# Initial wave setup
+
 @export var initial_enemy_count : int = 3
 @export var initial_spawn_range : int = 5
 @export var horde : Array[EnemyData]
 
-# Win condition system
-@export var win_condition: WinCondition  # Assign in inspector or set in code
+
+@export var win_condition: WinCondition  
 var current_win_condition: WinCondition = null
 
-# Event system
-@export var available_events: Array[EventData] = []  # Pool of events to choose from
+
+@export var available_events: Array[EventData] = []  
 var current_event_scene: EventScene = null
 
-# Draft screen reference
+
 var current_draft_screen: DraftScreen = null
 
-# Game state
+
 enum GameState { EVENT, COMBAT }
 var current_state: GameState = GameState.EVENT
 
@@ -46,15 +46,15 @@ func begin_run(seed : int = -1):
 	rng.seed = run_seed
 	create_ui()
 	
-	# Create player at start so it exists for card descriptions during events
+	
 	create_player()
-	player.toggle_visible(false)  # Keep hidden during events
+	player.toggle_visible(false)  
 
 func _ready() -> void:
 	begin_run()
 	Global.card_played.connect(_on_card_played)
 	
-	# Start with an event instead of combat
+	
 	show_random_event()
 
 func show_random_event():
@@ -65,21 +65,20 @@ func show_random_event():
 	
 	current_state = GameState.EVENT
 	
-	# Pick a random event
+	
 	var event = available_events.pick_random()
 	
-	# Create and show the event scene
+	
 	current_event_scene = load("res://Scenes/event_scene.tscn").instantiate()
 	current_event_scene.run_manager = self
 	current_event_scene.current_event = event
 	add_child(current_event_scene)
 	
-	# Connect to event completion
+	
 	current_event_scene.event_completed.connect(_on_event_completed)
 
 func _on_event_completed():
 	current_event_scene = null
-	# After event, start combat (the zombie horde blocking the way back to the car)
 	begin_combat()
 
 func begin_combat():
@@ -87,31 +86,29 @@ func begin_combat():
 	begin_wave()
 
 func begin_wave():
-	create_range_manager()    # Create range_manager FIRST
+	create_range_manager()    
 	
-	# Player now exists from begin_run(), just show and reset it
+	
 	if player:
 		player.toggle_visible(true)
-		player.reset_for_new_wave()  # Reset player state for new wave
+		player.reset_for_new_wave()  
 	else:
-		# Fallback: create player if somehow it doesn't exist
+		
 		create_player()
 		player.toggle_visible(true)
 		
 	create_card_handler()
 	ui_bar.set_health()
 	
-	# Initialize win condition
+
 	setup_win_condition()
 
 func setup_win_condition():
 	"""Initialize the win condition for this combat"""
 	if win_condition:
-		# Create a fresh instance of the win condition
 		current_win_condition = win_condition.duplicate(true)
 		current_win_condition.initialize(self)
 		
-		# Update UI if it has a method to show win condition
 		if ui_bar and ui_bar.has_method("set_win_condition"):
 			ui_bar.set_win_condition(current_win_condition)
 	else:
@@ -122,17 +119,13 @@ func spawn_initial_enemies():
 	Only spawn initial enemies if the win condition doesn't handle spawning itself.
 	For example, DefeatAllEnemies spawns its own wave.
 	"""
-	# Check if win condition handles its own spawning
+	
 	if current_win_condition is DefeatAllEnemies:
-		# DefeatAllEnemies spawns its own wave, skip initial spawn
 		return
 	
 	if current_win_condition is SurviveXTurns:
-		# SurviveXTurns spawns enemies each turn, but we might want some initial enemies
-		# You can customize this behavior
 		pass
 	
-	# Default: spawn initial enemies from pool
 	if range_manager.enemy_pool.is_empty():
 		push_warning("No enemies in enemy_pool - cannot spawn initial enemies")
 		return
@@ -165,7 +158,7 @@ func create_card_handler():
 func create_player():
 	player = load("res://Scenes/character.tscn").instantiate()
 	add_child(player)
-	player.run_manager = self  # ADD THIS LINE - set run_manager BEFORE set_data
+	player.run_manager = self  
 	player.set_data(character)
 
 func create_ui():
@@ -186,21 +179,21 @@ func show_base_character_sheet():
 		push_error("Character sheet scene not assigned! Assign it in the RunManager inspector.")
 		return
 	
-	# Close existing sheet if open
+	
 	if current_character_sheet:
 		current_character_sheet.queue_free()
 	
-	# Create new sheet
+	
 	current_character_sheet = character_sheet_scene.instantiate()
 	add_child(current_character_sheet)
 	
-	# Connect to popup_hide signal to track when sheet is closed
+	
 	current_character_sheet.popup_hide.connect(_on_character_sheet_closed)
 	
-	# Setup with base stats
+	
 	current_character_sheet.setup_base_stats(character)
 	
-	# Show the popup
+	
 	current_character_sheet.popup_centered()
 	
 	return current_character_sheet
@@ -218,21 +211,21 @@ func show_combat_character_sheet():
 		push_error("Cannot show combat character sheet - no player instance exists!")
 		return
 	
-	# Close existing sheet if open
+	
 	if current_character_sheet:
 		current_character_sheet.queue_free()
 	
-	# Create new sheet
+	
 	current_character_sheet = character_sheet_scene.instantiate()
 	add_child(current_character_sheet)
 	
-	# Connect to popup_hide signal to track when sheet is closed
+	
 	current_character_sheet.popup_hide.connect(_on_character_sheet_closed)
 	
-	# Setup with combat stats
+	
 	current_character_sheet.setup_combat_stats(player)
 	
-	# Show the popup
+	
 	current_character_sheet.popup_centered()
 	
 	return current_character_sheet
@@ -247,20 +240,17 @@ func close_character_sheet():
 func _on_character_sheet_closed():
 	"""Called when character sheet is closed (either by user or programmatically)"""
 	current_character_sheet = null
-	# Notify UI bar that sheet is closed
+	
 	if ui_bar:
 		ui_bar.is_character_sheet_open = false
 
 # ===== END CHARACTER SHEET METHODS =====
 	
-# Called when combat is won
 func on_combat_won():
-	# Clean up win condition
 	if current_win_condition:
 		current_win_condition.cleanup()
 		current_win_condition = null
 	
-	# Clean up combat
 	if range_manager:
 		range_manager.queue_free()
 		range_manager = null
@@ -271,19 +261,18 @@ func on_combat_won():
 		player.toggle_visible(false)
 		
 	
-	# Show next event
+	
 	show_random_event()
 
-# Called when player dies
+
 func on_player_death():
-	# Clean up win condition
 	if current_win_condition:
 		current_win_condition.cleanup()
 		current_win_condition = null
 	
-	# Handle game over
+	
 	print("Game Over!")
-	# You'll want to show a game over screen here
+	
 	
 func get_random_card_data() -> CardData:
 	var dir := DirAccess.open("res://Cards/")
@@ -314,11 +303,11 @@ func get_random_card_data() -> CardData:
 
 func create_draft_screen():
 	"""Creates and displays a draft screen with random card options"""
-	# Close any existing draft screen
+	
 	if current_draft_screen:
 		current_draft_screen.queue_free()
 	
-	# Load and instantiate the draft screen scene
+	
 	var draft_screen_scene = load("res://Scenes/draft_screen.tscn")
 	if not draft_screen_scene:
 		push_error("Could not load draft_screen.tscn - make sure the scene exists at res://Scenes/draft_screen.tscn")
@@ -327,12 +316,10 @@ func create_draft_screen():
 	current_draft_screen = draft_screen_scene.instantiate()
 	add_child(current_draft_screen)
 	
-	# Display the card options (this will show 3 random cards by default)
+	
 	current_draft_screen.display_card_options(self)
 	
-	# Optional: Connect to any signals you need
-	# For example, if you want to know when the draft is complete:
-	# current_draft_screen.draft_completed.connect(_on_draft_completed)
+
 
 func close_draft_screen():
 	"""Closes the currently open draft screen"""

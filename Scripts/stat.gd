@@ -13,7 +13,7 @@ func modify_stat(amount : int):
 	var modified_amount = amount * modify_value
 	value += modified_amount
 	
-	# Emit signal to notify listeners that this stat has changed
+	
 	stat_modified.emit(stat_type, value)
 func get_value() -> int:
 	if value_calc and character:

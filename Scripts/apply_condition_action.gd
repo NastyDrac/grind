@@ -15,14 +15,14 @@ func execute(target: Variant) -> void:
 		push_error("ApplyConditionAction requires valid player")
 		return
 	
-	# Calculate stacks
+
 	var stacks_to_apply = stacks_calculator.calculate(player)
 	
-	# Create a copy of the condition with the calculated stacks
+
 	var condition_to_apply = condition_resource.duplicate(true)
 	condition_to_apply.stacks = stacks_to_apply
 	
-	# Apply condition to target (target should be an Enemy)
+	
 	Global.apply_condition.emit(target, condition_to_apply)
 
 func get_description_with_values(character: Variant) -> String:
@@ -33,7 +33,7 @@ func get_description_with_values(character: Variant) -> String:
 	var formula_display = _format_formula_display(stacks_calculator.formula)
 	var condition_name = _get_condition_name()
 	
-	# Build description based on targeting
+
 	var desc = ""
 	
 	match target_type:

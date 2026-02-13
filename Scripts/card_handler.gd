@@ -47,23 +47,17 @@ var targeting_arrow : Line2D
 var deck_cards : Array[CardData] = []
 
 @export_category("Draw Mode")
-@export var discard_and_draw_mode : bool = false ## When true, discards hand and draws X cards. When false, draws 1 card per time pass.
-@export var cards_to_draw : int = 5 ## Number of cards to draw when in discard_and_draw_mode
+@export var discard_and_draw_mode : bool = false
+@export var cards_to_draw : int = 5 
 
 func _ready():
 	pass
 
 func initialize():
-	"""Called by RunManager after run_manager is set"""
-	if not run_manager or not run_manager.range_manager:
-		push_error("Cannot initialize CardHandler - run_manager or range_manager is null")
-		return
-	
 	# Connect to range manager targeting signals
 	run_manager.range_manager.targeting_cancelled.connect(_on_targeting_cancelled)
 	run_manager.range_manager.targets_confirmed.connect(_on_targets_confirmed)
 	
-	# Create targeting arrow
 	_create_targeting_arrow()
 
 func _create_targeting_arrow():
@@ -208,7 +202,6 @@ func _update_frozen_card(delta: float):
 		selected_card.scale = selected_card.scale.lerp(frozen_card_scale, hover_transition_speed * delta)
 		selected_card.rotation_degrees = lerp(selected_card.rotation_degrees, 0.0, hover_transition_speed * delta)
 		
-		# Update targeting arrow from card to mouse
 		if targeting_arrow:
 			var card_global_pos = selected_card.global_position
 			var mouse_pos = get_viewport().get_mouse_position()
@@ -228,7 +221,6 @@ func play_card(card: Card):
 	
 	selected_card = card
 	
-	# Store position BEFORE removing from hand
 	var stored_position = Vector2.ZERO
 	var stored_scale = base_scale * hover_scale
 	if card_position.has(card):
@@ -238,18 +230,16 @@ func play_card(card: Card):
 		stored_position = card.position
 		stored_scale = card.scale
 	
-	# Immediately remove from hand to prevent exploitation
 	cards_in_hand.erase(selected_card)
 	card_position.erase(selected_card)
 	
-	# Set frozen card position for animation
+
 	frozen_card_position = stored_position
 	frozen_card_scale = stored_scale
 	
 	stored_targets.clear()
 	store_target_type = Action.TargetType.SINGLE_ENEMY
 	stored_max_range = 0
-	# Process actions
 	current_action_index = 0
 	_process_next_action()
 
@@ -257,14 +247,12 @@ func _process_next_action():
 	if not selected_card or not selected_card.data:
 		return
 	
-	# If we've processed all actions, complete the card
 	if current_action_index >= selected_card.data.actions.size():
 		_complete_card_play()
 		return
 	
 	current_action = selected_card.data.actions[current_action_index]
 	
-	# Check if this action requires player targeting
 	if current_action.requires_player_target():
 		if _can_reuse_targets(current_action):
 			_execute_action_on_targets(current_action, stored_targets)
@@ -289,7 +277,6 @@ func _can_reuse_targets(action : Action) -> bool:
 func _start_targeting_for_action(action: Action):
 	is_targeting = true
 	
-	# Start targeting mode in range manager
 	run_manager.range_manager.start_targeting(
 		action.target_type,
 		action.max_range,
@@ -305,7 +292,6 @@ func _execute_action_without_targeting(action: Action):
 			_execute_action_on_targets(action, [run_manager.player])
 
 func _execute_action_on_targets(action: Action, targets: Array):
-	# Ensure action has player reference
 	if not action.player:
 		action.player = run_manager.player
 	
@@ -315,7 +301,6 @@ func _execute_action_on_targets(action: Action, targets: Array):
 func _on_targets_confirmed(targets: Array[Enemy]):
 	is_targeting = false
 	
-	# Hide targeting arrow
 	if targeting_arrow:
 		targeting_arrow.hide_arrow()
 	
@@ -324,30 +309,26 @@ func _on_targets_confirmed(targets: Array[Enemy]):
 	stored_max_range = current_action.max_range
 	
 	
-	# Execute the current action with the selected targets
 	var targets_array: Array = []
 	targets_array.assign(targets)
 	_execute_action_on_targets(current_action, targets_array)
 	
-	# Move to next action
 	current_action_index += 1
 	_process_next_action()
 
 func _on_targeting_cancelled():
 	is_targeting = false
 	
-	# Hide targeting arrow
 	if targeting_arrow:
 		targeting_arrow.hide_arrow()
 	
 	stored_targets.clear()
-	# Return card to hand instead of discarding it
 	if selected_card:
-		# Make sure the card is parented to hand
+	
 		if selected_card.get_parent() != hand:
 			selected_card.reparent(hand)
 		
-		# Add it back to cards_in_hand array
+		
 		if not cards_in_hand.has(selected_card):
 			cards_in_hand.append(selected_card)
 		
@@ -356,29 +337,25 @@ func _on_targeting_cancelled():
 	current_action = null
 	current_action_index = 0
 	
-	# Clear hover state
 	hovered_card = null
-	
-	# Re-enable hover and rearrange cards
 	arrange_cards()
 
 func _complete_card_play():
-	# Emit card played signal (spawns enemies)
 	Global.card_played.emit(selected_card.data)
 	
-	# Card was already removed from hand in play_card(), so just move to discard
+
 	selected_card.reparent(self)  
 	discard(selected_card)
 	
-	# Clean up
+
 	selected_card = null
 	current_action = null
 	current_action_index = 0
 	
-	# Clear hover state
+
 	hovered_card = null
 	
-	# Rearrange remaining cards
+
 	arrange_cards()
 
 func discard(card : Card):
@@ -391,16 +368,16 @@ func pass_time():
 	Global.time_passed.emit()
 	
 	if discard_and_draw_mode:
-		# Discard entire hand (with animation)
+		
 		await discard_hand()
-		# Draw X cards one at a time
+		
 		await draw_multiple_cards(cards_to_draw)
 	else:
-		# Draw single card (original behavior)
+	
 		if draw_stack.is_empty():
 			reshuffle_discard_into_draw()
 			
-		# Check again after reshuffle - deck might be truly empty
+		
 		if not draw_stack.is_empty():
 			var card = draw_stack.pop_front()
 			draw_cards(card)
@@ -415,7 +392,6 @@ func discard_hand():
 	cards_in_hand.clear()
 	card_position.clear()
 	
-	# Start all discard animations and wait for them to complete
 	var discard_tweens = []
 	for card in cards_to_discard:
 		card.reparent(self)
@@ -423,11 +399,10 @@ func discard_hand():
 		tween.tween_property(card, "position", discard_pile.global_position, .5)
 		discard_tweens.append(tween)
 	
-	# Wait for all discards to finish
+
 	for tween in discard_tweens:
 		await tween.finished
 	
-	# Now move cards to discard pile
 	for card in cards_to_discard:
 		card.reparent(discard_pile)
 
@@ -437,14 +412,13 @@ func draw_multiple_cards(amount: int):
 		if draw_stack.is_empty():
 			reshuffle_discard_into_draw()
 		
-		# Check again after reshuffle - deck might be truly empty
+	
 		if not draw_stack.is_empty():
 			var card = draw_stack.pop_front()
 			draw_cards(card)
-			# Wait for the card animation to complete before drawing next
+			
 			await get_tree().create_timer(0.2).timeout
 		else:
-			# If still empty after reshuffle, no more cards exist
 			print("No more cards to draw - deck is empty")
 			break
 	

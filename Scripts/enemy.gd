@@ -11,37 +11,34 @@ var movement_speed : float = 10.0
 var selectable : bool = false
 var is_targeted : bool = false
 var conditions : Array[Condition] = []
-var run_manager  # Add this so conditions can access it (for ItemDropper)
+var run_manager 
 
 signal enemy_attack_player(enemy : Enemy, damage : int)
 signal enemy_moved(enemy : Enemy, old_range : int, new_range : int)
 
 @onready var sprite := $Sprite2D
 
-# Visual feedback nodes (you'll add these to your enemy scene)
-# These can be null if you haven't created them yet
 @onready var selection_highlight = $SelectionHighlight if has_node("SelectionHighlight") else null
 @onready var target_highlight = $TargetHighlight if has_node("TargetHighlight") else null
 @onready var health_bar = $health_bar
 
 func _ready():
-	# Connect to global signals
-	Global.time_passed.connect(_on_enemies_advance)
-	Global.apply_condition.connect(_on_apply_condition)  # ADDED: Connect to apply_condition signal
 	
-	# Initialize visual feedback
+	Global.time_passed.connect(_on_enemies_advance)
+	Global.apply_condition.connect(_on_apply_condition)  
+	
+	
 	if selection_highlight:
 		selection_highlight.visible = false
 	if target_highlight:
 		target_highlight.visible = false
 
-# ADDED: Handler for apply_condition signal
+
 func _on_apply_condition(target, condition_to_apply: Condition):
-	# Only process if this enemy is the target
 	if target != self:
 		return
 	
-	# Let the condition handle its own application logic
+	
 	condition_to_apply.apply_condition(self, condition_to_apply)
 
 func resize_collision_shape():
@@ -72,33 +69,28 @@ func die():
 	Global.enemy_dies.emit(self)
 	queue_free()
 
-# Called when Global.enemies_advance is emitted (when player draws)
+# 
 func _on_enemies_advance():
 	move_toward_player()
 
 func move_toward_player():
-	# If within attack range, attack instead of moving
 	if current_range <= data.attack_range:
 		attack_player()
 		return
 	
-	# Otherwise, move closer
+	
 	var old_range = current_range
-	# FIX: Changed max(0, ...) to max(1, ...) to prevent enemies from reaching range 0
 	current_range = max(1, current_range - data.move_speed)
 	
-	# Get new target position from range manager
+	
 	if range_manager:
 		target_position = range_manager.get_position_for_enemy(self)
 	
 	enemy_moved.emit(self, old_range, current_range)
 	
-	# Check again if we're now in attack range after moving
-	#if current_range <= data.attack_range:
-	#	attack_player()
+
 
 func attack_player():
-	# Emit signal that enemy is attacking player
 	Global.enemy_attacks_player.emit(self, data.damage)
 
 func get_current_range() -> int:
@@ -151,35 +143,32 @@ func set_targeted(targeted: bool):
 	_update_visual_state()
 
 func _update_visual_state():
-	# Update selection highlight
+	
 	if selection_highlight:
 		selection_highlight.visible = selectable and not is_targeted
 	
-	# Update target highlight
+	
 	if target_highlight:
 		target_highlight.visible = is_targeted
 	
-	# Fallback: use sprite modulation if no highlight nodes exist
 	if not selection_highlight and not target_highlight:
 		if is_targeted:
-			sprite.modulate = Color(1.0, 1.0, 0.5)  # Yellow tint for targeted
+			sprite.modulate = Color(1.0, 1.0, 0.5) 
 		elif selectable:
-			sprite.modulate = Color(1.0, 1.0, 1.0)  # Normal for selectable
+			sprite.modulate = Color(1.0, 1.0, 1.0)  
 		else:
-			sprite.modulate = Color(0.7, 0.7, 0.7)  # Dimmed when not selectable
+			sprite.modulate = Color(0.7, 0.7, 0.7)  
 
 func _show_hover_feedback():
-	# Add a subtle highlight when hovering over selectable enemy
 	if not is_targeted:
 		if selection_highlight:
-			selection_highlight.modulate = Color(1.2, 1.2, 1.2)  # Brighten
+			selection_highlight.modulate = Color(1.2, 1.2, 1.2)  
 		elif not target_highlight:
-			sprite.modulate = Color(1.2, 1.2, 1.2)  # Brighten sprite
+			sprite.modulate = Color(1.2, 1.2, 1.2) 
 
 func _hide_hover_feedback():
-	# Remove hover highlight
 	if not is_targeted:
 		if selection_highlight:
-			selection_highlight.modulate = Color(1.0, 1.0, 1.0)  # Normal
+			selection_highlight.modulate = Color(1.0, 1.0, 1.0) 
 		elif not target_highlight:
-			_update_visual_state()  # Reset to appropriate state
+			_update_visual_state()  

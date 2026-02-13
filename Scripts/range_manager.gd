@@ -8,15 +8,15 @@ class_name RangeManager
 @export var screen_buffer_y : float = 75.0
 @export var wobble_speed := 1.0
 @export var wobble_amplitude := 2.5
-# Enemy pool for random spawning
+
 @export var enemy_pool: Array[EnemyData] = []
-@export var tiered_enemy_pools: Dictionary = {}  # tier (int) -> Array[EnemyData]
+@export var tiered_enemy_pools: Dictionary = {} 
 @export var center_ratio := .4
-# Spawn mode configuration
+
 enum SpawnMode {
-	IMMEDIATE,      # Spawn enemies instantly when card is played
-	ENERGY_BANKED,  # Bank energy, spawn when drawing
-	TIERED          # Higher cost = higher tier enemies
+	IMMEDIATE,      
+	ENERGY_BANKED, 
+	TIERED          
 }
 @export var spawn_mode: SpawnMode = SpawnMode.IMMEDIATE
 
@@ -24,7 +24,7 @@ var banked_energy: int = 0
 var enemies_by_range: Dictionary = {}
 var items_by_range : Dictionary = {}
 var run_manager : RunManager
-# Targeting system
+
 var enemy_hovered : Enemy
 var targeting : bool = false
 var targets : Array[Enemy] = []
@@ -32,7 +32,7 @@ var number_of_targets : int = 0
 var current_target_type : Action.TargetType
 var current_max_range : int = 0
 
-# Signals for targeting
+
 signal targeting_started()
 signal targeting_cancelled()
 signal targets_confirmed(targets: Array[Enemy])
@@ -42,7 +42,7 @@ func _initialize_ranges(max_range: int):
 		enemies_by_range[i] = []
 		items_by_range[i] = []
 
-# Main entry point for card costs
+
 func process_card_cost(cost: int):
 	match spawn_mode:
 		SpawnMode.IMMEDIATE:
@@ -56,16 +56,16 @@ func _ready() -> void:
 	add_to_group("range_manager")
 	_initialize_ranges(5)
 	
-	# Connect to global enemy death signal
+	
 	Global.enemy_dies.connect(_on_enemy_died)
 
-# Called when player draws a card (only relevant for ENERGY_BANKED mode)
+
 func process_card_draw():
 	if spawn_mode == SpawnMode.ENERGY_BANKED and banked_energy > 0:
 		_spawn_immediate(banked_energy)
 		banked_energy = 0
 
-# Mode 1: Spawn N random enemies immediately
+
 func _spawn_immediate(count: int):
 	if enemy_pool.is_empty():
 		push_warning("Enemy pool is empty!")
@@ -75,11 +75,11 @@ func _spawn_immediate(count: int):
 		var random_enemy = enemy_pool.pick_random()
 		spawn_enemy(random_enemy, 5)
 
-# Mode 2: Bank energy for later
+
 func _bank_energy(amount: int):
 	banked_energy += amount
 
-# Mode 3: Spawn enemies from tier-appropriate pool
+
 func _spawn_tiered(tier: int):
 	if not tiered_enemy_pools.has(tier):
 		push_warning("No enemies defined for tier %d" % tier)
@@ -105,14 +105,13 @@ func spawn_enemy(enemy_data: EnemyData, spawn_range: int = 5) -> Enemy:
 	
 	enemy.set_range_manager(self)
 	
-	# Set initial position BEFORE adding to the tracking system
-	# This prevents the enemy from lerping from (0,0)
+	
 	enemy.global_position = get_position_for_enemy(enemy)
-	enemy.target_position = enemy.global_position  # Start at target, no lerp on spawn
+	enemy.target_position = enemy.global_position  
 	
 	add_enemy(enemy)
 	
-	# Notify that enemy spawned
+	
 	Global.enemy_spawned.emit(enemy)
 	
 	return enemy
@@ -188,18 +187,18 @@ func spawn_item(item_data : ItemData, spawn_range : int, spawn_position : Vector
 	item.range_manager = self
 	add_child(item)
 	
-	# Add to tracking first (so _get_y_for_item can calculate properly)
+	
 	if not items_by_range.has(spawn_range):
 		items_by_range[spawn_range] = []
 	items_by_range[spawn_range].append(item)
 	
-	# Set initial position AFTER adding to tracking
+	
 	if spawn_position != Vector2.ZERO:
-		# Spawn at the specific position (e.g., where enemy died)
+		
 		item.global_position = spawn_position
 		item.target_position = spawn_position
 	else:
-		# Default: spawn at the range position
+		
 		var calculated_pos = get_position_for_item(item)
 		item.global_position = calculated_pos
 		item.target_position = calculated_pos
@@ -252,7 +251,7 @@ func _get_y_for_enemy(enemy: Enemy, range_num: int) -> float:
 	if enemy_index == -1:
 		return center_y
 
-	# Dynamic spread
+	
 	var max_h = get_max_enemy_height(enemies_at_range)
 	var total_spread = max_h * enemy_count * spread_multiplier
 	var spacing = total_spread / (enemy_count - 1)
@@ -290,7 +289,7 @@ func _on_enemy_moved(enemy: Enemy, old_range: int, new_range: int):
 
 func _input(event: InputEvent) -> void:
 	if targeting:
-		# Handle targeting input with higher priority
+		
 		if event.is_action_pressed("right click"):
 			cancel_targeting()
 			get_viewport().set_input_as_handled()
@@ -299,7 +298,7 @@ func _input(event: InputEvent) -> void:
 				toggle_target(enemy_hovered)
 				get_viewport().set_input_as_handled()
 		elif event.is_action_pressed("ui_accept"):
-			# Manual confirm with Enter/Space
+			
 			if targets.size() > 0:
 				confirm_targets()
 				get_viewport().set_input_as_handled()
@@ -309,9 +308,9 @@ func toggle_target(enemy: Enemy):
 	if not enemy:
 		return
 	
-	# Special handling for ALL_ENEMIES_AT_RANGE
+	
 	if current_target_type == Action.TargetType.ALL_ENEMIES_AT_RANGE:
-		# Select all enemies at this enemy's range
+		
 		var enemy_range = enemy.get_current_range()
 		targets.clear()
 		
@@ -324,18 +323,16 @@ func toggle_target(enemy: Enemy):
 		confirm_targets()
 		return
 	
-	# Normal toggle behavior for other target types
-	# If enemy is already targeted, remove it
+	
 	if targets.has(enemy):
 		targets.erase(enemy)
 		enemy.set_targeted(false)
-	# If we haven't reached the target limit, add it
+	
 	elif targets.size() < number_of_targets:
 		targets.append(enemy)
 		enemy.set_targeted(true)
 	
-	# Check if we have enough targets to auto-confirm
-	# OR if we've selected all available enemies
+	
 	var selectable_count = _count_selectable_enemies()
 	if targets.size() == number_of_targets or targets.size() == selectable_count:
 		confirm_targets()
@@ -353,15 +350,14 @@ func start_targeting(target_type: Action.TargetType, max_range: int, num_targets
 	number_of_targets = num_targets
 	targets.clear()
 	
-	# Make appropriate enemies selectable based on target type
+	
 	match target_type:
 		Action.TargetType.SINGLE_ENEMY, Action.TargetType.X_ENEMIES_UP_TO_RANGE:
 			_make_enemies_selectable_up_to_range(max_range)
 		Action.TargetType.ALL_ENEMIES_AT_RANGE:
-			# For this type, player needs to select which range
-			_make_all_ranges_selectable()
+			_make_enemies_selectable_up_to_range(max_range)
 		Action.TargetType.ALL_ENEMIES:
-			# This shouldn't need targeting - handled automatically
+			
 			pass
 	
 	targeting_started.emit()
@@ -382,7 +378,7 @@ func cancel_targeting():
 	targeting = false
 	number_of_targets = 0
 	
-	# Clear all enemy states
+	
 	for enemy in get_all_enemies():
 		enemy.make_unselectable()
 		enemy.set_targeted(false)
@@ -395,10 +391,10 @@ func cancel_targeting():
 func confirm_targets():
 	targeting = false
 	
-	# Clear all enemy states
+	
 	for enemy in get_all_enemies():
 		enemy.make_unselectable()
 		enemy.set_targeted(false)
 	
-	# Emit signal with confirmed targets
+	
 	targets_confirmed.emit(targets)
