@@ -8,19 +8,16 @@ class_name ItemDropper
 func apply_condition(who, condition: Condition) -> void:
 	entity = who
 	
-
 	var new_dropper = condition.duplicate(true)
 	new_dropper.entity = who
 	who.conditions.append(new_dropper)  
 	
-	
 	if not Global.enemy_dies.is_connected(new_dropper._on_enemy_death):
 		Global.enemy_dies.connect(new_dropper._on_enemy_death)
 
-func drop_item(enemy_range: int, enemy_position: Vector2):
 
+func drop_item(enemy_range: int, enemy_position: Vector2):
 	var run_manager = entity.run_manager
-	
 	if not run_manager:
 		return
 		
@@ -30,19 +27,11 @@ func drop_item(enemy_range: int, enemy_position: Vector2):
 	run_manager.range_manager.spawn_item(item, enemy_range, enemy_position)
 
 func _on_enemy_death(enemy: Enemy):
-	if not entity:
-		return
-	
-	
-	if enemy != entity:
-		return
-	
-
+	#if enemy != entity:
+	#	return
 	var run_manager = entity.run_manager
-	
 	if not run_manager:
 		return
-	
 	var drop_chance = chance.calculate(entity)
 	var roll = run_manager.rng.randi_range(0, 99)
 	

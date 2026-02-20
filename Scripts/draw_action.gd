@@ -24,29 +24,48 @@ func execute(target) -> void:
 	
 	
 	
+	# Draw cards immediately without waiting for animation
 	for i in cards_to_draw:
 		if card_handler.draw_stack.is_empty():
 			card_handler.reshuffle_discard_into_draw()
 		
 		if not card_handler.draw_stack.is_empty():
 			var card = card_handler.draw_stack.pop_front()
-			card_handler.draw_cards(card)
+			# Add directly to hand without animation during action execution
+			card.reparent(card_handler.hand)
+			card_handler.cards_in_hand.append(card)
+			
+	
+	# Arrange cards after all draws complete
+	card_handler.arrange_cards()
 
 func get_description_with_values(character: Character) -> String:
 	if not character or not card_count_calculator:
 		return "Draw cards"
 	
-	
 	var count = card_count_calculator.calculate(character)
+	var formula = card_count_calculator.formula
 	
+	# Only show formula if it's not just a simple number
+	var show_formula = not formula.is_valid_int()
 	
-	var formula_display = _format_formula_display(card_count_calculator.formula)
-	
-	
+	var desc = ""
 	if count == 1:
-		return "Draw: §%d§ card (%s)" % [count, formula_display]
+		if show_formula:
+			desc = "Draw §%d§ card (%s)" % [count, _format_formula_display(formula)]
+		else:
+			desc = "Draw §%d§ card" % count
 	else:
-		return "Draw: §%d§ cards (%s)" % [count, formula_display]
+		if show_formula:
+			desc = "Draw §%d§ cards (%s)" % [count, _format_formula_display(formula)]
+		else:
+			desc = "Draw §%d§ cards" % count
+	
+	# Add range inline if max_range > 0
+	if max_range > 0:
+		desc += " - Range: §%d§" % max_range
+	
+	return desc
 
 func _calculate_card_count() -> int:
 	if card_count_calculator and player:
@@ -54,6 +73,8 @@ func _calculate_card_count() -> int:
 	return 1
 
 func _get_card_handler() -> CardHandler:
+	if card_handler:
+		return card_handler
 	if player and player.run_manager and player.run_manager.card_handler:
 		return player.run_manager.card_handler
 	return null

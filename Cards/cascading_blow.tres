@@ -8,7 +8,7 @@
 
 [sub_resource type="Resource" id="Resource_xfp30"]
 script = ExtResource("2_0svjq")
-formula = "hustle * 2"
+formula = "hustle*2"
 metadata/_custom_type_script = "uid://cgrxhw8vqenhu"
 
 [sub_resource type="Resource" id="Resource_01g44"]

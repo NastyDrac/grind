@@ -1,0 +1,125 @@
+[gd_resource type="Resource" script_class="CharacterData" load_steps=28 format=3 uid="uid://ce6l5lqjxvcs6"]
+
+[ext_resource type="Texture2D" uid="uid://bdwqxwxli60bi" path="res://Art/engineer.png" id="1_486th"]
+[ext_resource type="Script" uid="uid://dpayg0f6j5y2n" path="res://Scripts/character_data.gd" id="1_t1uqq"]
+[ext_resource type="Script" uid="uid://b1ogi3xh5xakp" path="res://Scripts/condition.gd" id="2_th448"]
+[ext_resource type="Script" uid="uid://b2h1ochum01o" path="res://Scripts/stat.gd" id="3_wqn1a"]
+[ext_resource type="Script" uid="uid://cgrxhw8vqenhu" path="res://Scripts/ValueCalculator.gd" id="4_486th"]
+[ext_resource type="Texture2D" uid="uid://bd7k5vg61wl4u" path="res://Art/gear.png" id="5_xswsd"]
+[ext_resource type="Script" uid="uid://d2bewqoltjljo" path="res://Scripts/itemData.gd" id="6_kdvfq"]
+[ext_resource type="Script" uid="uid://dfo48c3dx2d7" path="res://Scripts/item_dropper.gd" id="7_qa6lw"]
+[ext_resource type="Script" uid="uid://bbikocjwp04x5" path="res://Scripts/scrap_collector.gd" id="8_486th"]
+
+[sub_resource type="Resource" id="Resource_livrn"]
+script = ExtResource("4_486th")
+formula = "10+guts"
+metadata/_custom_type_script = "uid://cgrxhw8vqenhu"
+
+[sub_resource type="Resource" id="Resource_5axbb"]
+script = ExtResource("4_486th")
+formula = "99"
+metadata/_custom_type_script = "uid://cgrxhw8vqenhu"
+
+[sub_resource type="Resource" id="Resource_mwbnt"]
+script = ExtResource("6_kdvfq")
+item_name = "Scrap"
+icon = ExtResource("5_xswsd")
+min_amount = 1
+max_amount = 1
+metadata/_custom_type_script = "uid://d2bewqoltjljo"
+
+[sub_resource type="Resource" id="Resource_v44ua"]
+script = ExtResource("7_qa6lw")
+chance = SubResource("Resource_5axbb")
+item = SubResource("Resource_mwbnt")
+condition_name = "Engineer"
+icon = ExtResource("5_xswsd")
+description = "enemies drop scrap"
+metadata/_custom_type_script = "uid://dfo48c3dx2d7"
+
+[sub_resource type="Resource" id="Resource_7ytw7"]
+script = ExtResource("4_486th")
+formula = "bang"
+metadata/_custom_type_script = "uid://cgrxhw8vqenhu"
+
+[sub_resource type="Resource" id="Resource_2t2is"]
+script = ExtResource("8_486th")
+scrap_threshold = 1
+turret_damage = SubResource("Resource_7ytw7")
+icon = ExtResource("5_xswsd")
+show_stacks = true
+metadata/_custom_type_script = "uid://bbikocjwp04x5"
+
+[sub_resource type="Resource" id="Resource_lgl55"]
+script = ExtResource("4_486th")
+formula = "2"
+metadata/_custom_type_script = "uid://cgrxhw8vqenhu"
+
+[sub_resource type="Resource" id="Resource_486th"]
+script = ExtResource("3_wqn1a")
+value_calc = SubResource("Resource_lgl55")
+metadata/_custom_type_script = "uid://b2h1ochum01o"
+
+[sub_resource type="Resource" id="Resource_xswsd"]
+script = ExtResource("4_486th")
+formula = "10"
+metadata/_custom_type_script = "uid://cgrxhw8vqenhu"
+
+[sub_resource type="Resource" id="Resource_kdvfq"]
+script = ExtResource("3_wqn1a")
+stat_type = 1
+value_calc = SubResource("Resource_xswsd")
+metadata/_custom_type_script = "uid://b2h1ochum01o"
+
+[sub_resource type="Resource" id="Resource_qa6lw"]
+script = ExtResource("4_486th")
+formula = "5"
+metadata/_custom_type_script = "uid://cgrxhw8vqenhu"
+
+[sub_resource type="Resource" id="Resource_fnqnm"]
+script = ExtResource("3_wqn1a")
+stat_type = 2
+value_calc = SubResource("Resource_qa6lw")
+metadata/_custom_type_script = "uid://b2h1ochum01o"
+
+[sub_resource type="Resource" id="Resource_mwbj8"]
+script = ExtResource("4_486th")
+formula = "4"
+metadata/_custom_type_script = "uid://cgrxhw8vqenhu"
+
+[sub_resource type="Resource" id="Resource_tikh6"]
+script = ExtResource("3_wqn1a")
+stat_type = 3
+value_calc = SubResource("Resource_mwbj8")
+metadata/_custom_type_script = "uid://b2h1ochum01o"
+
+[sub_resource type="Resource" id="Resource_a167t"]
+script = ExtResource("4_486th")
+formula = "5"
+metadata/_custom_type_script = "uid://cgrxhw8vqenhu"
+
+[sub_resource type="Resource" id="Resource_51bej"]
+script = ExtResource("3_wqn1a")
+stat_type = 4
+value_calc = SubResource("Resource_a167t")
+metadata/_custom_type_script = "uid://b2h1ochum01o"
+
+[sub_resource type="Resource" id="Resource_xjt1d"]
+script = ExtResource("4_486th")
+formula = "5"
+metadata/_custom_type_script = "uid://cgrxhw8vqenhu"
+
+[sub_resource type="Resource" id="Resource_nh7vn"]
+script = ExtResource("3_wqn1a")
+stat_type = 5
+value_calc = SubResource("Resource_xjt1d")
+metadata/_custom_type_script = "uid://b2h1ochum01o"
+
+[resource]
+script = ExtResource("1_t1uqq")
+character_name = "Engineer"
+character_image = ExtResource("1_486th")
+max_health = SubResource("Resource_livrn")
+stats = Array[ExtResource("3_wqn1a")]([SubResource("Resource_486th"), SubResource("Resource_kdvfq"), SubResource("Resource_fnqnm"), SubResource("Resource_tikh6"), SubResource("Resource_51bej"), SubResource("Resource_nh7vn")])
+special_effects = Array[ExtResource("2_th448")]([SubResource("Resource_v44ua"), SubResource("Resource_2t2is")])
+metadata/_custom_type_script = "uid://dpayg0f6j5y2n"

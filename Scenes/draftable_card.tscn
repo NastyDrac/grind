@@ -41,6 +41,7 @@ theme_override_font_sizes/normal_font_size = 12
 bbcode_enabled = true
 autowrap_mode = 2
 horizontal_alignment = 1
+vertical_alignment = 1
 
 [node name="cost" type="RichTextLabel" parent="BlankCard"]
 custom_minimum_size = Vector2(200, 300)

@@ -3,6 +3,7 @@ extends Resource
 class_name Action
 
 var player : Character
+var card_handler : CardHandler  # Reference to card handler for card targeting
 
 # Targeting options
 enum TargetType {
@@ -10,7 +11,12 @@ enum TargetType {
 	ALL_ENEMIES,            # Target all enemies regardless of range
 	ALL_ENEMIES_AT_RANGE,   # Target all enemies at a specific range
 	X_ENEMIES_UP_TO_RANGE,  # Target X enemies up to max range
-	SELF                    # Target the player character
+	SELF,                   # Target the player character
+	CARD_IN_HAND,           # Target a card in hand
+	CARD_IN_DISCARD,        # Target a card in discard pile
+	CARD_IN_DRAW,           # Target a card in draw pile
+	RANDOM_CARD_IN_HAND,    # Automatically target random card in hand
+	ALL_CARDS_IN_HAND       # Target all cards in hand
 }
 @export var target_type: TargetType = TargetType.SINGLE_ENEMY
 @export var max_range : int = 0
@@ -18,6 +24,14 @@ enum TargetType {
 
 func requires_player_target() -> bool:
 	return target_type in [TargetType.SINGLE_ENEMY, TargetType.X_ENEMIES_UP_TO_RANGE, TargetType.ALL_ENEMIES_AT_RANGE]
+
+
+func requires_card_target() -> bool:
+	return target_type in [TargetType.CARD_IN_HAND, TargetType.CARD_IN_DISCARD, TargetType.CARD_IN_DRAW]
+
+
+func is_automatic_card_action() -> bool:
+	return target_type in [TargetType.RANDOM_CARD_IN_HAND, TargetType.ALL_CARDS_IN_HAND]
 
 
 func get_num_targets(character: Character) -> int:

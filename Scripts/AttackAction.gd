@@ -27,35 +27,63 @@ func get_description_with_values(character: Character) -> String:
 	if not damage_calculator:
 		return ""
 	
-
 	var damage = damage_calculator.calculate(character)
+	var damage_formula = damage_calculator.formula
 	
-
-	var formula_display = _format_formula_display(damage_calculator.formula)
+	# Only show damage formula if it's not a simple number
+	var show_damage_formula = not damage_formula.is_valid_int()
 	
-
 	var desc = ""
 	
 	match target_type:
 		TargetType.SINGLE_ENEMY:
-			desc = "Attack: §%d§ (%s)" % [damage, formula_display]
+			if show_damage_formula:
+				desc = "Attack §%d§ damage (%s)" % [damage, _format_formula_display(damage_formula)]
+			else:
+				desc = "Attack §%d§ damage" % damage
 		
 		TargetType.ALL_ENEMIES:
-			desc = "Attack: §%d§ (%s) to all enemies" % [damage, formula_display]
+			if show_damage_formula:
+				desc = "Attack §%d§ damage (%s) to all enemies" % [damage, _format_formula_display(damage_formula)]
+			else:
+				desc = "Attack §%d§ damage to all enemies" % damage
 		
 		TargetType.ALL_ENEMIES_AT_RANGE:
-			desc = "Attack: §%d§ (%s) to all at range" % [damage, formula_display]
+			if show_damage_formula:
+				desc = "Attack §%d§ damage (%s) to all at range" % [damage, _format_formula_display(damage_formula)]
+			else:
+				desc = "Attack §%d§ damage to all at range" % damage
 		
 		TargetType.X_ENEMIES_UP_TO_RANGE:
 			if enemy_count_calculator:
 				var count = enemy_count_calculator.calculate(character)
-				var count_formula = _format_formula_display(enemy_count_calculator.formula)
-				desc = "Attack: §%d§ (%s) to §%d§ (%s) enemies" % [damage, formula_display, count, count_formula]
+				var count_formula = enemy_count_calculator.formula
+				var show_count_formula = not count_formula.is_valid_int()
+				
+				# Build description based on which formulas to show
+				if show_damage_formula and show_count_formula:
+					desc = "Attack §%d§ damage (%s) to §%d§ enemies (%s)" % [damage, _format_formula_display(damage_formula), count, _format_formula_display(count_formula)]
+				elif show_damage_formula:
+					desc = "Attack §%d§ damage (%s) to §%d§ enemies" % [damage, _format_formula_display(damage_formula), count]
+				elif show_count_formula:
+					desc = "Attack §%d§ damage to §%d§ enemies (%s)" % [damage, count, _format_formula_display(count_formula)]
+				else:
+					desc = "Attack §%d§ damage to §%d§ enemies" % [damage, count]
 			else:
-				desc = "Attack: §%d§ (%s) to multiple enemies" % [damage, formula_display]
+				if show_damage_formula:
+					desc = "Attack §%d§ damage (%s) to multiple enemies" % [damage, _format_formula_display(damage_formula)]
+				else:
+					desc = "Attack §%d§ damage to multiple enemies" % damage
 		
 		TargetType.SELF:
-			desc = "Attack: §%d§ (%s) to self" % [damage, formula_display]
+			if show_damage_formula:
+				desc = "Attack §%d§ damage (%s) to self" % [damage, _format_formula_display(damage_formula)]
+			else:
+				desc = "Attack §%d§ damage to self" % damage
+	
+	# Add range inline if max_range > 0
+	if max_range > 0:
+		desc += " - Range: §%d§" % max_range
 	
 	return desc
 

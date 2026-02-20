@@ -16,7 +16,7 @@ metadata/_custom_type_script = "uid://cgrxhw8vqenhu"
 
 [sub_resource type="Resource" id="Resource_nsmxn"]
 script = ExtResource("2_8k2ij")
-formula = "marbles * 2"
+formula = "swag"
 metadata/_custom_type_script = "uid://cgrxhw8vqenhu"
 
 [sub_resource type="Resource" id="Resource_x6t1t"]

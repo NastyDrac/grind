@@ -53,10 +53,17 @@ func refresh_description():
 		return
 	
 	var desc = ""
-	for action : Action in data.actions:
-		if action.max_range > 0:
-			desc += "Range : " + str(action.max_range) + "\n"
+	var action_count = data.actions.size()
+	
+	for i in range(action_count):
+		var action : Action = data.actions[i]
+		
+		# Add the action description (actions now handle their own range display)
 		desc += action.get_description_with_values(player)
+		
+		# Add newline between actions (but not after the last one)
+		if i < action_count - 1:
+			desc += "\n"
 	
 	
 	var regex = RegEx.new()
@@ -64,12 +71,12 @@ func refresh_description():
 	desc = regex.sub(desc, "[color=green]$1[/color]", true)
 	
 	
-	desc = desc.replace("swag", "[img=36x36]res://Art/swag.png[/img]")
-	desc = desc.replace("marbles", "[img=36x36]res://Art/marbles.png[/img]")
-	desc = desc.replace("guts", "[img=36x36]res://Art/guts.png[/img]")
-	desc = desc.replace("hustle", "[img=36x36]res://Art/hustle.png[/img]")
-	desc = desc.replace("bang", "[img=36x36]res://Art/bang.png[/img]")
-	desc = desc.replace("mojo", "[img=36x36]res://Art/mojo.png[/img]")
+	desc = desc.replace("swag", "[img=16x16]res://Art/swag.png[/img]")
+	desc = desc.replace("marbles", "[img=16x16]res://Art/marbles.png[/img]")
+	desc = desc.replace("guts", "[img=16x16]res://Art/guts.png[/img]")
+	desc = desc.replace("hustle", "[img=16x16]res://Art/hustle.png[/img]")
+	desc = desc.replace("bang", "[img=16x16]res://Art/bang.png[/img]")
+	desc = desc.replace("mojo", "[img=16x16]res://Art/mojo.png[/img]")
 	
 	description.parse_bbcode(desc)
 
@@ -79,23 +86,27 @@ func _show_description_without_player():
 		return
 	
 	var desc = ""
+	var action_count = data.actions.size()
 	
-	for action : Action in data.actions:
-		if action.max_range > 0:
-			desc += "Range: " + str(action.max_range) + "\n"
+	for i in range(action_count):
+		var action : Action = data.actions[i]
 		
-		
+		# Actions handle their own range display inline
 		if action.has_method("get_description_with_values"):
-			
+			# Try to get description with null player
 			var action_desc = action.get_description_with_values(null)
 			if action_desc and action_desc != "":
-				desc += action_desc + "\n"
+				desc += action_desc
 		elif action.has_method("get_base_description"):
-			desc += action.get_base_description() + "\n"
+			desc += action.get_base_description()
 		else:
-		
+			# Fallback to description property
 			if action.has("description") and action.description:
-				desc += action.description + "\n"
+				desc += action.description
+		
+		# Add newline between actions (but not after the last one)
+		if i < action_count - 1:
+			desc += "\n"
 	
 	
 	if desc.strip_edges() == "":

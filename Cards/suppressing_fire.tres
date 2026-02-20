@@ -1,4 +1,4 @@
-[gd_resource type="Resource" script_class="CardData" load_steps=10 format=3 uid="uid://bupn6mkodwnrl"]
+[gd_resource type="Resource" script_class="CardData" load_steps=11 format=3 uid="uid://bupn6mkodwnrl"]
 
 [ext_resource type="Script" uid="uid://dhxff5egnsgrv" path="res://Scripts/action.gd" id="1_4ggyy"]
 [ext_resource type="Script" uid="uid://0gsjrx47no8b" path="res://Scripts/card_data.gd" id="2_3o1ia"]
@@ -8,13 +8,19 @@
 
 [sub_resource type="Resource" id="Resource_dk1uf"]
 script = ExtResource("2_n2un8")
-formula = "bang + hustle"
+formula = "bang+hustle"
+metadata/_custom_type_script = "uid://cgrxhw8vqenhu"
+
+[sub_resource type="Resource" id="Resource_n2un8"]
+script = ExtResource("2_n2un8")
+formula = "mojo"
 metadata/_custom_type_script = "uid://cgrxhw8vqenhu"
 
 [sub_resource type="Resource" id="Resource_n8ugr"]
 script = ExtResource("3_kdxpt")
 damage_calculator = SubResource("Resource_dk1uf")
-target_type = 2
+enemy_count_calculator = SubResource("Resource_n2un8")
+target_type = 3
 max_range = 3
 metadata/_custom_type_script = "uid://clvjn77csx1a0"
 

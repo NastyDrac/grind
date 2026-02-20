@@ -8,6 +8,9 @@ class_name Condition
 
 @export var description: String = ""
 
+## When true, the condition icon will display the current stacks value as a number.
+@export var show_stacks: bool = false
+
 var entity 
 
 func apply_condition(who, condition : Condition) -> void:
