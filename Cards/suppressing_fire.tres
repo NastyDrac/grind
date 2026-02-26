@@ -22,6 +22,7 @@ damage_calculator = SubResource("Resource_dk1uf")
 enemy_count_calculator = SubResource("Resource_n2un8")
 target_type = 3
 max_range = 3
+animation_type = 1
 metadata/_custom_type_script = "uid://clvjn77csx1a0"
 
 [sub_resource type="Resource" id="Resource_4v3ue"]
@@ -33,6 +34,7 @@ metadata/_custom_type_script = "uid://cgrxhw8vqenhu"
 script = ExtResource("4_6gutp")
 block_calculator = SubResource("Resource_4v3ue")
 target_type = 4
+animation_type = 4
 metadata/_custom_type_script = "uid://px415e6h6tao"
 
 [resource]

@@ -1,0 +1,76 @@
+[gd_scene load_steps=2 format=3]
+
+[ext_resource type="Script" uid="uid://bmt6x2k5c0eih" path="res://Scripts/shop.gd" id="1_a0mxf"]
+
+[node name="Shop" type="CanvasLayer"]
+script = ExtResource("1_a0mxf")
+
+[node name="Panel_VBox_TopBar#ShopTitle" type="Label" parent="."]
+size_flags_horizontal = 3
+theme_override_font_sizes/font_size = 20
+text = "El Shoppe"
+horizontal_alignment = 1
+
+[node name="Panel_VBox_TopBar#GoldLabel" type="Label" parent="."]
+unique_name_in_owner = true
+theme_override_font_sizes/font_size = 14
+text = "Gold: 0"
+
+[node name="Panel_VBox_TopBar#LeaveButton" type="Button" parent="."]
+unique_name_in_owner = true
+text = "Leave Shop"
+
+[node name="Panel_VBox#HSep1" type="HSeparator" parent="."]
+size_flags_vertical = 3
+
+[node name="Panel_VBox_Scroll#ScrollVBox" type="VBoxContainer" parent="."]
+size_flags_horizontal = 3
+
+[node name="Panel_VBox_Scroll_ScrollVBox#CardSectionLabel" type="Label" parent="."]
+theme_override_font_sizes/font_size = 14
+text = "Cards for Sale"
+
+[node name="Panel_VBox_Scroll_ScrollVBox#CardContainer" type="HBoxContainer" parent="."]
+unique_name_in_owner = true
+alignment = 1
+
+[node name="Panel_VBox_Scroll_ScrollVBox#HSep2" type="HSeparator" parent="."]
+
+[node name="Panel_VBox_Scroll_ScrollVBox#ThingySectionLabel" type="Label" parent="."]
+theme_override_font_sizes/font_size = 14
+text = "Thingies for Sale"
+
+[node name="Panel_VBox_Scroll_ScrollVBox#ThingyContainer" type="HBoxContainer" parent="."]
+unique_name_in_owner = true
+alignment = 1
+
+[node name="Panel_VBox#RemoveSection" type="HBoxContainer" parent="."]
+
+[node name="Panel_VBox_RemoveSection#RemoveCardButton" type="Button" parent="."]
+unique_name_in_owner = true
+visible = false
+size_flags_vertical = 3
+text = "Remove a Card  (75 Gold)"
+
+[node name="Panel_VBox_RemovePanel#RemoveVBox" type="VBoxContainer" parent="."]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 8.0
+offset_top = 8.0
+offset_right = -8.0
+offset_bottom = -8.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Panel_VBox_RemovePanel_RemoveVBox#RemoveLabel" type="Label" parent="."]
+theme_override_font_sizes/font_size = 13
+text = "Click a card from your deck to remove it:"
+
+[node name="Panel_VBox_RemovePanel_RemoveVBox#DeckContainer" type="HFlowContainer" parent="."]
+unique_name_in_owner = true
+size_flags_vertical = 3
+
+[node name="Panel_VBox_RemovePanel_RemoveVBox#CancelButton" type="Button" parent="."]
+unique_name_in_owner = true
+text = "Cancel"

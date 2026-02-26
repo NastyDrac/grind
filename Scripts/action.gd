@@ -21,6 +21,37 @@ enum TargetType {
 @export var target_type: TargetType = TargetType.SINGLE_ENEMY
 @export var max_range : int = 0
 
+# ============================================================================
+# ANIMATION
+# ============================================================================
+
+enum AnimationType {
+	NONE,           # No visual — damage applies instantly
+	PROJECTILE,     # A projectile travels from the player to the target
+	MELEE_SLASH,    # A slash effect plays on the target
+	AOE_BURST,      # A burst effect plays centred on the target(s)
+	BUFF,           # A glow/shimmer effect plays on the player
+}
+
+@export var animation_type: AnimationType = AnimationType.NONE
+
+# Emitted by AnimationManager once the visual has finished playing.
+# play_animation_and_execute() awaits this before applying damage.
+signal animation_done
+
+
+## Call this from the card handler instead of execute() directly.
+## It plays the configured visual, waits for it to finish, then applies damage.
+func play_animation_and_execute(target) -> void:
+	if animation_type != AnimationType.NONE:
+		Global.request_animation.emit(self, target, animation_type)
+		await animation_done
+	execute(target)
+
+
+# ============================================================================
+# CORE INTERFACE  (implemented by subclasses)
+# ============================================================================
 
 func requires_player_target() -> bool:
 	return target_type in [TargetType.SINGLE_ENEMY, TargetType.X_ENEMIES_UP_TO_RANGE, TargetType.ALL_ENEMIES_AT_RANGE]
@@ -37,13 +68,12 @@ func is_automatic_card_action() -> bool:
 func get_num_targets(character: Character) -> int:
 	if target_type == TargetType.SINGLE_ENEMY:
 		return 1
-	
 	return 1
 
 
 func execute(target) -> void:
 	push_error("execute() must be implemented in %s" % get_script().resource_path)
-	
+
 
 func get_action_type() -> String:
 	return "Action"
@@ -52,9 +82,12 @@ func get_action_type() -> String:
 func get_description_with_values(character) -> String:
 	if not character:
 		return ""
-	
 	return ""
 
+
+# ============================================================================
+# HELPERS
+# ============================================================================
 
 func _get_stat_value(character: Character, stat_type: Stat.STAT) -> int:
 	for stat in character.stats:
@@ -62,10 +95,9 @@ func _get_stat_value(character: Character, stat_type: Stat.STAT) -> int:
 			return stat.value
 	return 0
 
-# Helper to format formula for display with stat names (not values)
+
 func _format_formula_display(formula: String) -> String:
 	var display = formula
-	
 	display = display.replace("*", " x ")
 	display = display.replace("/", " / ")
 	display = display.replace("+", " + ")

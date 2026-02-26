@@ -22,6 +22,7 @@ damage_calculator = SubResource("Resource_58xvx")
 enemy_count_calculator = SubResource("Resource_kbbbq")
 target_type = 3
 max_range = 1
+animation_type = 2
 metadata/_custom_type_script = "uid://clvjn77csx1a0"
 
 [sub_resource type="Resource" id="Resource_5hume"]

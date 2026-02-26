@@ -1,0 +1,14 @@
+[gd_scene load_steps=2 format=3 uid="uid://dn40540p4q1ve"]
+
+[ext_resource type="Script" uid="uid://ddjc2xk0gfgg1" path="res://Scripts/map_generator.gd" id="1_0r6lh"]
+
+[node name="MapGenerator" type="Node2D"]
+script = ExtResource("1_0r6lh")
+rows = 5
+urban_density = 0.241
+building_coverage = 0.889
+early_combat = 6
+early_services = 1
+early_gym = 1
+mid_services = 2
+mid_mystery = 2

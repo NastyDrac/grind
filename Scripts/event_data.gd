@@ -9,5 +9,5 @@ class_name EventData
 @export var event_image: Texture2D
 
 @export var gold_cost: int = 0
-enum Exit_Type {Food, Library, Gym, Shop, Mystery}
+enum Exit_Type {Gym, Store, Hospital, Mystery}
 @export var event_type : Exit_Type

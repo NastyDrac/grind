@@ -47,6 +47,7 @@ script = ExtResource("8_486th")
 scrap_threshold = 1
 turret_damage = SubResource("Resource_7ytw7")
 icon = ExtResource("5_xswsd")
+description = "If you have scrap, create a Deploy Turret Card"
 show_stacks = true
 metadata/_custom_type_script = "uid://bbikocjwp04x5"
 
@@ -121,5 +122,6 @@ character_name = "Engineer"
 character_image = ExtResource("1_486th")
 max_health = SubResource("Resource_livrn")
 stats = Array[ExtResource("3_wqn1a")]([SubResource("Resource_486th"), SubResource("Resource_kdvfq"), SubResource("Resource_fnqnm"), SubResource("Resource_tikh6"), SubResource("Resource_51bej"), SubResource("Resource_nh7vn")])
+gold = 100
 special_effects = Array[ExtResource("2_th448")]([SubResource("Resource_v44ua"), SubResource("Resource_2t2is")])
 metadata/_custom_type_script = "uid://dpayg0f6j5y2n"

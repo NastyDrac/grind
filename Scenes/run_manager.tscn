@@ -1,4 +1,4 @@
-[gd_scene load_steps=30 format=3 uid="uid://cssup3trfa1rg"]
+[gd_scene load_steps=32 format=3 uid="uid://cssup3trfa1rg"]
 
 [ext_resource type="Script" uid="uid://nami4xhnpwrm" path="res://Scripts/run_manager.gd" id="1_u1n32"]
 [ext_resource type="Script" uid="uid://0gsjrx47no8b" path="res://Scripts/card_data.gd" id="2_0y178"]
@@ -24,6 +24,8 @@
 [ext_resource type="Script" uid="uid://dbrkkfbjmvvar" path="res://Scripts/defeat_x_enemies.gd" id="17_boem8"]
 [ext_resource type="Resource" uid="uid://dc6blxo3bgxci" path="res://events/example_card_reward_event.tres" id="19_boem8"]
 [ext_resource type="Resource" uid="uid://dl83c5o7wxf4p" path="res://events/hospital.tres" id="20_h8e1q"]
+[ext_resource type="PackedScene" uid="uid://dn40540p4q1ve" path="res://map_generator.tscn" id="25_j41x3"]
+[ext_resource type="Script" uid="uid://obqdc13u6ea6" path="res://Scripts/animation_manager.gd" id="26_awuji"]
 
 [sub_resource type="Resource" id="Resource_1tppy"]
 script = ExtResource("10_4342n")
@@ -41,6 +43,7 @@ script = ExtResource("11_j41x3")
 condition_resource = SubResource("Resource_1tppy")
 stacks_calculator = SubResource("Resource_38h1b")
 target_type = 1
+animation_type = 3
 metadata/_custom_type_script = "uid://dm2bmau6ctnm8"
 
 [sub_resource type="Resource" id="Resource_0ycsu"]
@@ -52,14 +55,19 @@ metadata/_custom_type_script = "uid://0gsjrx47no8b"
 
 [sub_resource type="Resource" id="Resource_hl081"]
 script = ExtResource("17_boem8")
-enemies_to_defeat = 50
 metadata/_custom_type_script = "uid://dbrkkfbjmvvar"
 
-[node name="RunManager" type="Node2D"]
+[node name="RunManager" type="Node2D" node_paths=PackedStringArray("thingies")]
 script = ExtResource("1_u1n32")
 deck = Array[ExtResource("2_0y178")]([ExtResource("3_obnx0"), ExtResource("4_rqa6y"), ExtResource("5_fqwpn"), ExtResource("6_df7m0"), ExtResource("7_0c4k1"), ExtResource("8_boem8"), SubResource("Resource_0ycsu")])
+thingies = [NodePath("")]
 character = ExtResource("14_4342n")
 character_sheet_scene = ExtResource("12_4nan2")
 horde = Array[ExtResource("8_obnx0")]([ExtResource("8_qhjl3"), ExtResource("15_dic3b"), ExtResource("16_tvxjp")])
 win_condition = SubResource("Resource_hl081")
 available_events = Array[ExtResource("10_obnx0")]([ExtResource("11_rqa6y"), ExtResource("20_h8e1q"), ExtResource("19_boem8")])
+map_generator_scene = ExtResource("25_j41x3")
+
+[node name="AnimationManager" type="Node" parent="."]
+script = ExtResource("26_awuji")
+metadata/_custom_type_script = "uid://obqdc13u6ea6"

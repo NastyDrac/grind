@@ -9,33 +9,41 @@ var card_handler : CardHandler
 var player : Character
 var draft_amount : int = 3
 @export var deck : Array[CardData]
+
+## Passive items the player has collected during the run.
+## Persists across combats — only their combat refs are swapped each wave.
+@export var thingies : Array[Thingy] = []
 var range_manager : RangeManager 
 var ui_bar : UIBar
 @export var character : CharacterData
 
-
 @export var character_sheet_scene : PackedScene  
 var current_character_sheet : PopupPanel = null
-
 
 @export var initial_enemy_count : int = 3
 @export var initial_spawn_range : int = 5
 @export var horde : Array[EnemyData]
 
-
 @export var win_condition: WinCondition  
 var current_win_condition: WinCondition = null
-
 
 @export var available_events: Array[EventData] = []  
 var current_event_scene: EventScene = null
 
-
 var current_draft_screen: DraftScreen = null
+var current_shop: Shop = null
 
+# ── Map ───────────────────────────────────────────────────────────────────────
+## Assign the MapGenerator scene in the inspector.
+@export var map_generator_scene : PackedScene
+var map_generator : MapGenerator = null
+## The node the player most recently selected — resolved after combat/event ends.
+var _pending_map_node : MapNode = null
 
-enum GameState { EVENT, COMBAT }
-var current_state: GameState = GameState.EVENT
+enum GameState { MAP, EVENT, COMBAT }
+var current_state: GameState = GameState.MAP
+
+# ─────────────────────────────────────────────────────────────────────────────
 
 func begin_run(seed : int = -1):
 	rng = RandomNumberGenerator.new()
@@ -45,41 +53,84 @@ func begin_run(seed : int = -1):
 		run_seed = seed
 	rng.seed = run_seed
 	create_ui()
-	
-	
 	create_player()
-	player.toggle_visible(false)  
+	player.toggle_visible(false)
 
 func _ready() -> void:
 	begin_run()
 	Global.card_played.connect(_on_card_played)
-	
-	
-	show_random_event()
+	_show_map()
 
-func show_random_event():
+# ─────────────────────────────────────────────────────────────────────────────
+#  MAP
+# ─────────────────────────────────────────────────────────────────────────────
+
+func _show_map() -> void:
+	current_state = GameState.MAP
+
+	if map_generator == null:
+		if map_generator_scene:
+			map_generator = map_generator_scene.instantiate()
+			add_child(map_generator)
+			map_generator.node_chosen.connect(_on_map_node_chosen)
+			map_generator.build(rng)
+		else:
+			push_error("RunManager: map_generator_scene is not assigned in the inspector!")
+			return
+	else:
+		map_generator.show()
+
+func _on_map_node_chosen(node: MapNode) -> void:
+	_pending_map_node = node
+	map_generator.hide()
+
+	match node.node_type:
+		MapNode.NodeType.COMBAT:
+			begin_combat()
+		MapNode.NodeType.SHOP:
+			create_shop()
+		_:
+			_show_event_for_node(node)
+
+# ─────────────────────────────────────────────────────────────────────────────
+#  EVENTS
+# ─────────────────────────────────────────────────────────────────────────────
+
+func _show_event_for_node(node: MapNode) -> void:
 	if available_events.is_empty():
-		push_warning("No events available - starting combat directly")
+		push_warning("No events available — starting combat instead.")
 		begin_combat()
 		return
-	
+
 	current_state = GameState.EVENT
-	
-	
-	var event = available_events.pick_random()
-	
-	
+
+	# Try to find an event whose Exit_Type matches the node type.
+	# MapNode.NodeType: COMBAT=0, SERVICES=1, TRAINING=2, LANDMARK=3, MYSTERY=4
+	# EventData.Exit_Type:          Services=0, Training=1,  Landmark=2, Mystery=3
+	# Offset of 1 aligns them.
+	var target_exit_type : int = node.node_type - 1  # only valid for non-COMBAT nodes
+
+	var matching : Array[EventData] = []
+	for ev in available_events:
+		if ev.event_type == target_exit_type:
+			matching.append(ev)
+
+	var chosen_event : EventData = matching.pick_random() if not matching.is_empty() \
+								 else available_events.pick_random()
+
 	current_event_scene = load("res://Scenes/event_scene.tscn").instantiate()
 	current_event_scene.run_manager = self
-	current_event_scene.current_event = event
+	current_event_scene.current_event = chosen_event
 	add_child(current_event_scene)
-	
-	
 	current_event_scene.event_completed.connect(_on_event_completed)
 
 func _on_event_completed():
 	current_event_scene = null
-	begin_combat()
+	_resolve_pending_node()
+
+# ─────────────────────────────────────────────────────────────────────────────
+#  COMBAT
+# ─────────────────────────────────────────────────────────────────────────────
 
 func begin_combat():
 	current_state = GameState.COMBAT
@@ -87,24 +138,20 @@ func begin_combat():
 
 func begin_wave():
 	create_range_manager()    
-	
-	
+
 	if player:
 		player.toggle_visible(true)
 		player.reset_for_new_wave()  
 	else:
-		
 		create_player()
 		player.toggle_visible(true)
 		
 	create_card_handler()
 	ui_bar.set_health()
-	
-
 	setup_win_condition()
+	_setup_thingies()
 
 func setup_win_condition():
-	"""Initialize the win condition for this combat"""
 	if win_condition:
 		current_win_condition = win_condition.duplicate(true)
 		current_win_condition.initialize(self)
@@ -115,21 +162,16 @@ func setup_win_condition():
 		push_warning("No win condition set! Combat will not have a win condition.")
 
 func spawn_initial_enemies():
-	"""
-	Only spawn initial enemies if the win condition doesn't handle spawning itself.
-	For example, DefeatAllEnemies spawns its own wave.
-	"""
-	
 	if current_win_condition is DefeatAllEnemies:
 		return
-	
+
 	if current_win_condition is SurviveXTurns:
 		pass
-	
+
 	if range_manager.enemy_pool.is_empty():
-		push_warning("No enemies in enemy_pool - cannot spawn initial enemies")
+		push_warning("No enemies in enemy_pool — cannot spawn initial enemies")
 		return
-	
+
 	for i in initial_enemy_count:
 		var random_enemy = range_manager.enemy_pool.pick_random()
 		range_manager.spawn_enemy(random_enemy, initial_spawn_range)
@@ -168,112 +210,175 @@ func create_ui():
 	ui_bar = ui
 	ui.set_gold()
 	ui.set_health()
-# ===== CHARACTER SHEET METHODS =====
+
+# ─────────────────────────────────────────────────────────────────────────────
+#  RESOLVE NODE → RETURN TO MAP
+# ─────────────────────────────────────────────────────────────────────────────
+
+## Called by both on_combat_won and _on_event_completed.
+func _resolve_pending_node() -> void:
+	# Clean up any lingering combat state
+	if current_win_condition:
+		current_win_condition.cleanup()
+		current_win_condition = null
+
+	_teardown_thingies()
+
+	if range_manager:
+		range_manager.queue_free()
+		range_manager = null
+
+	if card_handler:
+		card_handler.queue_free()
+		card_handler = null
+
+	if player:
+		player.toggle_visible(false)
+
+	# Mark the completed node and unlock the next column, then show the map.
+	if _pending_map_node and map_generator:
+		map_generator.mark_visited_and_advance(_pending_map_node)
+		_pending_map_node = null
+
+	_show_map()
+
+func on_combat_won():
+	_resolve_pending_node()
+
+func on_player_death():
+	if current_win_condition:
+		current_win_condition.cleanup()
+		current_win_condition = null
+
+	print("Game Over!")
+
+# ─────────────────────────────────────────────────────────────────────────────
+#  THINGIES
+# ─────────────────────────────────────────────────────────────────────────────
+
+## Add a thingy to the run. Call this whenever the player acquires a passive item
+## (e.g. from an event reward or draft). If combat is already active, the thingy
+## is set up immediately so it takes effect right away.
+func add_thingy(thingy: Thingy) -> void:
+	thingies.append(thingy)
+	add_child(thingy)
+	if current_state == GameState.COMBAT and player and range_manager:
+		thingy.setup(player, range_manager)
+
+
+## Wire every thingy up for the current combat wave.
+func _setup_thingies() -> void:
+	if thingies.is_empty() != false:
+		for thingy in thingies:
+			thingy.setup(player, range_manager)
+
+
+## Disconnect every thingy from the combat that just ended.
+## Thingies themselves are NOT freed — they carry over to the next wave.
+func _teardown_thingies() -> void:
+	if thingies.is_empty() != false:
+		for thingy in thingies:
+			thingy.teardown()
+
+
+# ─────────────────────────────────────────────────────────────────────────────
+#  CHARACTER SHEET
+# ─────────────────────────────────────────────────────────────────────────────
 
 func show_base_character_sheet():
-	"""
-	Shows the character sheet with BASE stats (unmodified).
-	Call this from events or outside of combat.
-	"""
 	if not character_sheet_scene:
-		push_error("Character sheet scene not assigned! Assign it in the RunManager inspector.")
+		push_error("Character sheet scene not assigned!")
 		return
-	
-	
+
 	if current_character_sheet:
 		current_character_sheet.queue_free()
-	
-	
+
 	current_character_sheet = character_sheet_scene.instantiate()
 	add_child(current_character_sheet)
-	
-	
 	current_character_sheet.popup_hide.connect(_on_character_sheet_closed)
-	
-	
 	current_character_sheet.setup_base_stats(character)
-	
-	
 	current_character_sheet.popup_centered()
-	
 	return current_character_sheet
 
 func show_combat_character_sheet():
-	"""
-	Shows the character sheet with LIVE combat stats (including modifications).
-	Call this during combat to see current buffed/debuffed stats.
-	"""
 	if not character_sheet_scene:
-		push_error("Character sheet scene not assigned! Assign it in the RunManager inspector.")
+		push_error("Character sheet scene not assigned!")
 		return
-	
+
 	if not player:
-		push_error("Cannot show combat character sheet - no player instance exists!")
+		push_error("Cannot show combat character sheet — no player instance exists!")
 		return
-	
-	
+
 	if current_character_sheet:
 		current_character_sheet.queue_free()
-	
-	
+
 	current_character_sheet = character_sheet_scene.instantiate()
 	add_child(current_character_sheet)
-	
-	
 	current_character_sheet.popup_hide.connect(_on_character_sheet_closed)
-	
-	
 	current_character_sheet.setup_combat_stats(player)
-	
-	
 	current_character_sheet.popup_centered()
-	
 	return current_character_sheet
 
 func close_character_sheet():
-	"""Closes the currently open character sheet"""
 	if current_character_sheet:
 		current_character_sheet.queue_free()
 		current_character_sheet = null
 		_on_character_sheet_closed()
 
 func _on_character_sheet_closed():
-	"""Called when character sheet is closed (either by user or programmatically)"""
 	current_character_sheet = null
-	
+
 	if ui_bar:
 		ui_bar.is_character_sheet_open = false
 
-# ===== END CHARACTER SHEET METHODS =====
-	
-func on_combat_won():
-	if current_win_condition:
-		current_win_condition.cleanup()
-		current_win_condition = null
-	
-	if range_manager:
-		range_manager.queue_free()
-		range_manager = null
-	if card_handler:
-		card_handler.queue_free()
-		card_handler = null
-	if player:
-		player.toggle_visible(false)
-		
-	
-	
-	show_random_event()
+# ─────────────────────────────────────────────────────────────────────────────
+#  DRAFT SCREEN
+# ─────────────────────────────────────────────────────────────────────────────
 
+func create_draft_screen():
+	if current_draft_screen:
+		current_draft_screen.queue_free()
 
-func on_player_death():
-	if current_win_condition:
-		current_win_condition.cleanup()
-		current_win_condition = null
-	
-	
-	print("Game Over!")
-	
-	
+	var draft_screen_scene = load("res://Scenes/draft_screen.tscn")
+	if not draft_screen_scene:
+		push_error("Could not load draft_screen.tscn")
+		return
+
+	current_draft_screen = draft_screen_scene.instantiate()
+	add_child(current_draft_screen)
+	current_draft_screen.display_card_options(self)
+
+func close_draft_screen():
+	if current_draft_screen:
+		current_draft_screen.queue_free()
+		current_draft_screen = null
+
+# ─────────────────────────────────────────────────────────────────────────────
+#  SHOP
+# ─────────────────────────────────────────────────────────────────────────────
+
+func create_shop() -> void:
+	if current_shop:
+		current_shop.queue_free()
+
+	current_shop = Shop.new()
+	add_child(current_shop)
+	current_shop.display_shop(self)
+	current_shop.shop_closed.connect(_on_shop_closed)
+
+func close_shop() -> void:
+	if current_shop:
+		current_shop.queue_free()
+		current_shop = null
+	_resolve_pending_node()
+
+func _on_shop_closed() -> void:
+	pass
+
+# ─────────────────────────────────────────────────────────────────────────────
+#  CARDS
+# ─────────────────────────────────────────────────────────────────────────────
+
 func get_random_card_data() -> CardData:
 	var dir := DirAccess.open("res://Cards/")
 	if dir == null:
@@ -299,32 +404,40 @@ func get_random_card_data() -> CardData:
 	var new_card : CardData = load(random_path)
 	return new_card
 
-# ===== DRAFT SCREEN METHODS =====
+# ─────────────────────────────────────────────────────────────────────────────
+#  THINGIES (SCENES)
+# ─────────────────────────────────────────────────────────────────────────────
 
-func create_draft_screen():
-	"""Creates and displays a draft screen with random card options"""
-	
-	if current_draft_screen:
-		current_draft_screen.queue_free()
-	
-	
-	var draft_screen_scene = load("res://Scenes/draft_screen.tscn")
-	if not draft_screen_scene:
-		push_error("Could not load draft_screen.tscn - make sure the scene exists at res://Scenes/draft_screen.tscn")
-		return
-	
-	current_draft_screen = draft_screen_scene.instantiate()
-	add_child(current_draft_screen)
-	
-	
-	current_draft_screen.display_card_options(self)
-	
+## Scans res://Thingys/ for .tscn files and returns one at random.
+## Mirrors get_random_card_data() so the pattern stays consistent.
+## Adjust the path if your folder name differs (e.g. "res://Thingies/").
+func get_random_thingy_scene() -> PackedScene:
+	var dir := DirAccess.open("res://Thingys/")
+	if dir == null:
+		push_error("RunManager: could not open Thingys directory")
+		return null
 
+	var paths : Array = []
+	dir.list_dir_begin()
+	var file_name := dir.get_next()
+	while file_name != "":
+		if not dir.current_is_dir() and file_name.ends_with(".tscn"):
+			paths.append("res://Thingys/" + file_name)
+		file_name = dir.get_next()
+	dir.list_dir_end()
 
-func close_draft_screen():
-	"""Closes the currently open draft screen"""
-	if current_draft_screen:
-		current_draft_screen.queue_free()
-		current_draft_screen = null
+	if paths.is_empty():
+		push_error("RunManager: no Thingy scenes found in res://Thingys/")
+		return null
 
-# ===== END DRAFT SCREEN METHODS =====
+	return load(paths[randi() % paths.size()])
+
+# ─────────────────────────────────────────────────────────────────────────────
+#  GOLD
+# ─────────────────────────────────────────────────────────────────────────────
+
+## Award gold to the player and sync the HUD. Call after combat wins, events, etc.
+func award_gold(amount: int) -> void:
+	character.gold += amount
+	if ui_bar:
+		ui_bar.set_gold()

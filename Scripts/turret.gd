@@ -103,4 +103,13 @@ func _on_time_passed() -> void:
 			break
 		var target: Enemy = enemies.pick_random()
 		if target:
-			target.take_damgage(damage.calculate(run_manager.player))
+			# Fire a projectile visual then apply damage once it arrives.
+			# Capture values now — target or stats may change by the time the
+			# animation finishes, so we freeze them in the closure.
+			var hit_damage: int = damage.calculate(run_manager.player)
+			var anim_manager := get_tree().get_first_node_in_group("animation_manager") as AnimationManager
+			if anim_manager:
+				var on_hit := func(): target.take_damgage(hit_damage)
+				anim_manager.fire_projectile(_sprite.global_position, target, on_hit)
+			else:
+				target.take_damgage(hit_damage)

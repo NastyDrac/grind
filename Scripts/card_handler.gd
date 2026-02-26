@@ -412,7 +412,7 @@ func _collect_targets_for_next_action():
 	
 	# If we've collected targets for all actions, execute them all now
 	if current_action_index >= selected_card.data.actions.size():
-		_execute_queued_non_card_actions()
+		await _execute_queued_non_card_actions()
 		return
 	
 	current_action = selected_card.data.actions[current_action_index]
@@ -427,7 +427,7 @@ func _collect_targets_for_next_action():
 			# Reuse previous targets
 			action_queue.append({"action": current_action, "targets": stored_targets.duplicate()})
 			current_action_index += 1
-			_collect_targets_for_next_action()
+			await _collect_targets_for_next_action()
 		else:
 			# Need new targeting
 			_start_targeting_for_action(current_action)
@@ -435,7 +435,7 @@ func _collect_targets_for_next_action():
 		# IMPORTANT: Before card targeting, execute all queued actions so far
 		# This ensures draws happen before selecting cards to discard
 		if not action_queue.is_empty():
-			_execute_queued_non_card_actions()
+			await _execute_queued_non_card_actions()
 		else:
 			# No actions to execute yet, just start card targeting
 			_start_card_targeting_for_action(current_action)
@@ -444,34 +444,32 @@ func _collect_targets_for_next_action():
 		var targets = _get_automatic_card_targets(current_action)
 		action_queue.append({"action": current_action, "targets": targets})
 		current_action_index += 1
-		_collect_targets_for_next_action()
+		await _collect_targets_for_next_action()
 	else:
 		# No targeting needed - get targets automatically (like DrawAction)
 		var targets = _get_automatic_targets(current_action)
 		action_queue.append({"action": current_action, "targets": targets})
 		current_action_index += 1
-		_collect_targets_for_next_action()
+		await _collect_targets_for_next_action()
 
 func _execute_queued_non_card_actions():
 	"""Execute all non-card actions in the queue, then continue collecting targets"""
-
-	
 	for action_data in action_queue:
 		var action = action_data["action"]
 		var targets = action_data["targets"]
 		
-		
 		if not action.player:
 			action.player = run_manager.player
 		
-		# Execute the action
+		# Fire animation+damage without awaiting — damage still lands after the
+		# animation internally, but the card handler moves on immediately so
+		# the card is discarded and enemies spawn without delay.
 		if targets.is_empty():
-			action.execute(run_manager.player)
+			action.play_animation_and_execute(run_manager.player)
 		else:
 			for i in range(targets.size()):
 				var target = targets[i]
-				action.execute(target)
-	
+				action.play_animation_and_execute(target)
 	
 	# Clear executed actions from queue
 	action_queue.clear()
@@ -481,7 +479,7 @@ func _execute_queued_non_card_actions():
 	
 	# Continue with next action (will be card targeting)
 	if current_action_index < selected_card.data.actions.size():
-		_collect_targets_for_next_action()
+		await _collect_targets_for_next_action()
 	else:
 		# All done
 		_complete_card_play()
@@ -584,7 +582,7 @@ func _on_targets_confirmed(targets: Array[Enemy]):
 	
 	
 	current_action_index += 1
-	_collect_targets_for_next_action()
+	await _collect_targets_for_next_action()
 
 func _on_targeting_cancelled():
 	is_targeting = false
@@ -760,7 +758,7 @@ func _on_confirm_card_selection():
 	# Continue with any remaining actions
 	current_action_index += 1
 	if current_action_index < selected_card.data.actions.size():
-		_collect_targets_for_next_action()
+		await _collect_targets_for_next_action()
 	else:
 		# All done
 		_complete_card_play()
@@ -940,7 +938,8 @@ func _execute_action_on_cards(action: Action, cards: Array):
 	if not action.card_handler:
 		action.card_handler = self
 	
-	action.execute(cards)
+	for card in cards:
+		await action.play_animation_and_execute(card)
 
 # ============================================================================
 # STANDARD ACTION EXECUTION
