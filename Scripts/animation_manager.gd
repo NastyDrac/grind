@@ -1,27 +1,13 @@
 extends Node
 class_name AnimationManager
 
-# ============================================================================
-# ANIMATION MANAGER
-#
-# Add this as an Autoload (Project > Project Settings > Autoload) OR as a
-# child of your main scene node.
-#
-# Requires in Global.gd:
-#   signal request_animation(action: Action, target: Object, anim_type: Action.AnimationType)
-#
-# All visuals are drawn in code — no external art assets needed.
-# Replace the drawing helpers later with real sprites/particles as desired.
-# ============================================================================
 
 func _ready() -> void:
 	add_to_group("animation_manager")
 	Global.request_animation.connect(_on_animation_requested)
 
 
-# ============================================================================
-# PUBLIC API — for use outside the Action system (e.g. Turret)
-# ============================================================================
+
 
 ## Fire a projectile from `from` to `target`, then call `on_hit` once it lands.
 ## The caller does NOT need to await — this is self-contained.
@@ -82,10 +68,8 @@ func _get_target_position(target: Object) -> Vector2:
 		return (target as Node2D).global_position
 	return get_viewport().size * 0.5
 
-
-# Adds a node to the scene root so global_position matches enemy/player coords.
 func _spawn(node: Node) -> void:
-	get_tree().current_scene.add_child(node)
+	add_child(node)
 
 
 # ============================================================================

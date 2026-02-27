@@ -1,11 +1,10 @@
-[gd_resource type="Resource" script_class="CardData" load_steps=14 format=3 uid="uid://bhucicqn3bt7g"]
+[gd_resource type="Resource" script_class="CardData" load_steps=11 format=3 uid="uid://bhucicqn3bt7g"]
 
 [ext_resource type="Script" uid="uid://dhxff5egnsgrv" path="res://Scripts/action.gd" id="1_o1lv3"]
 [ext_resource type="Script" uid="uid://0gsjrx47no8b" path="res://Scripts/card_data.gd" id="2_5hcsj"]
 [ext_resource type="Script" uid="uid://cgrxhw8vqenhu" path="res://Scripts/ValueCalculator.gd" id="2_q8vow"]
 [ext_resource type="Script" uid="uid://clvjn77csx1a0" path="res://Scripts/AttackAction.gd" id="3_iqqcv"]
-[ext_resource type="Script" uid="uid://b227bd0gljerh" path="res://Scripts/discard_action.gd" id="4_iqqcv"]
-[ext_resource type="Script" uid="uid://bc8y3uqk02xnl" path="res://Scripts/draw_action.gd" id="4_wficx"]
+[ext_resource type="Script" uid="uid://y73360xhw2qs" path="res://Scripts/modify_stat_action.gd" id="4_iqqcv"]
 
 [sub_resource type="Resource" id="Resource_wficx"]
 script = ExtResource("2_q8vow")
@@ -27,29 +26,20 @@ metadata/_custom_type_script = "uid://clvjn77csx1a0"
 
 [sub_resource type="Resource" id="Resource_gnljg"]
 script = ExtResource("2_q8vow")
-formula = "2"
+formula = "1"
 metadata/_custom_type_script = "uid://cgrxhw8vqenhu"
 
 [sub_resource type="Resource" id="Resource_de1ei"]
-script = ExtResource("4_wficx")
-card_count_calculator = SubResource("Resource_gnljg")
-target_type = 4
-metadata/_custom_type_script = "uid://bc8y3uqk02xnl"
-
-[sub_resource type="Resource" id="Resource_1vfwn"]
-script = ExtResource("2_q8vow")
-formula = "2"
-metadata/_custom_type_script = "uid://cgrxhw8vqenhu"
-
-[sub_resource type="Resource" id="Resource_11kxx"]
 script = ExtResource("4_iqqcv")
-num_cards = SubResource("Resource_1vfwn")
-target_type = 5
-metadata/_custom_type_script = "uid://b227bd0gljerh"
+modify_calculator = SubResource("Resource_gnljg")
+stat_to_modify = 1
+target_type = 4
+animation_type = 4
+metadata/_custom_type_script = "uid://y73360xhw2qs"
 
 [resource]
 script = ExtResource("2_5hcsj")
 card_name = "Knife"
 card_cost = 0
-actions = Array[ExtResource("1_o1lv3")]([SubResource("Resource_f2uno"), SubResource("Resource_de1ei"), SubResource("Resource_11kxx")])
+actions = Array[ExtResource("1_o1lv3")]([SubResource("Resource_f2uno"), SubResource("Resource_de1ei")])
 metadata/_custom_type_script = "uid://0gsjrx47no8b"

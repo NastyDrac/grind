@@ -11,6 +11,7 @@ var character_instance : Character
 
 @onready var character_image = $VBoxContainer/HBoxContainer/TextureRect
 @onready var health_bar = $VBoxContainer/HBoxContainer/Control/TextureProgressBar
+@onready var hp_formula_label = $VBoxContainer/HBoxContainer/Control/hp_formula_label
 @onready var swag_label = $VBoxContainer/HBoxContainer/VBoxContainer/VBoxContainer/guts_label
 @onready var guts_label = $VBoxContainer/HBoxContainer/VBoxContainer/VBoxContainer2/guts_label
 @onready var marbles_label = $VBoxContainer/HBoxContainer/VBoxContainer/VBoxContainer3/guts_label
@@ -66,10 +67,8 @@ func update_health_bar():
 	
 	match display_mode:
 		DisplayMode.BASE_STATS:
-			
 			var max_hp = _calculate_base_max_health()
 			var current_hp = character_data.current_health
-			
 			health_bar.max_value = max_hp
 			health_bar.value = current_hp
 			
@@ -77,6 +76,12 @@ func update_health_bar():
 			if character_instance:
 				health_bar.max_value = character_data.max_health.calculate(character_instance)
 				health_bar.value = character_instance.health
+
+	# Show the formula that drives max HP regardless of mode
+	if hp_formula_label and character_data.max_health and character_data.max_health.formula != "":
+		hp_formula_label.text = "( %s )" % character_data.max_health.formula
+	elif hp_formula_label:
+		hp_formula_label.text = ""
 
 func _calculate_base_max_health() -> int:
 	"""Calculate max health using base stats only"""

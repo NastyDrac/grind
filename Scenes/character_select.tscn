@@ -1,0 +1,16 @@
+[gd_scene load_steps=6 format=3 uid="uid://4f2i8ovjoh3b"]
+
+[ext_resource type="Script" uid="uid://b0slo2gkxcus2" path="res://Scripts/character_select_scene.gd" id="1_2b87j"]
+[ext_resource type="Script" uid="uid://dpayg0f6j5y2n" path="res://Scripts/character_data.gd" id="2_krxhl"]
+[ext_resource type="Resource" uid="uid://ce6l5lqjxvcs6" path="res://Characters/Engineer.tres" id="3_72d1u"]
+[ext_resource type="Resource" uid="uid://c2xwf8l4o67yn" path="res://Characters/regalur_guy.tres" id="4_d1kp4"]
+[ext_resource type="PackedScene" uid="uid://cssup3trfa1rg" path="res://Scenes/run_manager.tscn" id="5_brbi3"]
+
+[node name="character_select" type="Control"]
+layout_mode = 3
+anchors_preset = 0
+offset_right = 40.0
+offset_bottom = 40.0
+script = ExtResource("1_2b87j")
+characters = Array[ExtResource("2_krxhl")]([ExtResource("3_72d1u"), ExtResource("4_d1kp4")])
+run_manager_scene = ExtResource("5_brbi3")

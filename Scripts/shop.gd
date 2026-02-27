@@ -25,8 +25,8 @@ var leave_button         : Button
 var card_container       : HBoxContainer
 var thingy_container     : HBoxContainer
 var remove_card_button   : Button
-var remove_vbox          : VBoxContainer
-var deck_container       : VBoxContainer   # buttons, one per deck card
+var remove_overlay       : Panel            # full-screen card-picker overlay
+var deck_card_container  : HFlowContainer  # actual DraftableCard instances
 var cancel_remove_button : Button
 
 signal shop_closed
@@ -124,31 +124,55 @@ func _build_ui() -> void:
 	remove_card_button.pressed.connect(_on_remove_card_pressed)
 	root_vbox.add_child(remove_card_button)
 
-	# ── Deck removal overlay — hidden until needed ──
-	remove_vbox = VBoxContainer.new()
-	remove_vbox.size_flags_vertical = Control.SIZE_EXPAND_FILL
-	remove_vbox.visible = false
-	root_vbox.add_child(remove_vbox)
+	# ── Remove-card overlay — full screen, hidden until needed ──
+	remove_overlay = Panel.new()
+	remove_overlay.anchor_left   = 0.0
+	remove_overlay.anchor_top    = 0.0
+	remove_overlay.anchor_right  = 1.0
+	remove_overlay.anchor_bottom = 1.0
+	remove_overlay.offset_left   =  MARGIN
+	remove_overlay.offset_top    =  UIBAR_HEIGHT
+	remove_overlay.offset_right  = -MARGIN
+	remove_overlay.offset_bottom = -MARGIN
+	remove_overlay.visible = false
+	add_child(remove_overlay)   # sibling of panel, drawn on top
 
-	var remove_lbl := Label.new()
-	remove_lbl.text = "Select a card to remove from your deck:"
-	remove_vbox.add_child(remove_lbl)
+	var overlay_vbox := VBoxContainer.new()
+	overlay_vbox.anchor_right  = 1.0
+	overlay_vbox.anchor_bottom = 1.0
+	overlay_vbox.offset_left   =  12.0
+	overlay_vbox.offset_top    =  8.0
+	overlay_vbox.offset_right  = -12.0
+	overlay_vbox.offset_bottom = -8.0
+	overlay_vbox.add_theme_constant_override("separation", 8)
+	remove_overlay.add_child(overlay_vbox)
 
-	# Scrollable list of card-name buttons — much smaller than full card previews
-	var deck_scroll := ScrollContainer.new()
-	deck_scroll.size_flags_vertical = Control.SIZE_EXPAND_FILL
-	deck_scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
-	remove_vbox.add_child(deck_scroll)
+	var overlay_top := HBoxContainer.new()
+	overlay_vbox.add_child(overlay_top)
 
-	deck_container = VBoxContainer.new()
-	deck_container.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	deck_container.add_theme_constant_override("separation", 4)
-	deck_scroll.add_child(deck_container)
+	var overlay_lbl := Label.new()
+	overlay_lbl.text = "Choose a card to remove from your deck:"
+	overlay_lbl.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	overlay_lbl.add_theme_font_size_override("font_size", 16)
+	overlay_top.add_child(overlay_lbl)
 
 	cancel_remove_button = Button.new()
-	cancel_remove_button.text = "Cancel"
+	cancel_remove_button.text = "← Back"
 	cancel_remove_button.pressed.connect(_on_cancel_remove_pressed)
-	remove_vbox.add_child(cancel_remove_button)
+	overlay_top.add_child(cancel_remove_button)
+
+	overlay_vbox.add_child(HSeparator.new())
+
+	var deck_scroll := ScrollContainer.new()
+	deck_scroll.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	deck_scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_AUTO
+	overlay_vbox.add_child(deck_scroll)
+
+	deck_card_container = HFlowContainer.new()
+	deck_card_container.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	deck_card_container.add_theme_constant_override("h_separation", 16)
+	deck_card_container.add_theme_constant_override("v_separation", 16)
+	deck_scroll.add_child(deck_card_container)
 
 # ─── Public entry point ───────────────────────────────────────────────────────
 
@@ -279,40 +303,51 @@ func _on_remove_card_pressed() -> void:
 	if run.character.gold < REMOVE_COST:
 		_flash_button(remove_card_button, "Need %d Gold!" % REMOVE_COST)
 		return
-	remove_vbox.visible = true
+	remove_overlay.visible = true
 	_populate_deck_for_removal()
 
 func _populate_deck_for_removal() -> void:
-	for child in deck_container.get_children():
+	for child in deck_card_container.get_children():
 		child.queue_free()
 
 	if run.deck.is_empty():
 		var lbl := Label.new()
 		lbl.text = "Your deck is empty."
-		deck_container.add_child(lbl)
+		deck_card_container.add_child(lbl)
 		return
 
-	# One button per card — shows name and cost, fits any deck size on screen
 	for card_data in run.deck:
-		var btn := Button.new()
-		btn.text = "%s  (Cost: %d)  [%s]" % [
-			card_data.card_name,
-			card_data.card_cost,
-			_rarity_label(card_data.get("rarity") if card_data.get("rarity") != null else 0)
-		]
-		btn.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-		btn.pressed.connect(_on_remove_card_selected.bind(card_data))
-		deck_container.add_child(btn)
+		var slot := VBoxContainer.new()
+		slot.alignment = BoxContainer.ALIGNMENT_CENTER
+
+		var card : DraftableCard = card_scene.instantiate()
+		slot.add_child(card)
+
+		var rarity : int = card_data.get("rarity") if card_data.get("rarity") != null else 0
+		var rarity_lbl := Label.new()
+		rarity_lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+		rarity_lbl.text = _rarity_label(rarity)
+		rarity_lbl.add_theme_color_override("font_color", _rarity_color(rarity))
+		slot.add_child(rarity_lbl)
+
+		var remove_btn := Button.new()
+		remove_btn.text = "Remove  (-%d Gold)" % REMOVE_COST
+		remove_btn.pressed.connect(_on_remove_card_selected.bind(card_data))
+		slot.add_child(remove_btn)
+
+		deck_card_container.add_child(slot)
+		card.set_data(card_data)
+		card.current_mode = card.Mode.DISPLAY_ONLY
 
 func _on_remove_card_selected(card_data: CardData) -> void:
 	run.character.gold -= REMOVE_COST
 	run.deck.erase(card_data)
 	_refresh_gold_label()
 	_refresh_remove_button()
-	remove_vbox.visible = false
+	remove_overlay.visible = false
 
 func _on_cancel_remove_pressed() -> void:
-	remove_vbox.visible = false
+	remove_overlay.visible = false
 
 # ─── Leave ────────────────────────────────────────────────────────────────────
 

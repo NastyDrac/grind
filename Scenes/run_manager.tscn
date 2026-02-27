@@ -57,10 +57,9 @@ metadata/_custom_type_script = "uid://0gsjrx47no8b"
 script = ExtResource("17_boem8")
 metadata/_custom_type_script = "uid://dbrkkfbjmvvar"
 
-[node name="RunManager" type="Node2D" node_paths=PackedStringArray("thingies")]
+[node name="RunManager" type="Node2D"]
 script = ExtResource("1_u1n32")
 deck = Array[ExtResource("2_0y178")]([ExtResource("3_obnx0"), ExtResource("4_rqa6y"), ExtResource("5_fqwpn"), ExtResource("6_df7m0"), ExtResource("7_0c4k1"), ExtResource("8_boem8"), SubResource("Resource_0ycsu")])
-thingies = [NodePath("")]
 character = ExtResource("14_4342n")
 character_sheet_scene = ExtResource("12_4nan2")
 horde = Array[ExtResource("8_obnx0")]([ExtResource("8_qhjl3"), ExtResource("15_dic3b"), ExtResource("16_tvxjp")])

@@ -1,16 +1,6 @@
 extends Node2D
 class_name MapGenerator
 
-## ─────────────────────────────────────────────────────────────────────────────
-##  MapGenerator
-##  Road-first city map with Slay-the-Spire node overlay.
-##
-##  RunManager usage:
-##    map_generator.build(rng)
-##    map_generator.node_chosen.connect(_on_map_node_chosen)
-##    map_generator.mark_visited_and_advance(chosen_node)   # after resolution
-## ─────────────────────────────────────────────────────────────────────────────
-
 # ── Layout ────────────────────────────────────────────────────────────────────
 @export var columns        : int   = 7
 @export var rows           : int   = 4
@@ -27,7 +17,7 @@ class_name MapGenerator
 ## 0.0 = rural  →  1.0 = dense city
 @export_range(0.0, 1.0) var urban_density    : float = 0.75
 ## How tightly buildings pack to the road edge
-@export_range(0.1, 1.0) var building_coverage: float = 0.65
+@export_range(0.1, 1.0) var building_coverage: float = 0.65 
 
 # ── Node type weights ─────────────────────────────────────────────────────────
 @export_group("Node Weights – Early Columns")
@@ -95,8 +85,8 @@ const C_BORDER       := Color(0.12, 0.10, 0.08)
 const C_ROUTE_GLOW    := Color(0.20, 0.55, 1.00, 0.20)  # soft halo
 const C_ROUTE_CASE    := Color(0.08, 0.28, 0.65, 1.00)  # dark outline
 const C_ROUTE_FILL    := Color(0.502, 0.553, 1.0, 1.0)  # light surface
-const C_ROUTE_VISITED := Color(0.35, 0.32, 0.28, 0.80)  # already travelled
-const C_ROUTE_OFF     := Color(0.35, 0.32, 0.28, 0.45)  # future / not yet reachable
+const C_ROUTE_VISITED := Color(1.0, 1.0, 1.0, 1.0)  # already travelled
+const C_ROUTE_OFF     := Color(0.0, 0.0, 0.0, 1.0)  # future / not yet reachable
 
 # ─────────────────────────────────────────────────────────────────────────────
 #  PUBLIC API

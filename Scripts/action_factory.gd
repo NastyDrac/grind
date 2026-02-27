@@ -1,7 +1,7 @@
 extends Node
 class_name ActionFactory
 
-
+#Does not currently work
 
 static func create_damage_action(expression: String, target_type = Action.TargetType.SINGLE_ENEMY, description: String = "") -> Action:
 	var action = AttackAction.new()

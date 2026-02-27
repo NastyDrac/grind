@@ -24,14 +24,20 @@ func execute(target: Variant) -> void:
 func get_description_with_values(character: Variant) -> String:
 	if not character or not modify_calculator:
 		return "Modify"
-	
-	var mod_value = modify_calculator.calculate(character)
-	var formula_display = _format_formula_display(modify_calculator.formula)
-	var stat_name = _get_stat_name(stat_to_modify)
-	var modifier_sign = "+" if mod_value >= 0 else ""
-	
-	return "Modify %s: §%s%d§ (%s)" % [stat_name, modifier_sign, mod_value, formula_display]
 
+	var mod_value      : int    = modify_calculator.calculate(character)
+	var formula        : String = modify_calculator.formula
+	var stat_name      : String = _get_stat_name(stat_to_modify)
+	var modifier_sign  : String = "+" if mod_value >= 0 else ""
+	var is_plain_number: bool   = formula.is_valid_int()
+
+	if is_plain_number:
+		# e.g. "Modify Swag: +§5§"  — no formula needed
+		return "Modify %s: %s%d" % [stat_name, modifier_sign, mod_value]
+	else:
+		# e.g. "Modify Swag: +§10§ (swag * 2)"
+		var formula_display := _format_formula_display(formula)
+		return "Modify %s: §%s%d§ (%s)" % [stat_name, modifier_sign, mod_value, formula_display]
 func _get_stat_name(stat_type: Stat.STAT) -> String:
 	match stat_type:
 		Stat.STAT.SWAG:

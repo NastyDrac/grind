@@ -15,9 +15,12 @@ func get_action_type() -> String:
 ## Damage is applied AFTER the animation completes.
 ## The card handler should call play_animation_and_execute() rather than
 ## execute() directly so the visual stays in sync with the damage.
-func execute(target: Enemy) -> void:
+func execute(target) -> void:
 	if not player:
 		push_error("AttackAction requires a valid Character")
+		return
+	if not target:
+		push_error("AttackAction.execute: target is null")
 		return
 
 	var damage = damage_calculator.calculate(player)

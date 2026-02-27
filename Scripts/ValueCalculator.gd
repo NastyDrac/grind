@@ -49,7 +49,7 @@ func _find_stat_from_character(player: Character, stat_type: Stat.STAT) -> int:
 func _compile_expression() -> void:
 	_expression = Expression.new()
 	# Parse with variable names as input
-	var error = _expression.parse(formula, ["swag", "guts", "bang", "marbles", "hustle", "mojo"])
+	var error = _expression.parse(formula, ["swag", "guts", "bang", "hustle", "marbles", "mojo"])
 	
 	if error != OK:
 		push_error("Failed to parse formula '%s': %s" % [formula, _expression.get_error_text()])

@@ -32,6 +32,9 @@ var current_event_scene: EventScene = null
 
 var current_draft_screen: DraftScreen = null
 var current_shop: Shop = null
+var current_gym      : Gym      = null
+var current_hospital : Hospital = null
+var current_services : Services = null
 
 # ── Map ───────────────────────────────────────────────────────────────────────
 ## Assign the MapGenerator scene in the inspector.
@@ -89,6 +92,12 @@ func _on_map_node_chosen(node: MapNode) -> void:
 			begin_combat()
 		MapNode.NodeType.SHOP:
 			create_shop()
+		MapNode.NodeType.GYM:
+			create_gym()
+		MapNode.NodeType.SERVICES:
+			create_services()
+		MapNode.NodeType.HOSPITAL:
+			create_hospital()
 		_:
 			_show_event_for_node(node)
 
@@ -200,8 +209,10 @@ func create_card_handler():
 func create_player():
 	player = load("res://Scenes/character.tscn").instantiate()
 	add_child(player)
-	player.run_manager = self  
+	player.run_manager = self
 	player.set_data(character)
+	if ui_bar:
+		ui_bar.set_health()
 
 func create_ui():
 	var ui : UIBar = load("res://Scenes/ui_bar.tscn").instantiate()
@@ -209,7 +220,7 @@ func create_ui():
 	add_child(ui)
 	ui_bar = ui
 	ui.set_gold()
-	ui.set_health()
+	# set_health() is called after create_player() so run_manager.player exists
 
 # ─────────────────────────────────────────────────────────────────────────────
 #  RESOLVE NODE → RETURN TO MAP
@@ -374,6 +385,72 @@ func close_shop() -> void:
 
 func _on_shop_closed() -> void:
 	pass
+
+# ─────────────────────────────────────────────────────────────────────────────
+#  GYM
+# ─────────────────────────────────────────────────────────────────────────────
+
+func create_gym() -> void:
+	if current_gym:
+		current_gym.queue_free()
+	current_gym = Gym.new()
+	add_child(current_gym)
+	current_gym.gym_closed.connect(close_gym)
+	current_gym.display_gym(self)
+
+func close_gym() -> void:
+	if current_gym:
+		current_gym.queue_free()
+		current_gym = null
+	_resolve_pending_node()
+
+# ─────────────────────────────────────────────────────────────────────────────
+#  HOSPITAL
+# ─────────────────────────────────────────────────────────────────────────────
+
+func create_hospital() -> void:
+	if current_hospital:
+		current_hospital.queue_free()
+	current_hospital = Hospital.new()
+	add_child(current_hospital)
+	current_hospital.hospital_closed.connect(close_hospital)
+	current_hospital.display_hospital(self)
+
+func close_hospital() -> void:
+	if current_hospital:
+		current_hospital.queue_free()
+		current_hospital = null
+	_resolve_pending_node()
+
+# ─────────────────────────────────────────────────────────────────────────────
+#  SERVICES
+# ─────────────────────────────────────────────────────────────────────────────
+
+func create_services() -> void:
+	if current_services:
+		current_services.queue_free()
+	current_services = Services.new()
+	add_child(current_services)
+	current_services.service_chosen.connect(_on_service_chosen)
+	current_services.display_services(self)
+
+func close_services() -> void:
+	if current_services:
+		current_services.queue_free()
+		current_services = null
+
+func _on_service_chosen(service: String) -> void:
+	close_services()
+	match service:
+		"hospital":
+			create_hospital()
+		"gym":
+			create_gym()
+		"shop":
+			create_shop()
+		_:
+			push_warning("RunManager: unknown service '%s'" % service)
+			_resolve_pending_node()
 
 # ─────────────────────────────────────────────────────────────────────────────
 #  CARDS

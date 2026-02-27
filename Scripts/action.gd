@@ -35,8 +35,6 @@ enum AnimationType {
 
 @export var animation_type: AnimationType = AnimationType.NONE
 
-# Emitted by AnimationManager once the visual has finished playing.
-# play_animation_and_execute() awaits this before applying damage.
 signal animation_done
 
 
