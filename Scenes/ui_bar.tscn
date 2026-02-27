@@ -50,7 +50,7 @@ text = "Help"
 
 [node name="Log" type="Button" parent="UI Bar/HBoxContainer"]
 layout_mode = 2
-text = "Log"
+text = "Character Info"
 
 [connection signal="pressed" from="UI Bar/HBoxContainer/Settings" to="." method="_on_settings_pressed"]
 [connection signal="pressed" from="UI Bar/HBoxContainer/Help" to="." method="_on_help_pressed"]

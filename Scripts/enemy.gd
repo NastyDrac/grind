@@ -15,6 +15,7 @@ var run_manager
 
 signal enemy_attack_player(enemy : Enemy, damage : int)
 signal enemy_moved(enemy : Enemy, old_range : int, new_range : int)
+signal enemy_player_moved(enemy : Enemy, old_range : int, new_range : int)
 
 @onready var sprite := $Sprite2D
 
@@ -92,6 +93,20 @@ func move_toward_player():
 
 func attack_player():
 	Global.enemy_attacks_player.emit(self, data.damage)
+
+
+## Push this enemy away from the player by the given number of range steps.
+## Always use this for push effects — it emits enemy_moved so the range manager
+## stays in sync, and enemy_player_moved so Newton's Cradle (player-only) fires.
+func push(amount: int) -> void:
+	if amount <= 0:
+		return
+	var old_range := current_range
+	current_range += amount
+	if range_manager:
+		target_position = range_manager.get_position_for_enemy(self)
+	enemy_moved.emit(self, old_range, current_range)
+	enemy_player_moved.emit(self, old_range, current_range)
 
 func get_current_range() -> int:
 	return current_range
@@ -171,4 +186,4 @@ func _hide_hover_feedback():
 		if selection_highlight:
 			selection_highlight.modulate = Color(1.0, 1.0, 1.0) 
 		elif not target_highlight:
-			_update_visual_state()  
+			_update_visual_state()

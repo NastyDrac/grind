@@ -22,17 +22,20 @@ func execute(target: Enemy) -> void:
 	
 	var distance = _calculate_distance()
 	
-	
 	var current_range = target.get_current_range()
-	var old_range = current_range
-	
-	
 	var new_range = clamp(current_range + distance, 0, 5)
+	var clamped_distance = new_range - current_range
 	
-	
-	if new_range != old_range:
+	if clamped_distance > 0:
+		target.push(clamped_distance)
+	elif clamped_distance < 0:
+		# Pull — player-forced movement, so emit both enemy_moved and enemy_player_moved
+		var old_range = current_range
 		target.current_range = new_range
+		if target.range_manager:
+			target.target_position = target.range_manager.get_position_for_enemy(target)
 		target.enemy_moved.emit(target, old_range, new_range)
+		target.enemy_player_moved.emit(target, old_range, new_range)
 
 func get_description_with_values(character: Character) -> String:
 	if not character or not distance_calculator:

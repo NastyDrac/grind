@@ -273,13 +273,16 @@ func on_player_death():
 func add_thingy(thingy: Thingy) -> void:
 	thingies.append(thingy)
 	add_child(thingy)
-	if current_state == GameState.COMBAT and player and range_manager:
+	
+	# Only wire up combat connections if we're actually in combat.
+	# If purchased at the shop, _setup_thingies() will handle it at wave start.
+	if current_state == GameState.COMBAT:
 		thingy.setup(player, range_manager)
 
 
 ## Wire every thingy up for the current combat wave.
 func _setup_thingies() -> void:
-	if thingies.is_empty() != false:
+	if not thingies.is_empty():
 		for thingy in thingies:
 			thingy.setup(player, range_manager)
 
@@ -287,7 +290,7 @@ func _setup_thingies() -> void:
 ## Disconnect every thingy from the combat that just ended.
 ## Thingies themselves are NOT freed — they carry over to the next wave.
 func _teardown_thingies() -> void:
-	if thingies.is_empty() != false:
+	if not thingies.is_empty():
 		for thingy in thingies:
 			thingy.teardown()
 
