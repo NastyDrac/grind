@@ -270,22 +270,32 @@ func _draw_border() -> void:
 # Three draw passes so casing and fill are consistent regardless of draw order.
 
 func _draw_routes() -> void:
-	# Pass 0 – wide soft glow behind active/reachable routes only
+	# Split edges into inactive (future) and active (visited/reachable).
+	var inactive : Array = []
+	var active   : Array = []
 	for e in _path_edges:
 		if e["from"].is_visited and (e["to"].is_visited or e["to"].is_reachable):
-			_draw_route_pts(e["pts"], C_ROUTE_GLOW, 20.0)
+			active.append(e)
+		else:
+			inactive.append(e)
 
-	# Pass 1 – dark casing for all edges (future paths at low alpha via C_ROUTE_OFF)
-	for e in _path_edges:
+	# ── Draw inactive paths first (underneath) ────────────────────────────────
+	for e in inactive:
 		var col := _route_colour(e["from"], e["to"])
 		_draw_route_pts(e["pts"], col.darkened(0.5), 9.0)
-
-	# Pass 2 – light surface for all edges
-	for e in _path_edges:
+	for e in inactive:
 		var col := _route_colour(e["from"], e["to"])
 		_draw_route_pts(e["pts"], col, 4.0)
 
-## Draw the pre-computed waypoint list as connected line segments.
+	# ── Draw active paths on top ───────────────────────────────────────────────
+	for e in active:
+		_draw_route_pts(e["pts"], C_ROUTE_GLOW, 20.0)   # soft glow halo
+	for e in active:
+		var col := _route_colour(e["from"], e["to"])
+		_draw_route_pts(e["pts"], col.darkened(0.5), 9.0)
+	for e in active:
+		var col := _route_colour(e["from"], e["to"])
+		_draw_route_pts(e["pts"], col, 4.0)
 func _draw_route_pts(pts: Array, col: Color, w: float) -> void:
 	for i in range(pts.size() - 1):
 		draw_line(pts[i], pts[i + 1], col, w, true)

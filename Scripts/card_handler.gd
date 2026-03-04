@@ -24,6 +24,7 @@ var discard_stack : Array[Card]
 @export var hover_y_offset := -50.0
 @export var hover_transition_speed := 15.0
 @export var base_scale := Vector2(.75, .75)
+@export var card_height_px : int
 var card_zoom := Vector2(1.5,1.5)
 
 var cards_in_hand : Array[Card]
@@ -315,16 +316,21 @@ func _animate_hovered_card(delta: float):
 	if not card_position.has(hovered_card):
 		return
 	
-	var base_pos = card_position[hovered_card]["position"]
-	var target_pos = base_pos + Vector2(0, hover_y_offset)
-	var target_rotation = 0.0
-	var target_scale = base_scale * hover_scale
-	
-	var speed = hover_transition_speed * delta
-	hovered_card.position = hovered_card.position.lerp(target_pos, speed)
-	hovered_card.rotation_degrees = lerp(hovered_card.rotation_degrees, target_rotation, speed)
-	hovered_card.scale = hovered_card.scale.lerp(target_scale, speed)
+	var target_scale      := base_scale * hover_scale
+	var viewport_height   = get_viewport().size.y
+	var scaled_height     = card_height_px * target_scale.y
+	# Global Y where the card's top must sit so its bottom edge = screen bottom
+	var target_global_y   = viewport_height - scaled_height
+	# Convert to Hand-local space
+	var target_local_y    = hand.to_local(Vector2(0.0, target_global_y)).y
 
+	var base_pos   = card_position[hovered_card]["position"]
+	var target_pos = Vector2(base_pos.x, target_local_y)
+
+	var speed = hover_transition_speed * delta
+	hovered_card.position         = hovered_card.position.lerp(target_pos, speed)
+	hovered_card.rotation_degrees = lerp(hovered_card.rotation_degrees, 0.0, speed)
+	hovered_card.scale            = hovered_card.scale.lerp(target_scale, speed)
 func _animate_non_hovered_cards(delta: float):
 	for card in cards_in_hand:
 		# Skip cards that are staged (being selected for discard)
@@ -625,11 +631,11 @@ func _start_card_targeting_for_action(action: Action):
 	
 	# Get how many cards to select
 	
-	if action.num_cards is ValueCalculator:
-		card_target_max = action.num_cards.calculate(run_manager.player)
+	if action.card_count_calculator is ValueCalculator:
+		card_target_max = action.card_count_calculator.calculate(run_manager.player)
 	else:
 		# Fallback for backwards compatibility if someone uses an int
-		card_target_max = action.num_cards
+		card_target_max = action.card_count_calculator.calculate()
 	
 	
 	

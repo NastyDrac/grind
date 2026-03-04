@@ -1,4 +1,4 @@
-[gd_scene load_steps=32 format=3 uid="uid://cssup3trfa1rg"]
+[gd_scene load_steps=33 format=3 uid="uid://cssup3trfa1rg"]
 
 [ext_resource type="Script" uid="uid://nami4xhnpwrm" path="res://Scripts/run_manager.gd" id="1_u1n32"]
 [ext_resource type="Script" uid="uid://0gsjrx47no8b" path="res://Scripts/card_data.gd" id="2_0y178"]
@@ -20,6 +20,7 @@
 [ext_resource type="Script" uid="uid://cgrxhw8vqenhu" path="res://Scripts/ValueCalculator.gd" id="12_awuji"]
 [ext_resource type="Resource" uid="uid://ce6l5lqjxvcs6" path="res://Characters/Engineer.tres" id="14_4342n"]
 [ext_resource type="Resource" uid="uid://byxygfcotqt5s" path="res://Enemies/runner.tres" id="15_dic3b"]
+[ext_resource type="Script" uid="uid://6vpnqyvhbord" path="res://Scripts/horde_pool.gd" id="16_1tppy"]
 [ext_resource type="Resource" uid="uid://2omyroag2mcs" path="res://Enemies/bloater.tres" id="16_tvxjp"]
 [ext_resource type="Script" uid="uid://dbrkkfbjmvvar" path="res://Scripts/defeat_x_enemies.gd" id="17_boem8"]
 [ext_resource type="Resource" uid="uid://dc6blxo3bgxci" path="res://events/example_card_reward_event.tres" id="19_boem8"]
@@ -62,6 +63,7 @@ script = ExtResource("1_u1n32")
 deck = Array[ExtResource("2_0y178")]([ExtResource("3_obnx0"), ExtResource("4_rqa6y"), ExtResource("5_fqwpn"), ExtResource("6_df7m0"), ExtResource("7_0c4k1"), ExtResource("8_boem8"), SubResource("Resource_0ycsu")])
 character = ExtResource("14_4342n")
 character_sheet_scene = ExtResource("12_4nan2")
+act_recipe_pools = Array[ExtResource("16_1tppy")]([null])
 horde = Array[ExtResource("8_obnx0")]([ExtResource("8_qhjl3"), ExtResource("15_dic3b"), ExtResource("16_tvxjp")])
 win_condition = SubResource("Resource_hl081")
 available_events = Array[ExtResource("10_obnx0")]([ExtResource("11_rqa6y"), ExtResource("20_h8e1q"), ExtResource("19_boem8")])

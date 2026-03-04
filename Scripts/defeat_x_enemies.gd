@@ -24,3 +24,5 @@ func get_progress_text() -> String:
 func cleanup() -> void:
 	if Global.enemy_dies.is_connected(_on_enemy_died):
 		Global.enemy_dies.disconnect(_on_enemy_died)
+func get_announcement_text() -> String:
+	return "Defeat %d Enemies" % enemies_to_defeat

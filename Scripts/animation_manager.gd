@@ -278,3 +278,70 @@ func _flash_red(node: Node2D, duration: float) -> void:
 	tween.tween_property(node, "modulate", original, duration * 0.7) \
 		.set_trans(Tween.TRANS_SINE)
 	await tween.finished
+
+# ============================================================================
+# HEAL  — paste this block directly below _play_buff() in animation_manager.gd
+# ============================================================================
+# Bright green motes rise from the target and a soft green flash washes over it.
+# Called directly from HealCondition — no Action or signal needed.
+
+func play_heal(target: Node2D) -> void:
+	if not is_instance_valid(target):
+		return
+	var at := target.global_position
+	_play_heal_motes(at)
+	_flash_green(target, 0.30)
+
+
+func _play_heal_motes(at: Vector2) -> void:
+	const NUM_MOTES := 8
+	const DURATION  := 0.50
+
+	var green_tones := [
+		Color(0.20, 1.00, 0.40),   # Bright green
+		Color(0.35, 0.90, 0.35),   # Mid green
+		Color(0.55, 1.00, 0.20),   # Yellow-green
+	]
+
+	var motes : Array[ColorRect] = []
+
+	for i in NUM_MOTES:
+		var mote := ColorRect.new()
+		mote.size         = Vector2(10.0, 10.0)
+		mote.pivot_offset = mote.size * 0.5
+		mote.color        = green_tones[i % green_tones.size()]
+		mote.z_index      = 200
+
+		var offset  := Vector2(randf_range(-30.0, 30.0), randf_range(-5.0, 20.0))
+		mote.global_position = at + offset - mote.pivot_offset
+		_spawn(mote)
+		motes.append(mote)
+
+		var delay   := i * 0.04
+		var rise    := Vector2(randf_range(-15.0, 15.0), randf_range(-60.0, -100.0))
+		var end_pos := mote.global_position + rise
+
+		var tween := create_tween()
+		tween.set_parallel(true)
+		tween.tween_property(mote, "global_position", end_pos, DURATION) \
+			.set_delay(delay).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
+		tween.tween_property(mote, "modulate:a", 0.0, DURATION * 0.75) \
+			.set_delay(delay + DURATION * 0.25)
+
+	await get_tree().create_timer(DURATION + NUM_MOTES * 0.04).timeout
+
+	for mote in motes:
+		if is_instance_valid(mote):
+			mote.queue_free()
+
+
+## Flashes the target node to bright green then fades back to its original colour.
+## Can be awaited or called fire-and-forget.
+func _flash_green(node: Node2D, duration: float) -> void:
+	var original := node.modulate
+	var tween    := create_tween()
+	tween.tween_property(node, "modulate", Color(0.25, 1.80, 0.40), duration * 0.3) \
+		.set_trans(Tween.TRANS_SINE)
+	tween.tween_property(node, "modulate", original, duration * 0.7) \
+		.set_trans(Tween.TRANS_SINE)
+	await tween.finished

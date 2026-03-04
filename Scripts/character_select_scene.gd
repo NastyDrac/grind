@@ -62,17 +62,15 @@ func _ready() -> void:
 # ─────────────────────────────────────────────────────────────────────────────
 
 func _build_ui() -> void:
-	# ── Full-screen background ──
 	var bg := ColorRect.new()
-	bg.anchor_right  = 1.0
-	bg.anchor_bottom = 1.0
+	bg.set_anchors_preset(Control.PRESET_FULL_RECT)
 	bg.color = Color(0.08, 0.08, 0.10)
 	add_child(bg)
 
-	# ── Root VBox: top detail | bottom cards ──
 	var root_vbox := VBoxContainer.new()
-	root_vbox.anchor_right  = 1.0
-	root_vbox.anchor_bottom = 1.0
+	# Use PRESET_FULL_RECT then apply margins via offsets — this is the
+	# reliable way to get a VBox that actually respects the screen edge.
+	root_vbox.set_anchors_preset(Control.PRESET_FULL_RECT)
 	root_vbox.offset_left   =  24.0
 	root_vbox.offset_top    =  20.0
 	root_vbox.offset_right  = -24.0
@@ -82,14 +80,14 @@ func _build_ui() -> void:
 
 	_build_top_panel(root_vbox)
 	_build_bottom_panel(root_vbox)
-
 	_populate_character_list()
 
 # ── TOP: character sheet detail (~50% of screen) ─────────────────────────────
 
 func _build_top_panel(parent: Control) -> void:
 	_detail_panel = PanelContainer.new()
-	_detail_panel.size_flags_vertical   = Control.SIZE_EXPAND_FILL
+	_detail_panel.size_flags_horizontal    = Control.SIZE_EXPAND_FILL
+	_detail_panel.size_flags_vertical      = Control.SIZE_EXPAND_FILL
 	_detail_panel.size_flags_stretch_ratio = 1.0
 
 	var style := StyleBoxFlat.new()
@@ -105,7 +103,6 @@ func _build_top_panel(parent: Control) -> void:
 	outer_vbox.add_theme_constant_override("separation", 14)
 	_detail_panel.add_child(outer_vbox)
 
-	# ── Placeholder (before selection) ──
 	_placeholder_lbl = Label.new()
 	_placeholder_lbl.text = "↓ Select a character below to preview"
 	_placeholder_lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
@@ -115,40 +112,39 @@ func _build_top_panel(parent: Control) -> void:
 	_placeholder_lbl.add_theme_font_size_override("font_size", 16)
 	outer_vbox.add_child(_placeholder_lbl)
 
-	# ── Content (hidden until selection) ──
 	var content_vbox := VBoxContainer.new()
+	content_vbox.size_flags_horizontal = Control.SIZE_EXPAND_FILL  # ← key fix
 	content_vbox.add_theme_constant_override("separation", 10)
 	content_vbox.visible = false
 	outer_vbox.add_child(content_vbox)
 	outer_vbox.set_meta("content_ref", content_vbox)
 
-	# ── Main row: portrait | stats+HP | effects ──
 	var main_hbox := HBoxContainer.new()
-	main_hbox.add_theme_constant_override("separation", 24)
+	main_hbox.size_flags_horizontal = Control.SIZE_EXPAND_FILL     # ← key fix
+	main_hbox.add_theme_constant_override("separation", 16)        # tighter gap
 	main_hbox.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	content_vbox.add_child(main_hbox)
 
-	# Portrait
+	# Portrait — reduced and no longer forces the row wider than needed
 	_detail_portrait = TextureRect.new()
-	_detail_portrait.custom_minimum_size = Vector2(160, 160)
+	_detail_portrait.custom_minimum_size   = Vector2(120, 120)     # was 160×160
+	_detail_portrait.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
 	_detail_portrait.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
 	_detail_portrait.expand_mode  = TextureRect.EXPAND_FIT_HEIGHT
 	main_hbox.add_child(_detail_portrait)
 
-	var sep1 := VSeparator.new()
-	main_hbox.add_child(sep1)
+	main_hbox.add_child(VSeparator.new())
 
-	# ── Middle column: name + HP + stats ──
 	var mid_vbox := VBoxContainer.new()
 	mid_vbox.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	mid_vbox.add_theme_constant_override("separation", 8)
 	main_hbox.add_child(mid_vbox)
 
 	_detail_name = Label.new()
-	_detail_name.add_theme_font_size_override("font_size", 24)
+	_detail_name.add_theme_font_size_override("font_size", 22)
+	_detail_name.clip_contents = true                              # ← prevent name overflow
 	mid_vbox.add_child(_detail_name)
 
-	# HP section
 	var hp_section := VBoxContainer.new()
 	hp_section.add_theme_constant_override("separation", 3)
 	mid_vbox.add_child(hp_section)
@@ -176,14 +172,15 @@ func _build_top_panel(parent: Control) -> void:
 	_detail_hp_formula.add_theme_font_size_override("font_size", 11)
 	_detail_hp_formula.add_theme_color_override("font_color", Color(0.50, 0.50, 0.50))
 	_detail_hp_formula.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	_detail_hp_formula.clip_contents = true                        # ← prevent formula overflow
 	hp_row.add_child(_detail_hp_formula)
 
 	mid_vbox.add_child(HSeparator.new())
 
-	# Stats — 2-column grid
 	var stats_grid := GridContainer.new()
 	stats_grid.columns = 2
-	stats_grid.add_theme_constant_override("h_separation", 28)
+	stats_grid.size_flags_horizontal = Control.SIZE_EXPAND_FILL    # ← fill mid column
+	stats_grid.add_theme_constant_override("h_separation", 16)     # was 28
 	stats_grid.add_theme_constant_override("v_separation", 5)
 	mid_vbox.add_child(stats_grid)
 
@@ -199,15 +196,15 @@ func _build_top_panel(parent: Control) -> void:
 		stats_grid.add_child(row)
 
 		var icon := TextureRect.new()
-		icon.texture              = load(icon_path)
-		icon.custom_minimum_size  = Vector2(16, 16)
-		icon.stretch_mode         = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
-		icon.expand_mode          = TextureRect.EXPAND_FIT_WIDTH_PROPORTIONAL
+		icon.texture             = load(icon_path)
+		icon.custom_minimum_size = Vector2(16, 16)
+		icon.stretch_mode        = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+		icon.expand_mode         = TextureRect.EXPAND_FIT_WIDTH_PROPORTIONAL
 		row.add_child(icon)
 
 		var name_lbl := Label.new()
 		name_lbl.text = "%s:" % stat_name
-		name_lbl.custom_minimum_size = Vector2(64, 0)
+		name_lbl.custom_minimum_size = Vector2(52, 0)              # was 64
 		name_lbl.add_theme_color_override("font_color", col)
 		name_lbl.add_theme_font_size_override("font_size", 13)
 		row.add_child(name_lbl)
@@ -219,12 +216,11 @@ func _build_top_panel(parent: Control) -> void:
 
 		_detail_stat_rows[stat_type] = val_lbl
 
-	var sep2 := VSeparator.new()
-	main_hbox.add_child(sep2)
+	main_hbox.add_child(VSeparator.new())
 
-	# ── Right column: special effects ──
+	# Right column — no fixed minimum width, let it flex
 	var fx_vbox := VBoxContainer.new()
-	fx_vbox.custom_minimum_size = Vector2(180, 0)
+	fx_vbox.size_flags_horizontal = Control.SIZE_EXPAND_FILL       # was fixed 180px min
 	fx_vbox.add_theme_constant_override("separation", 6)
 	main_hbox.add_child(fx_vbox)
 
@@ -238,12 +234,12 @@ func _build_top_panel(parent: Control) -> void:
 	_detail_effects.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	_detail_effects.add_theme_color_override("font_color", Color(0.78, 0.78, 0.78))
 	_detail_effects.add_theme_font_size_override("font_size", 12)
-	_detail_effects.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	_detail_effects.size_flags_vertical   = Control.SIZE_EXPAND_FILL
+	_detail_effects.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	fx_vbox.add_child(_detail_effects)
 
 	content_vbox.add_child(HSeparator.new())
 
-	# ── Begin Run button ──
 	_begin_btn = Button.new()
 	_begin_btn.text    = "Begin Run"
 	_begin_btn.visible = false

@@ -1,6 +1,7 @@
-[gd_resource type="Resource" script_class="EnemyData" load_steps=3 format=3 uid="uid://byxygfcotqt5s"]
+[gd_resource type="Resource" script_class="EnemyData" load_steps=4 format=3 uid="uid://byxygfcotqt5s"]
 
 [ext_resource type="Script" uid="uid://tnxg66jw03v3" path="res://Scripts/enemy_data.gd" id="1_3s7dc"]
+[ext_resource type="Script" uid="uid://b1ogi3xh5xakp" path="res://Scripts/condition.gd" id="1_aa1k1"]
 [ext_resource type="Texture2D" uid="uid://dh3ghgo4uvj2i" path="res://Art/runner.png" id="2_u23b3"]
 
 [resource]

@@ -1,11 +1,28 @@
-[gd_resource type="Resource" script_class="EnemyData" load_steps=4 format=3 uid="uid://bfr5bliq5oiih"]
+[gd_resource type="Resource" script_class="EnemyData" load_steps=8 format=3 uid="uid://bfr5bliq5oiih"]
 
 [ext_resource type="Script" uid="uid://tnxg66jw03v3" path="res://Scripts/enemy_data.gd" id="1_8vfdf"]
 [ext_resource type="Script" uid="uid://b1ogi3xh5xakp" path="res://Scripts/condition.gd" id="1_nkj5m"]
 [ext_resource type="Texture2D" uid="uid://c50c16qnyv3tl" path="res://Art/Walk (1).png" id="2_2orq7"]
+[ext_resource type="Script" uid="uid://bpr8cwurcrxy3" path="res://Scripts/triggered_condition.gd" id="2_hwfw4"]
+[ext_resource type="Script" uid="uid://c4ykbt10defal" path="res://Scripts/heal_condition.gd" id="3_75ahp"]
+
+[sub_resource type="Resource" id="Resource_f8bxa"]
+script = ExtResource("3_75ahp")
+condition_name = "Heal"
+stacks = 5
+metadata/_custom_type_script = "uid://c4ykbt10defal"
+
+[sub_resource type="Resource" id="Resource_grr4f"]
+script = ExtResource("2_hwfw4")
+target_type = 3
+triggered_effect = SubResource("Resource_f8bxa")
+condition_name = "Healing ooze"
+stacks = 1
+metadata/_custom_type_script = "uid://bpr8cwurcrxy3"
 
 [resource]
 script = ExtResource("1_8vfdf")
 enemy_name = "Crawler"
 texture = ExtResource("2_2orq7")
+conditions = Array[ExtResource("1_nkj5m")]([SubResource("Resource_grr4f")])
 metadata/_custom_type_script = "uid://tnxg66jw03v3"

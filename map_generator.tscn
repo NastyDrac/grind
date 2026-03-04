@@ -4,6 +4,7 @@
 
 [node name="MapGenerator" type="Node2D"]
 script = ExtResource("1_0r6lh")
+columns = 15
 rows = 5
 urban_density = 0.241
 building_coverage = 0.889

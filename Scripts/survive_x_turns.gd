@@ -27,3 +27,5 @@ func get_progress_text() -> String:
 func cleanup() -> void:
 	if Global.time_passed.is_connected(_on_time_passed):
 		Global.time_passed.disconnect(_on_time_passed)
+func get_announcement_text() -> String:
+	return "Survive %d Turns" % turns_to_survive

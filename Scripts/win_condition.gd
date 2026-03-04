@@ -21,3 +21,6 @@ func get_progress_text() -> String:
 
 func cleanup() -> void:
 	pass
+## Short title shown at the start of combat. Override in each subclass.
+func get_announcement_text() -> String:
+	return ""

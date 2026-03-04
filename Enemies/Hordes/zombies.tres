@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="Horde" load_steps=6 format=3 uid="uid://clop67dqyffoo"]
+
+[ext_resource type="Script" uid="uid://tnxg66jw03v3" path="res://Scripts/enemy_data.gd" id="1_uao20"]
+[ext_resource type="Resource" uid="uid://2omyroag2mcs" path="res://Enemies/bloater.tres" id="2_26vh0"]
+[ext_resource type="Script" uid="uid://b6h8ntxfaauo5" path="res://Scripts/horde.gd" id="2_agese"]
+[ext_resource type="Resource" uid="uid://bfr5bliq5oiih" path="res://Enemies/crawler.tres" id="3_sjs3r"]
+[ext_resource type="Resource" uid="uid://byxygfcotqt5s" path="res://Enemies/runner.tres" id="4_ttelw"]
+
+[resource]
+script = ExtResource("2_agese")
+recipe_name = "Zombies"
+enemies = Array[ExtResource("1_uao20")]([ExtResource("2_26vh0"), ExtResource("3_sjs3r"), ExtResource("4_ttelw")])
+max_column = 4
+metadata/_custom_type_script = "uid://b6h8ntxfaauo5"

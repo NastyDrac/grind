@@ -5,29 +5,38 @@ class_name RunManager
 var run_seed : int
 var rng : RandomNumberGenerator
 
-var card_handler : CardHandler 
+var card_handler : CardHandler
 var player : Character
 var draft_amount : int = 3
 @export var deck : Array[CardData]
 
 ## Passive items the player has collected during the run.
-## Persists across combats — only their combat refs are swapped each wave.
+## Persists across combats -- only their combat refs are swapped each wave.
 @export var thingies : Array[Thingy] = []
-var range_manager : RangeManager 
+var range_manager : RangeManager
 var ui_bar : UIBar
 @export var character : CharacterData
 
-@export var character_sheet_scene : PackedScene  
+@export var character_sheet_scene : PackedScene
 var current_character_sheet : PopupPanel = null
 
 @export var initial_enemy_count : int = 3
 @export var initial_spawn_range : int = 5
-@export var horde : Array[EnemyData]
 
-@export var win_condition: WinCondition  
+## Which act the player is currently on (0-indexed internally, displayed as 1-indexed).
+var current_act : int = 0
+
+## One HordePool per act (index 0 = Act 1, index 1 = Act 2, etc.).
+## If the player reaches an act beyond this array, falls back to horde.
+@export var act_recipe_pools : Array[HordePool] = []
+
+## Fallback enemy list used when no pool is defined for the current act.
+@export var horde : Array[EnemyData] = []
+
+@export var win_condition: WinCondition
 var current_win_condition: WinCondition = null
 
-@export var available_events: Array[EventData] = []  
+@export var available_events: Array[EventData] = []
 var current_event_scene: EventScene = null
 
 var current_draft_screen: DraftScreen = null
@@ -36,25 +45,26 @@ var current_gym      : Gym      = null
 var current_hospital : Hospital = null
 var current_services : Services = null
 
-# ── Map ───────────────────────────────────────────────────────────────────────
+# -- Map -----------------------------------------------------------------------
 ## Assign the MapGenerator scene in the inspector.
 @export var map_generator_scene : PackedScene
 var map_generator : MapGenerator = null
-## The node the player most recently selected — resolved after combat/event ends.
+## The node the player most recently selected -- resolved after combat/event ends.
 var _pending_map_node : MapNode = null
 
 enum GameState { MAP, EVENT, COMBAT }
 var current_state: GameState = GameState.MAP
 
-# ─────────────────────────────────────────────────────────────────────────────
+# ------------------------------------------------------------------------------
 
 func begin_run(seed : int = -1):
 	rng = RandomNumberGenerator.new()
 	if seed == -1:
 		run_seed = randi()
-	else: 
+	else:
 		run_seed = seed
 	rng.seed = run_seed
+	current_act = 0
 	create_ui()
 	create_player()
 	player.toggle_visible(false)
@@ -64,9 +74,9 @@ func _ready() -> void:
 	Global.card_played.connect(_on_card_played)
 	_show_map()
 
-# ─────────────────────────────────────────────────────────────────────────────
+# ------------------------------------------------------------------------------
 #  MAP
-# ─────────────────────────────────────────────────────────────────────────────
+# ------------------------------------------------------------------------------
 
 func _show_map() -> void:
 	current_state = GameState.MAP
@@ -89,35 +99,31 @@ func _on_map_node_chosen(node: MapNode) -> void:
 
 	match node.node_type:
 		MapNode.NodeType.COMBAT:
-			begin_combat()
+			await Transitions.transition(func(): begin_combat())
 		MapNode.NodeType.SHOP:
-			create_shop()
+			await Transitions.transition(func(): create_shop())
 		MapNode.NodeType.GYM:
-			create_gym()
+			await Transitions.transition(func(): create_gym())
 		MapNode.NodeType.SERVICES:
-			create_services()
+			await Transitions.transition(func(): create_services())
 		MapNode.NodeType.HOSPITAL:
-			create_hospital()
+			await Transitions.transition(func(): create_hospital())
 		_:
-			_show_event_for_node(node)
+			await Transitions.transition(func(): _show_event_for_node(node))
 
-# ─────────────────────────────────────────────────────────────────────────────
+# ------------------------------------------------------------------------------
 #  EVENTS
-# ─────────────────────────────────────────────────────────────────────────────
+# ------------------------------------------------------------------------------
 
 func _show_event_for_node(node: MapNode) -> void:
 	if available_events.is_empty():
-		push_warning("No events available — starting combat instead.")
+		push_warning("No events available -- starting combat instead.")
 		begin_combat()
 		return
 
 	current_state = GameState.EVENT
 
-	# Try to find an event whose Exit_Type matches the node type.
-	# MapNode.NodeType: COMBAT=0, SERVICES=1, TRAINING=2, LANDMARK=3, MYSTERY=4
-	# EventData.Exit_Type:          Services=0, Training=1,  Landmark=2, Mystery=3
-	# Offset of 1 aligns them.
-	var target_exit_type : int = node.node_type - 1  # only valid for non-COMBAT nodes
+	var target_exit_type : int = node.node_type - 1
 
 	var matching : Array[EventData] = []
 	for ev in available_events:
@@ -125,7 +131,7 @@ func _show_event_for_node(node: MapNode) -> void:
 			matching.append(ev)
 
 	var chosen_event : EventData = matching.pick_random() if not matching.is_empty() \
-								 else available_events.pick_random()
+									else available_events.pick_random()
 
 	current_event_scene = load("res://Scenes/event_scene.tscn").instantiate()
 	current_event_scene.run_manager = self
@@ -137,24 +143,24 @@ func _on_event_completed():
 	current_event_scene = null
 	_resolve_pending_node()
 
-# ─────────────────────────────────────────────────────────────────────────────
+# ------------------------------------------------------------------------------
 #  COMBAT
-# ─────────────────────────────────────────────────────────────────────────────
+# ------------------------------------------------------------------------------
 
 func begin_combat():
 	current_state = GameState.COMBAT
 	begin_wave()
 
 func begin_wave():
-	create_range_manager()    
+	create_range_manager()
 
 	if player:
 		player.toggle_visible(true)
-		player.reset_for_new_wave()  
+		player.reset_for_new_wave()
 	else:
 		create_player()
 		player.toggle_visible(true)
-		
+
 	create_card_handler()
 	ui_bar.set_health()
 	setup_win_condition()
@@ -164,9 +170,15 @@ func setup_win_condition():
 	if win_condition:
 		current_win_condition = win_condition.duplicate(true)
 		current_win_condition.initialize(self)
-		
+
 		if ui_bar and ui_bar.has_method("set_win_condition"):
 			ui_bar.set_win_condition(current_win_condition)
+
+		# Show the announcement
+		var announcer := CombatAnnouncer.new()
+		add_child(announcer)
+		var subtitle := "Act %d" % (current_act + 1)
+		announcer.show_announcement(current_win_condition.get_announcement_text(), subtitle)
 	else:
 		push_warning("No win condition set! Combat will not have a win condition.")
 
@@ -178,7 +190,7 @@ func spawn_initial_enemies():
 		pass
 
 	if range_manager.enemy_pool.is_empty():
-		push_warning("No enemies in enemy_pool — cannot spawn initial enemies")
+		push_warning("No enemies in enemy_pool -- cannot spawn initial enemies")
 		return
 
 	for i in initial_enemy_count:
@@ -193,15 +205,35 @@ func create_range_manager():
 	range_manager = RangeManager.new()
 	add_child(range_manager)
 	range_manager.run_manager = self
-	range_manager.enemy_pool.append_array(horde) 
+	range_manager.enemy_pool.append_array(_pick_horde_for_combat())
 	spawn_initial_enemies()
+
+## Selects enemies from a Horde in the current act's pool that is valid for
+## the current map column. Falls back to the legacy horde array if needed.
+func _pick_horde_for_combat() -> Array[EnemyData]:
+	var col : int = _pending_map_node.col if _pending_map_node else 0
+
+	if current_act < act_recipe_pools.size():
+		var pool : HordePool = act_recipe_pools[current_act]
+		if pool:
+			var recipe := pool.pick_random(rng, col)
+			if recipe and not recipe.enemies.is_empty():
+				print("RunManager: act %d col %d using horde '%s'" % [current_act + 1, col, recipe.recipe_name])
+				return recipe.enemies
+
+	if not horde.is_empty():
+		push_warning("RunManager: no pool for act %d, using fallback horde." % (current_act + 1))
+		return horde
+
+	push_warning("RunManager: no horde or fallback set for act %d col %d" % [current_act + 1, col])
+	return []
 
 func create_card_handler():
 	card_handler = load("res://Scenes/card_handler.tscn").instantiate()
 	add_child(card_handler)
 	card_handler.run_manager = self
 	card_handler.initialize()
-	
+
 	for card in deck:
 		card_handler.create_card(card)
 	card_handler.draw_stack.shuffle()
@@ -220,15 +252,13 @@ func create_ui():
 	add_child(ui)
 	ui_bar = ui
 	ui.set_gold()
-	# set_health() is called after create_player() so run_manager.player exists
 
-# ─────────────────────────────────────────────────────────────────────────────
-#  RESOLVE NODE → RETURN TO MAP
-# ─────────────────────────────────────────────────────────────────────────────
+# ------------------------------------------------------------------------------
+#  RESOLVE NODE -> RETURN TO MAP
+# ------------------------------------------------------------------------------
 
 ## Called by both on_combat_won and _on_event_completed.
 func _resolve_pending_node() -> void:
-	# Clean up any lingering combat state
 	if current_win_condition:
 		current_win_condition.cleanup()
 		current_win_condition = null
@@ -246,15 +276,28 @@ func _resolve_pending_node() -> void:
 	if player:
 		player.toggle_visible(false)
 
-	# Mark the completed node and unlock the next column, then show the map.
 	if _pending_map_node and map_generator:
 		map_generator.mark_visited_and_advance(_pending_map_node)
 		_pending_map_node = null
 
-	_show_map()
+	await Transitions.transition(func(): _show_map())
 
 func on_combat_won():
-	_resolve_pending_node()
+	## Check before _resolve_pending_node clears _pending_map_node.
+	var was_boss := _pending_map_node != null \
+					and _pending_map_node.node_type == MapNode.NodeType.BOSS
+	await _resolve_pending_node()
+	if was_boss:
+		_start_new_act()
+
+## Increments the act counter and generates a brand-new map for the next act.
+func _start_new_act() -> void:
+	current_act += 1
+	print("RunManager: beginning Act %d" % (current_act + 1))
+	if map_generator:
+		await Transitions.transition(func(): map_generator.build(rng))
+	else:
+		push_error("RunManager: _start_new_act called but map_generator is null")
 
 func on_player_death():
 	if current_win_condition:
@@ -263,22 +306,17 @@ func on_player_death():
 
 	print("Game Over!")
 
-# ─────────────────────────────────────────────────────────────────────────────
+# ------------------------------------------------------------------------------
 #  THINGIES
-# ─────────────────────────────────────────────────────────────────────────────
+# ------------------------------------------------------------------------------
 
-## Add a thingy to the run. Call this whenever the player acquires a passive item
-## (e.g. from an event reward or draft). If combat is already active, the thingy
-## is set up immediately so it takes effect right away.
+## Add a thingy to the run. Call this whenever the player acquires a passive item.
 func add_thingy(thingy: Thingy) -> void:
 	thingies.append(thingy)
 	add_child(thingy)
-	
-	# Only wire up combat connections if we're actually in combat.
-	# If purchased at the shop, _setup_thingies() will handle it at wave start.
+
 	if current_state == GameState.COMBAT:
 		thingy.setup(player, range_manager)
-
 
 ## Wire every thingy up for the current combat wave.
 func _setup_thingies() -> void:
@@ -286,18 +324,16 @@ func _setup_thingies() -> void:
 		for thingy in thingies:
 			thingy.setup(player, range_manager)
 
-
 ## Disconnect every thingy from the combat that just ended.
-## Thingies themselves are NOT freed — they carry over to the next wave.
+## Thingies themselves are NOT freed -- they carry over to the next wave.
 func _teardown_thingies() -> void:
 	if not thingies.is_empty():
 		for thingy in thingies:
 			thingy.teardown()
 
-
-# ─────────────────────────────────────────────────────────────────────────────
+# ------------------------------------------------------------------------------
 #  CHARACTER SHEET
-# ─────────────────────────────────────────────────────────────────────────────
+# ------------------------------------------------------------------------------
 
 func show_base_character_sheet():
 	if not character_sheet_scene:
@@ -320,7 +356,7 @@ func show_combat_character_sheet():
 		return
 
 	if not player:
-		push_error("Cannot show combat character sheet — no player instance exists!")
+		push_error("Cannot show combat character sheet -- no player instance exists!")
 		return
 
 	if current_character_sheet:
@@ -345,9 +381,9 @@ func _on_character_sheet_closed():
 	if ui_bar:
 		ui_bar.is_character_sheet_open = false
 
-# ─────────────────────────────────────────────────────────────────────────────
+# ------------------------------------------------------------------------------
 #  DRAFT SCREEN
-# ─────────────────────────────────────────────────────────────────────────────
+# ------------------------------------------------------------------------------
 
 func create_draft_screen():
 	if current_draft_screen:
@@ -367,9 +403,9 @@ func close_draft_screen():
 		current_draft_screen.queue_free()
 		current_draft_screen = null
 
-# ─────────────────────────────────────────────────────────────────────────────
+# ------------------------------------------------------------------------------
 #  SHOP
-# ─────────────────────────────────────────────────────────────────────────────
+# ------------------------------------------------------------------------------
 
 func create_shop() -> void:
 	if current_shop:
@@ -389,9 +425,9 @@ func close_shop() -> void:
 func _on_shop_closed() -> void:
 	pass
 
-# ─────────────────────────────────────────────────────────────────────────────
+# ------------------------------------------------------------------------------
 #  GYM
-# ─────────────────────────────────────────────────────────────────────────────
+# ------------------------------------------------------------------------------
 
 func create_gym() -> void:
 	if current_gym:
@@ -407,9 +443,9 @@ func close_gym() -> void:
 		current_gym = null
 	_resolve_pending_node()
 
-# ─────────────────────────────────────────────────────────────────────────────
+# ------------------------------------------------------------------------------
 #  HOSPITAL
-# ─────────────────────────────────────────────────────────────────────────────
+# ------------------------------------------------------------------------------
 
 func create_hospital() -> void:
 	if current_hospital:
@@ -425,9 +461,9 @@ func close_hospital() -> void:
 		current_hospital = null
 	_resolve_pending_node()
 
-# ─────────────────────────────────────────────────────────────────────────────
+# ------------------------------------------------------------------------------
 #  SERVICES
-# ─────────────────────────────────────────────────────────────────────────────
+# ------------------------------------------------------------------------------
 
 func create_services() -> void:
 	if current_services:
@@ -455,9 +491,9 @@ func _on_service_chosen(service: String) -> void:
 			push_warning("RunManager: unknown service '%s'" % service)
 			_resolve_pending_node()
 
-# ─────────────────────────────────────────────────────────────────────────────
+# ------------------------------------------------------------------------------
 #  CARDS
-# ─────────────────────────────────────────────────────────────────────────────
+# ------------------------------------------------------------------------------
 
 func get_random_card_data() -> CardData:
 	var dir := DirAccess.open("res://Cards/")
@@ -484,13 +520,11 @@ func get_random_card_data() -> CardData:
 	var new_card : CardData = load(random_path)
 	return new_card
 
-# ─────────────────────────────────────────────────────────────────────────────
+# ------------------------------------------------------------------------------
 #  THINGIES (SCENES)
-# ─────────────────────────────────────────────────────────────────────────────
+# ------------------------------------------------------------------------------
 
 ## Scans res://Thingys/ for .tscn files and returns one at random.
-## Mirrors get_random_card_data() so the pattern stays consistent.
-## Adjust the path if your folder name differs (e.g. "res://Thingies/").
 func get_random_thingy_scene() -> PackedScene:
 	var dir := DirAccess.open("res://Thingys/")
 	if dir == null:
@@ -512,11 +546,11 @@ func get_random_thingy_scene() -> PackedScene:
 
 	return load(paths[randi() % paths.size()])
 
-# ─────────────────────────────────────────────────────────────────────────────
+# ------------------------------------------------------------------------------
 #  GOLD
-# ─────────────────────────────────────────────────────────────────────────────
+# ------------------------------------------------------------------------------
 
-## Award gold to the player and sync the HUD. Call after combat wins, events, etc.
+## Award gold to the player and sync the HUD.
 func award_gold(amount: int) -> void:
 	character.gold += amount
 	if ui_bar:

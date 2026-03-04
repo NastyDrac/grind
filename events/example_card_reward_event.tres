@@ -9,12 +9,14 @@
 script = ExtResource("1_option")
 option_text = "Search the abandoned vehicle"
 result_text = "You find some useful supplies in the trunk!"
+random_selection = false
 triggers_combat = false
 
 [sub_resource type="Resource" id="Resource_leave"]
 script = ExtResource("1_option")
 option_text = "Keep moving"
 result_text = "You decide not to waste time and continue on your way."
+random_selection = false
 triggers_combat = false
 
 [resource]

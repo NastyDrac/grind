@@ -21,11 +21,12 @@ spacing_curve = SubResource("Curve_rom71")
 rotation_curve = SubResource("Curve_sdc1o")
 height_curve = SubResource("Curve_r6eh0")
 max_y_offset = -50.0
+card_height_px = 500
 discard_and_draw_mode = true
 metadata/_custom_type_script = "uid://qb2kyhu1kbb1"
 
 [node name="Hand" type="Node2D" parent="."]
-position = Vector2(526, 425)
+position = Vector2(526, 500)
 
 [node name="DrawPile" type="Node2D" parent="."]
 position = Vector2(-210, 604)

@@ -20,13 +20,13 @@ func trigger_condition() -> void:
 
 
 func enemy_has_condition_type(who: Enemy, condition_type) -> bool:
-	for each_condition in who.condition:
+	for each_condition in who.conditions:        # was who.condition
 		if each_condition.get_script() == condition_type.get_script():
 			return true
 	return false
 
-func get_existing_condition(who: Enemy, condition_type) -> Condition:
-	for each_condition in who.condition:
+func get_existing_condition(who, condition_type) -> Condition:
+	for each_condition in who.conditions:        # was who.condition
 		if each_condition.get_script() == condition_type.get_script():
 			return each_condition
 	return null
