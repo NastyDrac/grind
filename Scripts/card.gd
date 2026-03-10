@@ -78,6 +78,21 @@ func refresh_description():
 	
 	description.parse_bbcode(desc) 
 
+	# ── Keyword tags ──────────────────────────────────────────────────────
+	# Prepend / append keyword lines so they always appear regardless of actions
+	var keyword_prefix := ""
+	var keyword_suffix := ""
+	if data.volatile:
+		keyword_prefix += "[b][color=orange]Volatile[/color][/b]\n"
+	if data.fickle:
+		keyword_prefix += "[b][color=purple]Fickle[/color][/b]\n"
+	if data.exhaust:
+		keyword_suffix += "\n[b][color=red]Exhaust[/color][/b]"
+	
+	if keyword_prefix != "" or keyword_suffix != "":
+		var full = keyword_prefix + desc + keyword_suffix
+		description.parse_bbcode(full)
+
 
 func _ready():
 	for each in data.actions:

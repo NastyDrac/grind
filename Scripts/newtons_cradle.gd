@@ -31,7 +31,7 @@ func teardown() -> void:
 		Global.enemy_spawned.disconnect(_on_enemy_spawned)
 
 	# Disconnect from every enemy still alive so signals don't leak into the next wave.
-	if range_manager:
+	if is_instance_valid(range_manager):
 		for enemy in range_manager.get_all_enemies():
 			if enemy.enemy_player_moved.is_connected(_on_enemy_moved):
 				enemy.enemy_player_moved.disconnect(_on_enemy_moved)
@@ -46,7 +46,8 @@ func _on_enemy_spawned(enemy: Enemy) -> void:
 
 func _on_enemy_moved(enemy: Enemy, old_range: int, new_range: int) -> void:
 	# Combat may have ended while this signal was in-flight -- bail silently.
-	if not range_manager:
+	# Use is_instance_valid so a freed (but non-null) RangeManager is also caught.
+	if not is_instance_valid(range_manager):
 		return
 
 	var damage := _calculate_damage()

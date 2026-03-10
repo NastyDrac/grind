@@ -38,7 +38,6 @@ func _setup_card():
 	
 	refresh_description()
 
-	
 	_connect_to_player_stats()
 
 func refresh_description():
@@ -46,7 +45,6 @@ func refresh_description():
 		return
 	
 	var player = get_tree().get_first_node_in_group("player")
-	
 	
 	if not player:
 		_show_description_without_player()
@@ -57,19 +55,13 @@ func refresh_description():
 	
 	for i in range(action_count):
 		var action : Action = data.actions[i]
-		
-		# Add the action description (actions now handle their own range display)
 		desc += action.get_description_with_values(player)
-		
-		# Add newline between actions (but not after the last one)
 		if i < action_count - 1:
 			desc += "\n"
-	
 	
 	var regex = RegEx.new()
 	regex.compile("§(\\d+)§")
 	desc = regex.sub(desc, "[color=green]$1[/color]", true)
-	
 	
 	desc = desc.replace("swag", "[img=16x16]res://Art/swag.png[/img]")
 	desc = desc.replace("marbles", "[img=16x16]res://Art/marbles.png[/img]")
@@ -78,10 +70,19 @@ func refresh_description():
 	desc = desc.replace("bang", "[img=16x16]res://Art/bang.png[/img]")
 	desc = desc.replace("mojo", "[img=16x16]res://Art/mojo.png[/img]")
 	
-	description.parse_bbcode(desc)
+	# Keyword tags
+	var keyword_prefix := ""
+	var keyword_suffix := ""
+	if data.volatile:
+		keyword_prefix += "[b][color=orange]Volatile[/color][/b]\n"
+	if data.fickle:
+		keyword_prefix += "[b][color=purple]Fickle[/color][/b]\n"
+	if data.exhaust:
+		keyword_suffix += "\n[b][color=red]Exhaust[/color][/b]"
+	
+	description.parse_bbcode(keyword_prefix + desc + keyword_suffix)
 
 func _show_description_without_player():
-	"""Show card description when no player exists (during events)"""
 	if not data:
 		return
 	
@@ -91,23 +92,18 @@ func _show_description_without_player():
 	for i in range(action_count):
 		var action : Action = data.actions[i]
 		
-		# Actions handle their own range display inline
 		if action.has_method("get_description_with_values"):
-			# Try to get description with null player
 			var action_desc = action.get_description_with_values(null)
 			if action_desc and action_desc != "":
 				desc += action_desc
 		elif action.has_method("get_base_description"):
 			desc += action.get_base_description()
 		else:
-			# Fallback to description property
 			if action.has("description") and action.description:
 				desc += action.description
 		
-		# Add newline between actions (but not after the last one)
 		if i < action_count - 1:
 			desc += "\n"
-	
 	
 	if desc.strip_edges() == "":
 		desc = "[i]Preview mode - full details available in combat[/i]"
@@ -116,7 +112,6 @@ func _show_description_without_player():
 	regex.compile("§(\\d+)§")
 	desc = regex.sub(desc, "[color=green]$1[/color]", true)
 	
-	
 	desc = desc.replace("swag", "[img=36x36]res://Art/swag.png[/img]")
 	desc = desc.replace("marbles", "[img=36x36]res://Art/marbles.png[/img]")
 	desc = desc.replace("guts", "[img=36x36]res://Art/guts.png[/img]")
@@ -124,16 +119,24 @@ func _show_description_without_player():
 	desc = desc.replace("bang", "[img=36x36]res://Art/bang.png[/img]")
 	desc = desc.replace("mojo", "[img=36x36]res://Art/mojo.png[/img]")
 	
-	description.parse_bbcode(desc)
+	# Keyword tags
+	var keyword_prefix := ""
+	var keyword_suffix := ""
+	if data.volatile:
+		keyword_prefix += "[b][color=orange]Volatile[/color][/b]\n"
+	if data.fickle:
+		keyword_prefix += "[b][color=purple]Fickle[/color][/b]\n"
+	if data.exhaust:
+		keyword_suffix += "\n[b][color=red]Exhaust[/color][/b]"
+	
+	description.parse_bbcode(keyword_prefix + desc + keyword_suffix)
 
 func _connect_to_player_stats():
 	var player = get_tree().get_first_node_in_group("player")
 	if not player:
-		
 		connection_attempts += 1
 		if connection_attempts < max_connection_attempts:
 			call_deferred("_connect_to_player_stats")
-		
 		return
 	
 	if not player.has_signal("stats_changed"):
@@ -149,10 +152,7 @@ func _on_player_stats_changed():
 	refresh_description()
 
 func _on_add_pressed():
-	"""Called when add button is pressed"""
 	card_selected.emit(data, "add")
-
-
 
 func _on_mouse_entered() -> void:
 	hovered = true

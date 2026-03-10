@@ -11,6 +11,8 @@ enum RARITY {Common, Uncommon, Rare}
 @export var actions: Array[Action] = []
 @export var exhaust : bool
 @export var fickle : bool
+## Card automatically executes its actions when left in hand as time passes.
+@export var volatile : bool
 
 func get_description_with_values(character_data: Character) -> String:
 	var desc = card_description

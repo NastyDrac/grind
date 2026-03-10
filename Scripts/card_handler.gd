@@ -8,8 +8,17 @@ var selected_card : Card
 @onready var hand = $Hand
 @onready var draw_pile = $DrawPile
 @onready var discard_pile = $DiscardPile
+@onready var exhaust_pile = $ExhaustPile
+@onready var draw_pile_button = $DrawPileButton
+@onready var discard_pile_button = $DiscardPileButton
+@onready var exhaust_pile_button = $ExhaustPileButton
+@onready var pass_time_button = $PassTimeButton
 var draw_stack : Array[Card]
 var discard_stack : Array[Card]
+var exhaust_stack : Array[Card] = []
+
+# Pile viewer window
+var pile_viewer : CanvasLayer = null
 
 @export_category("Hand Alignment")
 @export var spacing_curve : Curve
@@ -146,7 +155,16 @@ func initialize():
 	
 	_create_targeting_arrow()
 	_create_card_targeting_ui()
-
+	
+	# Connect pile viewer buttons
+	if draw_pile_button:
+		draw_pile_button.pressed.connect(_on_draw_pile_button_pressed)
+	if discard_pile_button:
+		discard_pile_button.pressed.connect(_on_discard_pile_button_pressed)
+	if exhaust_pile_button:
+		exhaust_pile_button.pressed.connect(_on_exhaust_pile_button_pressed)
+	if pass_time_button:
+		pass_time_button.pressed.connect(_on_pass_time_button_pressed)
 func _create_card_targeting_ui():
 	"""Create the card targeting UI overlay inline"""
 	card_targeting_ui = CanvasLayer.new()
@@ -315,14 +333,14 @@ func _update_card_animations(delta: float):
 func _animate_hovered_card(delta: float):
 	if not card_position.has(hovered_card):
 		return
-	
-	var target_scale      := base_scale * hover_scale
-	var viewport_height   = get_viewport().size.y
-	var scaled_height     = card_height_px * target_scale.y
-	# Global Y where the card's top must sit so its bottom edge = screen bottom
-	var target_global_y   = viewport_height - scaled_height
-	# Convert to Hand-local space
-	var target_local_y    = hand.to_local(Vector2(0.0, target_global_y)).y
+
+	var target_scale   := base_scale * hover_scale
+	var viewport_height = get_viewport().get_visible_rect().size.y
+	var pivot_y         = 150.0  # pivot_offset.y from card.tscn (half of 300px height)
+	# Bottom of card = position.y + pivot_y + pivot_y * scale.y
+	# Solve for position.y to put bottom at viewport_height:
+	var target_global_y = viewport_height - pivot_y * (1.0 + target_scale.y)
+	var target_local_y  = hand.to_local(Vector2(0.0, target_global_y)).y
 
 	var base_pos   = card_position[hovered_card]["position"]
 	var target_pos = Vector2(base_pos.x, target_local_y)
@@ -972,7 +990,7 @@ func _complete_card_play():
 	selected_card.reparent(self)
 
 	if selected_card.data and selected_card.data.exhaust:
-		selected_card.queue_free()
+		exhaust(selected_card)
 	else:
 		discard(selected_card)
 	
@@ -997,8 +1015,19 @@ func discard(card : Card):
 	await tween.finished
 	card.reparent(discard_pile)
 
+func exhaust(card : Card):
+	var tween = create_tween()
+	tween.tween_property(card, "position", exhaust_pile.global_position, .5)
+	await tween.finished
+	card.reparent(exhaust_pile)
+	if not exhaust_stack.has(card):
+		exhaust_stack.append(card)
+
 func pass_time():
 	Global.time_passed.emit()
+	
+	# Volatile cards execute their actions automatically when left in hand
+	await _trigger_volatile_cards()
 	
 	if discard_and_draw_mode:
 		
@@ -1020,17 +1049,17 @@ func draw_cards(card : Card):
 		add_card_to_hand(card)
 
 func discard_hand():
-	"""Discards all cards currently in hand"""
+	"""Discards all cards currently in hand. Fickle cards go to exhaust pile. All others (including exhaust) discard normally."""
 	var cards_to_discard = cards_in_hand.duplicate()
 	cards_in_hand.clear()
 	card_position.clear()
 
 	var discard_tweens = []
-	var exhaust_cards = []
+	var fickle_cards = []
 	for card in cards_to_discard:
 		card.reparent(self)
-		if card.data and card.data.exhaust:
-			exhaust_cards.append(card)
+		if card.data and card.data.fickle:
+			fickle_cards.append(card)
 		else:
 			var tween = create_tween()
 			tween.tween_property(card, "position", discard_pile.global_position, .5)
@@ -1040,8 +1069,10 @@ func discard_hand():
 		await tween.finished
 
 	for card in cards_to_discard:
-		if card.data and card.data.exhaust:
-			card.queue_free()
+		if card.data and card.data.fickle:
+			card.reparent(exhaust_pile)
+			if not exhaust_stack.has(card):
+				exhaust_stack.append(card)
 		else:
 			card.reparent(discard_pile)
 
@@ -1092,3 +1123,167 @@ func add_card_to_hand(card : Card):
 	card.reparent(hand)
 	cards_in_hand.append(card)
 	arrange_cards()
+
+# ============================================================================
+# VOLATILE CARDS — execute actions automatically when time passes
+# ============================================================================
+
+func _trigger_volatile_cards():
+	"""Find volatile cards in hand and execute their non-targeting actions automatically."""
+	var volatile_cards : Array[Card] = []
+	for card in cards_in_hand:
+		if card.data and card.data.volatile:
+			volatile_cards.append(card)
+	
+	for card in volatile_cards:
+		cards_in_hand.erase(card)
+		card_position.erase(card)
+		card.reparent(self)
+		
+		# Execute each action that doesn't require explicit player targeting
+		for action in card.data.actions:
+			if not action.player:
+				action.player = run_manager.player
+			action.card_handler = self
+			
+			if action.requires_player_target():
+				# Auto-target: all enemies in range
+				var targets = run_manager.range_manager.get_all_enemies()
+				for target in targets:
+					action.play_animation_and_execute(target)
+			elif action.requires_card_target() or action.is_automatic_card_action():
+				# Card-targeting actions use automatic card targets
+				var targets = _get_automatic_card_targets(action)
+				if not targets.is_empty():
+					await _execute_action_on_cards(action, targets)
+			else:
+				var targets = _get_automatic_targets(action)
+				if targets.is_empty():
+					action.play_animation_and_execute(run_manager.player)
+				else:
+					for target in targets:
+						action.play_animation_and_execute(target)
+		
+		# Send to exhaust pile after triggering (volatile cards are consumed)
+		card.reparent(exhaust_pile)
+		if not exhaust_stack.has(card):
+			exhaust_stack.append(card)
+	
+	if not volatile_cards.is_empty():
+		arrange_cards()
+
+# ============================================================================
+# PILE VIEWER WINDOW
+# ============================================================================
+
+func _on_draw_pile_button_pressed():
+	_show_pile_window("Draw Pile (%d)" % draw_stack.size(), draw_pile, draw_stack)
+
+func _on_discard_pile_button_pressed():
+	var cards = discard_pile.get_children()
+	_show_pile_window("Discard Pile (%d)" % cards.size(), discard_pile, [])
+
+func _on_exhaust_pile_button_pressed():
+	var cards = exhaust_pile.get_children()
+	_show_pile_window("Exhaust Pile (%d)" % cards.size(), exhaust_pile, [])
+
+func _show_pile_window(title_text: String, pile_node: Node, ordered_stack: Array):
+	# Close existing viewer first
+	if pile_viewer:
+		pile_viewer.queue_free()
+		pile_viewer = null
+	
+	# Collect cards — prefer the ordered stack if provided, otherwise use pile children
+	var cards_to_show : Array = []
+	if not ordered_stack.is_empty():
+		cards_to_show = ordered_stack.duplicate()
+	else:
+		for child in pile_node.get_children():
+			if child is Card:
+				cards_to_show.append(child)
+	
+	pile_viewer = CanvasLayer.new()
+	pile_viewer.layer = 100
+	add_child(pile_viewer)
+	
+	# Semi-transparent backdrop — clicking it closes the window
+	var backdrop = ColorRect.new()
+	backdrop.color = Color(0, 0, 0, 0.55)
+	backdrop.set_anchors_preset(Control.PRESET_FULL_RECT)
+	backdrop.mouse_filter = Control.MOUSE_FILTER_STOP
+	backdrop.gui_input.connect(func(ev):
+		if ev is InputEventMouseButton and ev.pressed and ev.button_index == MOUSE_BUTTON_LEFT:
+			if pile_viewer:
+				pile_viewer.queue_free()
+				pile_viewer = null
+	)
+	pile_viewer.add_child(backdrop)
+	
+	# Centred panel
+	var panel = PanelContainer.new()
+	panel.set_anchors_preset(Control.PRESET_CENTER)
+	panel.custom_minimum_size = Vector2(860, 560)
+	panel.offset_left   = -430
+	panel.offset_top    = -280
+	panel.offset_right  =  430
+	panel.offset_bottom =  280
+	panel.mouse_filter = Control.MOUSE_FILTER_STOP
+	pile_viewer.add_child(panel)
+	
+	var vbox = VBoxContainer.new()
+	vbox.add_theme_constant_override("separation", 8)
+	panel.add_child(vbox)
+	
+	# ── Title bar ──────────────────────────────────────────────────────────
+	var title_bar = HBoxContainer.new()
+	vbox.add_child(title_bar)
+	
+	var title_lbl = Label.new()
+	title_lbl.text = title_text
+	title_lbl.add_theme_font_size_override("font_size", 20)
+	title_lbl.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	title_bar.add_child(title_lbl)
+	
+	var close_btn = Button.new()
+	close_btn.text = "✕  Close"
+	close_btn.pressed.connect(func():
+		if pile_viewer:
+			pile_viewer.queue_free()
+			pile_viewer = null
+	)
+	title_bar.add_child(close_btn)
+	
+	# ── Scrollable card grid ───────────────────────────────────────────────
+	var scroll = ScrollContainer.new()
+	scroll.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	scroll.custom_minimum_size = Vector2(840, 460)
+	vbox.add_child(scroll)
+	
+	var flow = HFlowContainer.new()
+	flow.add_theme_constant_override("h_separation", 12)
+	flow.add_theme_constant_override("v_separation", 12)
+	flow.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	scroll.add_child(flow)
+	
+	if cards_to_show.is_empty():
+		var empty_lbl = Label.new()
+		empty_lbl.text = "( empty )"
+		empty_lbl.add_theme_font_size_override("font_size", 18)
+		flow.add_child(empty_lbl)
+	else:
+		for card in cards_to_show:
+			if not (card is Card) or not card.data:
+				continue
+			var preview = load("res://Scenes/card.tscn").instantiate()
+			preview.mouse_filter = Control.MOUSE_FILTER_IGNORE
+			# Scale preview cards to a readable size
+			preview.scale = Vector2(0.55, 0.55)
+			preview.custom_minimum_size = Vector2(160, 220)
+			flow.add_child(preview)
+			preview.set_data(card.data)
+			# Disable hover signals on the preview so it doesn't interfere
+			if preview.has_signal("card_hovered"):
+				for conn in preview.card_hovered.get_connections():
+					preview.card_hovered.disconnect(conn["callable"])
+func _on_pass_time_button_pressed():
+	pass_time()

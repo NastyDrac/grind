@@ -1,4 +1,4 @@
-[gd_scene load_steps=10 format=3 uid="uid://dc08wv3l8mie2"]
+[gd_scene load_steps=11 format=3 uid="uid://dc08wv3l8mie2"]
 
 [ext_resource type="Texture2D" uid="uid://dniqodr7uofg0" path="res://Art/regalur guy.png" id="1_ipn01"]
 [ext_resource type="Script" uid="uid://cvpu5bvlqu2fe" path="res://Scripts/character_sheet.gd" id="1_oqqt4"]
@@ -10,17 +10,21 @@
 [ext_resource type="Texture2D" uid="uid://dy6yulqjedv40" path="res://Art/bang.png" id="6_lqkta"]
 [ext_resource type="Texture2D" uid="uid://btnp5m57fhynw" path="res://Art/mojo.png" id="7_vdo1c"]
 
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_fe3m8"]
+bg_color = Color(0.07871165, 0.1282911, 0.16969937, 1)
+
 [node name="character_sheet" type="PopupPanel"]
+disable_3d = true
+transparent_bg = false
 oversampling_override = 1.0
 size = Vector2i(396, 318)
 visible = true
+theme_override_styles/panel = SubResource("StyleBoxFlat_fe3m8")
 script = ExtResource("1_oqqt4")
 
 [node name="VBoxContainer" type="VBoxContainer" parent="."]
-offset_left = 4.0
-offset_top = 4.0
-offset_right = 392.0
-offset_bottom = 314.0
+offset_right = 396.0
+offset_bottom = 318.0
 
 [node name="HBoxContainer" type="HBoxContainer" parent="VBoxContainer"]
 layout_mode = 2
