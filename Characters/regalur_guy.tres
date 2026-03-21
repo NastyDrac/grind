@@ -2,7 +2,7 @@
 
 [ext_resource type="Script" uid="uid://dpayg0f6j5y2n" path="res://Scripts/character_data.gd" id="1_5j4wt"]
 [ext_resource type="Script" uid="uid://b2h1ochum01o" path="res://Scripts/stat.gd" id="1_8ety0"]
-[ext_resource type="Texture2D" uid="uid://dniqodr7uofg0" path="res://Art/regalur guy.png" id="1_8k2ij"]
+[ext_resource type="Texture2D" uid="uid://c0mry8vul074d" path="res://Art/WildSellswordwSword.png" id="1_rw86x"]
 [ext_resource type="Script" uid="uid://cgrxhw8vqenhu" path="res://Scripts/ValueCalculator.gd" id="2_8k2ij"]
 [ext_resource type="Resource" uid="uid://dj6ttthval7yo" path="res://items/gold.tres" id="4_dvkhi"]
 [ext_resource type="Script" uid="uid://b1ogi3xh5xakp" path="res://Scripts/condition.gd" id="4_rw86x"]
@@ -31,7 +31,7 @@ metadata/_custom_type_script = "uid://dfo48c3dx2d7"
 
 [sub_resource type="Resource" id="Resource_rw86x"]
 script = ExtResource("2_8k2ij")
-formula = "5"
+formula = "1"
 metadata/_custom_type_script = "uid://cgrxhw8vqenhu"
 
 [sub_resource type="Resource" id="Resource_8ety0"]
@@ -41,7 +41,7 @@ metadata/_custom_type_script = "uid://b2h1ochum01o"
 
 [sub_resource type="Resource" id="Resource_p2jjl"]
 script = ExtResource("2_8k2ij")
-formula = "5"
+formula = "1"
 metadata/_custom_type_script = "uid://cgrxhw8vqenhu"
 
 [sub_resource type="Resource" id="Resource_82thg"]
@@ -52,7 +52,7 @@ metadata/_custom_type_script = "uid://b2h1ochum01o"
 
 [sub_resource type="Resource" id="Resource_3ax6e"]
 script = ExtResource("2_8k2ij")
-formula = "5"
+formula = "1"
 metadata/_custom_type_script = "uid://cgrxhw8vqenhu"
 
 [sub_resource type="Resource" id="Resource_ml0kd"]
@@ -63,7 +63,7 @@ metadata/_custom_type_script = "uid://b2h1ochum01o"
 
 [sub_resource type="Resource" id="Resource_ill6o"]
 script = ExtResource("2_8k2ij")
-formula = "5"
+formula = "1"
 metadata/_custom_type_script = "uid://cgrxhw8vqenhu"
 
 [sub_resource type="Resource" id="Resource_o2qd2"]
@@ -74,7 +74,7 @@ metadata/_custom_type_script = "uid://b2h1ochum01o"
 
 [sub_resource type="Resource" id="Resource_utx1w"]
 script = ExtResource("2_8k2ij")
-formula = "5"
+formula = "1"
 metadata/_custom_type_script = "uid://cgrxhw8vqenhu"
 
 [sub_resource type="Resource" id="Resource_8k2ij"]
@@ -85,7 +85,7 @@ metadata/_custom_type_script = "uid://b2h1ochum01o"
 
 [sub_resource type="Resource" id="Resource_x83ha"]
 script = ExtResource("2_8k2ij")
-formula = "5"
+formula = "1"
 metadata/_custom_type_script = "uid://cgrxhw8vqenhu"
 
 [sub_resource type="Resource" id="Resource_dvkhi"]
@@ -97,7 +97,7 @@ metadata/_custom_type_script = "uid://b2h1ochum01o"
 [resource]
 script = ExtResource("1_5j4wt")
 character_name = "Regalur Guy"
-character_image = ExtResource("1_8k2ij")
+character_image = ExtResource("1_rw86x")
 max_health = SubResource("Resource_sjutl")
 stats = Array[ExtResource("1_8ety0")]([SubResource("Resource_8ety0"), SubResource("Resource_82thg"), SubResource("Resource_ml0kd"), SubResource("Resource_o2qd2"), SubResource("Resource_8k2ij"), SubResource("Resource_dvkhi")])
 special_effects = Array[ExtResource("4_rw86x")]([SubResource("Resource_x6t1t")])

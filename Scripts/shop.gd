@@ -2,7 +2,6 @@ extends CanvasLayer
 class_name Shop
 
 # ─── Layout ───────────────────────────────────────────────────────────────────
-# Adjust UIBAR_HEIGHT to match your UIBar's actual pixel height.
 const UIBAR_HEIGHT : float = 50.0
 const MARGIN       : float = 40.0
 
@@ -25,8 +24,8 @@ var leave_button         : Button
 var card_container       : HBoxContainer
 var thingy_container     : HBoxContainer
 var remove_card_button   : Button
-var remove_overlay       : Panel            # full-screen card-picker overlay
-var deck_card_container  : HFlowContainer  # actual DraftableCard instances
+var remove_overlay       : Panel
+var deck_card_container  : HFlowContainer
 var cancel_remove_button : Button
 
 signal shop_closed
@@ -38,7 +37,6 @@ func _ready() -> void:
 	_build_ui()
 
 func _build_ui() -> void:
-	# ── Backdrop panel ──
 	var panel := Panel.new()
 	panel.anchor_left   = 0.0
 	panel.anchor_top    = 0.0
@@ -50,7 +48,6 @@ func _build_ui() -> void:
 	panel.offset_bottom = -MARGIN
 	add_child(panel)
 
-	# ── Root VBox ──
 	var root_vbox := VBoxContainer.new()
 	root_vbox.anchor_right  = 1.0
 	root_vbox.anchor_bottom = 1.0
@@ -61,7 +58,6 @@ func _build_ui() -> void:
 	root_vbox.add_theme_constant_override("separation", 6)
 	panel.add_child(root_vbox)
 
-	# ── Top bar: title | gold | leave ──
 	var top_bar := HBoxContainer.new()
 	root_vbox.add_child(top_bar)
 
@@ -84,7 +80,6 @@ func _build_ui() -> void:
 
 	root_vbox.add_child(HSeparator.new())
 
-	# ── Scroll area: cards + thingies ──
 	var scroll := ScrollContainer.new()
 	scroll.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
@@ -119,12 +114,10 @@ func _build_ui() -> void:
 
 	root_vbox.add_child(HSeparator.new())
 
-	# ── Remove card button — pinned at bottom ──
 	remove_card_button = Button.new()
 	remove_card_button.pressed.connect(_on_remove_card_pressed)
 	root_vbox.add_child(remove_card_button)
 
-	# ── Remove-card overlay — full screen, hidden until needed ──
 	remove_overlay = Panel.new()
 	remove_overlay.anchor_left   = 0.0
 	remove_overlay.anchor_top    = 0.0
@@ -135,7 +128,7 @@ func _build_ui() -> void:
 	remove_overlay.offset_right  = -MARGIN
 	remove_overlay.offset_bottom = -MARGIN
 	remove_overlay.visible = false
-	add_child(remove_overlay)   # sibling of panel, drawn on top
+	add_child(remove_overlay)
 
 	var overlay_vbox := VBoxContainer.new()
 	overlay_vbox.anchor_right  = 1.0
@@ -213,7 +206,6 @@ func _populate_cards() -> void:
 		buy_btn.text = "Buy  (%d Gold)" % price
 		slot.add_child(buy_btn)
 
-		# Add to tree BEFORE set_data so DraftableCard.is_node_ready() is true
 		card_container.add_child(slot)
 		card.set_data(card_data)
 		card.current_mode = card.Mode.DISPLAY_ONLY
@@ -238,30 +230,25 @@ func _populate_thingies() -> void:
 		child.queue_free()
 
 	for _i in range(THINGY_SLOTS):
-		var thingy_scene : PackedScene = run.get_random_thingy_scene()
-		if not thingy_scene:
+		var condition : ThingyCondition = run.get_random_thingy_condition()
+		if not condition:
 			continue
 
-		var thingy     : Thingy = thingy_scene.instantiate()
-		var rarity     : int    = thingy.get("rarity") if thingy.get("rarity") != null else 0
-		var price               := _thingy_price(rarity)
-		var thingy_name         := thingy.name.replace("@", "").strip_edges()
-		var desc                := thingy.get_description_with_values()
-		var icon_tex            := thingy.texture
-		thingy.queue_free()
+		var rarity : int = condition.rarity
+		var price  := _thingy_price(rarity)
 
 		var slot := VBoxContainer.new()
 		slot.alignment = BoxContainer.ALIGNMENT_CENTER
 
-		var icon := TextureRect.new()
-		icon.texture = icon_tex
+		# ConditionIcon gives us the tooltip on mouse-over for free.
+		var icon := ConditionIcon.new(condition)
 		icon.custom_minimum_size = Vector2(64, 64)
 		icon.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
 		icon.expand_mode = TextureRect.EXPAND_FIT_WIDTH_PROPORTIONAL
 		slot.add_child(icon)
 
 		var name_lbl := Label.new()
-		name_lbl.text = thingy_name
+		name_lbl.text = condition.get_condition_name()
 		name_lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 		slot.add_child(name_lbl)
 
@@ -271,28 +258,19 @@ func _populate_thingies() -> void:
 		rarity_lbl.add_theme_color_override("font_color", _rarity_color(rarity))
 		slot.add_child(rarity_lbl)
 
-		if desc != "":
-			var desc_lbl := RichTextLabel.new()
-			desc_lbl.bbcode_enabled = true
-			desc_lbl.fit_content = true
-			desc_lbl.custom_minimum_size = Vector2(130, 0)
-			desc_lbl.parse_bbcode(desc)
-			slot.add_child(desc_lbl)
-
 		var buy_btn := Button.new()
 		buy_btn.text = "Buy  (%d Gold)" % price
-		buy_btn.pressed.connect(_on_buy_thingy.bind(thingy_scene, price, buy_btn))
+		buy_btn.pressed.connect(_on_buy_thingy.bind(condition, price, buy_btn))
 		slot.add_child(buy_btn)
 
 		thingy_container.add_child(slot)
 
-func _on_buy_thingy(thingy_scene: PackedScene, price: int, btn: Button) -> void:
+func _on_buy_thingy(condition: ThingyCondition, price: int, btn: Button) -> void:
 	if run.character.gold < price:
 		_flash_button(btn, "Need %d Gold!" % price)
 		return
 	run.character.gold -= price
-	var thingy : Thingy = thingy_scene.instantiate()
-	run.add_thingy(thingy)
+	run.add_thingy_condition(condition)
 	btn.text = "Purchased!"
 	btn.disabled = true
 	_refresh_gold_label()

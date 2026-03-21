@@ -10,9 +10,6 @@ var player : Character
 var draft_amount : int = 3
 @export var deck : Array[CardData]
 
-## Passive items the player has collected during the run.
-## Persists across combats -- only their combat refs are swapped each wave.
-@export var thingies : Array[Thingy] = []
 var range_manager : RangeManager
 var ui_bar : UIBar
 @export var character : CharacterData
@@ -156,6 +153,10 @@ func begin_wave():
 
 	if player:
 		player.toggle_visible(true)
+		# reset_for_new_wave tears down last wave's condition instances and
+		# re-applies character_data.special_effects (which includes thingy
+		# conditions) as fresh duplicates, calling setup() on each one now
+		# that a RangeManager is live in the scene tree.
 		player.reset_for_new_wave()
 	else:
 		create_player()
@@ -164,7 +165,6 @@ func begin_wave():
 	create_card_handler()
 	ui_bar.set_health()
 	setup_win_condition()
-	_setup_thingies()
 
 func setup_win_condition():
 	if win_condition:
@@ -263,7 +263,8 @@ func _resolve_pending_node() -> void:
 		current_win_condition.cleanup()
 		current_win_condition = null
 
-	_teardown_thingies()
+	# Thingy condition teardown happens at the START of the next wave inside
+	# reset_for_new_wave, so nothing extra is needed here.
 
 	if range_manager:
 		range_manager.queue_free()
@@ -307,29 +308,24 @@ func on_player_death():
 	print("Game Over!")
 
 # ------------------------------------------------------------------------------
-#  THINGIES
+#  THINGY CONDITIONS
 # ------------------------------------------------------------------------------
 
-## Add a thingy to the run. Call this whenever the player acquires a passive item.
-func add_thingy(thingy: Thingy) -> void:
-	thingies.append(thingy)
-	add_child(thingy)
+## Add a thingy condition to the run. Call this whenever the player acquires
+## a passive item (e.g. from the shop).
+##
+## The condition is stored in character_data.special_effects so it persists
+## across waves. reset_for_new_wave re-applies it as a fresh duplicate at the
+## start of every subsequent combat, calling setup() automatically.
+##
+## If a combat wave is already in progress, a working copy is applied to the
+## player immediately so it takes effect without waiting for the next wave.
+func add_thingy_condition(condition: ThingyCondition) -> void:
+	character.special_effects.append(condition)
 
-	if current_state == GameState.COMBAT:
-		thingy.setup(player, range_manager)
-
-## Wire every thingy up for the current combat wave.
-func _setup_thingies() -> void:
-	if not thingies.is_empty():
-		for thingy in thingies:
-			thingy.setup(player, range_manager)
-
-## Disconnect every thingy from the combat that just ended.
-## Thingies themselves are NOT freed -- they carry over to the next wave.
-func _teardown_thingies() -> void:
-	if not thingies.is_empty():
-		for thingy in thingies:
-			thingy.teardown()
+	if current_state == GameState.COMBAT and player:
+		var fresh := condition.duplicate(true) as ThingyCondition
+		fresh.apply_condition(player, fresh)
 
 # ------------------------------------------------------------------------------
 #  CHARACTER SHEET
@@ -521,11 +517,12 @@ func get_random_card_data() -> CardData:
 	return new_card
 
 # ------------------------------------------------------------------------------
-#  THINGIES (SCENES)
+#  THINGY CONDITIONS (RESOURCES)
 # ------------------------------------------------------------------------------
 
-## Scans res://Thingys/ for .tscn files and returns one at random.
-func get_random_thingy_scene() -> PackedScene:
+## Scans res://Thingys/ for .tres files and returns one at random.
+## ThingyConditions are Resources, not scenes -- save them as .tres assets.
+func get_random_thingy_condition() -> ThingyCondition:
 	var dir := DirAccess.open("res://Thingys/")
 	if dir == null:
 		push_error("RunManager: could not open Thingys directory")
@@ -535,13 +532,13 @@ func get_random_thingy_scene() -> PackedScene:
 	dir.list_dir_begin()
 	var file_name := dir.get_next()
 	while file_name != "":
-		if not dir.current_is_dir() and file_name.ends_with(".tscn"):
+		if not dir.current_is_dir() and file_name.ends_with(".tres"):
 			paths.append("res://Thingys/" + file_name)
 		file_name = dir.get_next()
 	dir.list_dir_end()
 
 	if paths.is_empty():
-		push_error("RunManager: no Thingy scenes found in res://Thingys/")
+		push_error("RunManager: no ThingyCondition resources found in res://Thingys/")
 		return null
 
 	return load(paths[randi() % paths.size()])

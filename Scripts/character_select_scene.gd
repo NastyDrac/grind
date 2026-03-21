@@ -30,7 +30,7 @@ const STAT_META : Array = [
 # ─────────────────────────────────────────────────────────────────────────────
 
 var _selected_data    : CharacterData = null
-var _card_nodes       : Array         = []   # one PanelContainer per character
+var _card_nodes       : Array         = []
 
 # ─────────────────────────────────────────────────────────────────────────────
 #  BUILT NODES  (detail panel)
@@ -42,11 +42,11 @@ var _detail_name       : Label
 var _detail_hp_bar     : ProgressBar
 var _detail_hp_label   : Label
 var _detail_hp_formula : Label
-var _detail_stat_rows  : Dictionary   # stat_type → value Label
-var _detail_effects    : Label
+var _detail_stat_rows  : Dictionary
+var _detail_effects    : HFlowContainer  # ConditionIcon row
 var _begin_btn         : Button
-var _placeholder_lbl   : Label        # shown before any selection
-var _card_list         : HBoxContainer  # direct ref — no meta hunting needed
+var _placeholder_lbl   : Label
+var _card_list         : HBoxContainer
 
 # ─────────────────────────────────────────────────────────────────────────────
 #  READY
@@ -68,8 +68,6 @@ func _build_ui() -> void:
 	add_child(bg)
 
 	var root_vbox := VBoxContainer.new()
-	# Use PRESET_FULL_RECT then apply margins via offsets — this is the
-	# reliable way to get a VBox that actually respects the screen edge.
 	root_vbox.set_anchors_preset(Control.PRESET_FULL_RECT)
 	root_vbox.offset_left   =  24.0
 	root_vbox.offset_top    =  20.0
@@ -82,7 +80,7 @@ func _build_ui() -> void:
 	_build_bottom_panel(root_vbox)
 	_populate_character_list()
 
-# ── TOP: character sheet detail (~50% of screen) ─────────────────────────────
+# ── TOP: character sheet detail ───────────────────────────────────────────────
 
 func _build_top_panel(parent: Control) -> void:
 	_detail_panel = PanelContainer.new()
@@ -113,21 +111,20 @@ func _build_top_panel(parent: Control) -> void:
 	outer_vbox.add_child(_placeholder_lbl)
 
 	var content_vbox := VBoxContainer.new()
-	content_vbox.size_flags_horizontal = Control.SIZE_EXPAND_FILL  # ← key fix
+	content_vbox.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	content_vbox.add_theme_constant_override("separation", 10)
 	content_vbox.visible = false
 	outer_vbox.add_child(content_vbox)
 	outer_vbox.set_meta("content_ref", content_vbox)
 
 	var main_hbox := HBoxContainer.new()
-	main_hbox.size_flags_horizontal = Control.SIZE_EXPAND_FILL     # ← key fix
-	main_hbox.add_theme_constant_override("separation", 16)        # tighter gap
+	main_hbox.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	main_hbox.add_theme_constant_override("separation", 16)
 	main_hbox.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	content_vbox.add_child(main_hbox)
 
-	# Portrait — reduced and no longer forces the row wider than needed
 	_detail_portrait = TextureRect.new()
-	_detail_portrait.custom_minimum_size   = Vector2(120, 120)     # was 160×160
+	_detail_portrait.custom_minimum_size   = Vector2(120, 120)
 	_detail_portrait.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
 	_detail_portrait.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
 	_detail_portrait.expand_mode  = TextureRect.EXPAND_FIT_HEIGHT
@@ -142,7 +139,7 @@ func _build_top_panel(parent: Control) -> void:
 
 	_detail_name = Label.new()
 	_detail_name.add_theme_font_size_override("font_size", 22)
-	_detail_name.clip_contents = true                              # ← prevent name overflow
+	_detail_name.clip_contents = true
 	mid_vbox.add_child(_detail_name)
 
 	var hp_section := VBoxContainer.new()
@@ -172,15 +169,15 @@ func _build_top_panel(parent: Control) -> void:
 	_detail_hp_formula.add_theme_font_size_override("font_size", 11)
 	_detail_hp_formula.add_theme_color_override("font_color", Color(0.50, 0.50, 0.50))
 	_detail_hp_formula.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	_detail_hp_formula.clip_contents = true                        # ← prevent formula overflow
+	_detail_hp_formula.clip_contents = true
 	hp_row.add_child(_detail_hp_formula)
 
 	mid_vbox.add_child(HSeparator.new())
 
 	var stats_grid := GridContainer.new()
 	stats_grid.columns = 2
-	stats_grid.size_flags_horizontal = Control.SIZE_EXPAND_FILL    # ← fill mid column
-	stats_grid.add_theme_constant_override("h_separation", 16)     # was 28
+	stats_grid.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	stats_grid.add_theme_constant_override("h_separation", 16)
 	stats_grid.add_theme_constant_override("v_separation", 5)
 	mid_vbox.add_child(stats_grid)
 
@@ -204,7 +201,7 @@ func _build_top_panel(parent: Control) -> void:
 
 		var name_lbl := Label.new()
 		name_lbl.text = "%s:" % stat_name
-		name_lbl.custom_minimum_size = Vector2(52, 0)              # was 64
+		name_lbl.custom_minimum_size = Vector2(52, 0)
 		name_lbl.add_theme_color_override("font_color", col)
 		name_lbl.add_theme_font_size_override("font_size", 13)
 		row.add_child(name_lbl)
@@ -218,9 +215,9 @@ func _build_top_panel(parent: Control) -> void:
 
 	main_hbox.add_child(VSeparator.new())
 
-	# Right column — no fixed minimum width, let it flex
+	# Right column — special effects as ConditionIcons
 	var fx_vbox := VBoxContainer.new()
-	fx_vbox.size_flags_horizontal = Control.SIZE_EXPAND_FILL       # was fixed 180px min
+	fx_vbox.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	fx_vbox.add_theme_constant_override("separation", 6)
 	main_hbox.add_child(fx_vbox)
 
@@ -230,12 +227,11 @@ func _build_top_panel(parent: Control) -> void:
 	fx_title.add_theme_color_override("font_color", Color(0.70, 0.70, 0.70))
 	fx_vbox.add_child(fx_title)
 
-	_detail_effects = Label.new()
-	_detail_effects.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	_detail_effects.add_theme_color_override("font_color", Color(0.78, 0.78, 0.78))
-	_detail_effects.add_theme_font_size_override("font_size", 12)
-	_detail_effects.size_flags_vertical   = Control.SIZE_EXPAND_FILL
+	_detail_effects = HFlowContainer.new()
 	_detail_effects.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	_detail_effects.size_flags_vertical   = Control.SIZE_EXPAND_FILL
+	_detail_effects.add_theme_constant_override("h_separation", 4)
+	_detail_effects.add_theme_constant_override("v_separation", 4)
 	fx_vbox.add_child(_detail_effects)
 
 	content_vbox.add_child(HSeparator.new())
@@ -333,7 +329,6 @@ func _build_character_card(char_data: CharacterData, resolved_stats: Dictionary)
 	vbox.add_theme_constant_override("separation", 2)
 	card.add_child(vbox)
 
-	# Portrait — square, fills almost all the card
 	var portrait := TextureRect.new()
 	portrait.custom_minimum_size = Vector2(70, 70)
 	portrait.size_flags_horizontal = Control.SIZE_EXPAND_FILL
@@ -342,7 +337,6 @@ func _build_character_card(char_data: CharacterData, resolved_stats: Dictionary)
 	portrait.texture      = char_data.character_image
 	vbox.add_child(portrait)
 
-	# Name — single line, small, clipped
 	var name_lbl := Label.new()
 	name_lbl.text = char_data.character_name if char_data.character_name != "" else "Unnamed"
 	name_lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
@@ -352,7 +346,6 @@ func _build_character_card(char_data: CharacterData, resolved_stats: Dictionary)
 	name_lbl.add_theme_font_size_override("font_size", 9)
 	vbox.add_child(name_lbl)
 
-	# Transparent button overlay
 	var btn := Button.new()
 	btn.flat = true
 	btn.anchor_right  = 1.0
@@ -373,7 +366,6 @@ func _build_character_card(char_data: CharacterData, resolved_stats: Dictionary)
 func _on_character_card_pressed(char_data: CharacterData, pressed_card: PanelContainer) -> void:
 	_selected_data = char_data
 
-	# Update card highlight styles
 	for card in _card_nodes:
 		if card == pressed_card:
 			card.add_theme_stylebox_override("panel", card.get_meta("style_selected"))
@@ -383,63 +375,46 @@ func _on_character_card_pressed(char_data: CharacterData, pressed_card: PanelCon
 	_refresh_detail_panel(char_data)
 
 func _refresh_detail_panel(char_data: CharacterData) -> void:
-	# Show content, hide placeholder
 	_placeholder_lbl.visible = false
 
-	# Find the content vbox via meta
 	var outer_vbox : VBoxContainer = _detail_panel.get_child(0)
 	var content_vbox : VBoxContainer = outer_vbox.get_meta("content_ref")
 	content_vbox.visible = true
 
-	# Spin up a temporary Character to get real stat and HP values
 	var preview := _make_preview_character(char_data)
 
-	# Portrait
 	_detail_portrait.texture = char_data.character_image
-
-	# Name
 	_detail_name.text = char_data.character_name if char_data.character_name != "" else "Unnamed"
 
-	# HP — calculable with a real Character instance
 	var max_hp  : int = char_data.max_health.calculate(preview) if char_data.max_health else 100
-	var cur_hp  : int = max_hp   # fresh character always starts full
+	var cur_hp  : int = max_hp
 	_detail_hp_bar.visible   = true
 	_detail_hp_bar.max_value = max_hp
 	_detail_hp_bar.value     = cur_hp
 	_detail_hp_label.text    = "%d / %d" % [cur_hp, max_hp]
-	# Show the formula so players understand what drives HP
 	if char_data.max_health and char_data.max_health.formula != "":
 		_detail_hp_formula.text = "( %s )" % char_data.max_health.formula
 	else:
 		_detail_hp_formula.text = ""
 
-	# Stats — read from the preview character so values are fully resolved
 	for meta in STAT_META:
 		var stat_type : int = meta[0]
 		var val : int = _get_stat_value_from_character(preview, stat_type)
 		if _detail_stat_rows.has(stat_type):
 			_detail_stat_rows[stat_type].text = str(val)
 
-	# Clean up the temporary character node
 	preview.queue_free()
 
-	# Special effects
-	if char_data.special_effects.is_empty():
-		_detail_effects.text = "None"
-	else:
-		var lines : Array = []
-		for fx in char_data.special_effects:
-			if "description" in fx:
-				lines.append(fx.description)
-			elif "effect_name" in fx:
-				lines.append(fx.effect_name)
-			elif "name" in fx:
-				lines.append(fx.name)
-			else:
-				lines.append(str(fx))
-		_detail_effects.text = "\n".join(lines)
+	# Special effects — rebuild ConditionIcon row
+	for child in _detail_effects.get_children():
+		child.queue_free()
 
-	# Show begin button
+	for fx in char_data.special_effects:
+		if fx is Condition:
+			var icon := ConditionIcon.new(fx)
+			_detail_effects.add_child(icon)
+			icon.ready.connect(icon.update_display.bind(), CONNECT_ONE_SHOT)
+
 	_begin_btn.visible = true
 
 # ─────────────────────────────────────────────────────────────────────────────
@@ -454,7 +429,6 @@ func _on_begin_run_pressed() -> void:
 		push_error("CharacterSelect: run_manager_scene is not assigned in the Inspector!")
 		return
 
-	# Reset HP to full using a real Character so the ValueCalculator works correctly
 	var preview := _make_preview_character(_selected_data)
 	_selected_data.current_health = _selected_data.max_health.calculate(preview) if _selected_data.max_health else 100
 	preview.queue_free()
@@ -481,8 +455,6 @@ func _get_stat_value_from_character(character: Character, stat_type: int) -> int
 	return 0
 
 func _make_preview_character(char_data: CharacterData) -> Character:
-	## Instantiates a hidden Character, calls set_data() so all stats and HP
-	## are properly initialised, then returns it. Caller must queue_free() it.
 	var character : Character = load("res://Scenes/character.tscn").instantiate()
 	add_child(character)
 	character.set_data(char_data)

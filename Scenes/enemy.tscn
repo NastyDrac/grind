@@ -2,7 +2,7 @@
 
 [ext_resource type="Script" uid="uid://cwk187k7dxx42" path="res://Scripts/enemy.gd" id="1_hghv2"]
 [ext_resource type="Texture2D" uid="uid://cxdbsw4i5raf4" path="res://Art/test health bar.png" id="2_1f0kj"]
-[ext_resource type="Texture2D" uid="uid://b2rjhiy4rifig" path="res://icon.svg" id="2_afpow"]
+[ext_resource type="Texture2D" uid="uid://dh3ghgo4uvj2i" path="res://Art/runner.png" id="2_0830c"]
 [ext_resource type="Script" uid="uid://c6expubttir7l" path="res://Scripts/intent_indicator.gd" id="4_287tu"]
 [ext_resource type="Script" uid="uid://tx05aeu75a0s" path="res://Scripts/condition_container.gd" id="5_0830c"]
 
@@ -15,7 +15,7 @@ metadata/_custom_type_script = "uid://cwk187k7dxx42"
 [node name="Sprite2D" type="Sprite2D" parent="."]
 position = Vector2(0, -19)
 scale = Vector2(0.5, 0.5)
-texture = ExtResource("2_afpow")
+texture = ExtResource("2_0830c")
 
 [node name="Area2D" type="Area2D" parent="Sprite2D"]
 
@@ -51,8 +51,9 @@ script = ExtResource("4_287tu")
 enemy = NodePath("..")
 metadata/_custom_type_script = "uid://c6expubttir7l"
 
-[node name="ConditionContainer" type="HBoxContainer" parent="." node_paths=PackedStringArray("entity")]
-offset_right = 40.0
+[node name="ConditionContainer" type="GridContainer" parent="." node_paths=PackedStringArray("entity")]
+offset_left = 35.0
+offset_right = 75.00003
 offset_bottom = 40.0
 script = ExtResource("5_0830c")
 entity = NodePath("..")

@@ -48,7 +48,7 @@ theme_override_colors/font_color = Color(0, 0, 0, 1)
 theme_override_font_sizes/font_size = 34
 text = "7"
 
-[node name="ConditionContainer" type="HBoxContainer" parent="TextureProgressBar" node_paths=PackedStringArray("entity")]
+[node name="ConditionContainer" type="GridContainer" parent="TextureProgressBar" node_paths=PackedStringArray("entity")]
 layout_mode = 0
 offset_top = 14.46
 offset_right = 40.0

@@ -20,21 +20,25 @@ var character_instance : Character
 @onready var mojo_label = $VBoxContainer/HBoxContainer/VBoxContainer/VBoxContainer6/mojo_label
 @onready var effects_label = $VBoxContainer/VBoxContainer/Label2
 
+var _effects_container : HFlowContainer
+
 func _ready():
-	pass
+	# Hide the scene label and replace it with a flow container of ConditionIcons.
+	effects_label.visible = false
+	_effects_container = HFlowContainer.new()
+	_effects_container.add_theme_constant_override("h_separation", 4)
+	_effects_container.add_theme_constant_override("v_separation", 4)
+	effects_label.get_parent().add_child(_effects_container)
 
 func setup_base_stats(data: CharacterData):
-	"""Setup to show base character stats (unmodified by combat buffs)"""
 	display_mode = DisplayMode.BASE_STATS
 	character_data = data
 	populate_character_sheet()
 
 func setup_combat_stats(character: Character):
-	"""Setup to show live combat stats (with all modifications)"""
 	display_mode = DisplayMode.COMBAT_STATS
 	character_instance = character
 	character_data = character.character_data
-	
 
 	if not character_instance.stats_changed.is_connected(refresh):
 		character_instance.stats_changed.connect(refresh)
@@ -42,26 +46,17 @@ func setup_combat_stats(character: Character):
 	populate_character_sheet()
 
 func populate_character_sheet():
-
 	if not character_data:
-
 		return
-	
 
 	if character_data.character_image:
 		character_image.texture = character_data.character_image
-	
 
 	update_health_bar()
-	
-
 	update_stats()
-	
-
 	update_effects()
 
 func update_health_bar():
-	"""Updates the health bar based on current and max health"""
 	if not character_data:
 		return
 	
@@ -77,47 +72,32 @@ func update_health_bar():
 				health_bar.max_value = character_data.max_health.calculate(character_instance)
 				health_bar.value = character_instance.health
 
-	# Show the formula that drives max HP regardless of mode
 	if hp_formula_label and character_data.max_health and character_data.max_health.formula != "":
 		hp_formula_label.text = "( %s )" % character_data.max_health.formula
 	elif hp_formula_label:
 		hp_formula_label.text = ""
 
 func _calculate_base_max_health() -> int:
-	"""Calculate max health using base stats only"""
-
 	if character_instance:
-
 		return character_data.max_health.calculate(character_instance)
 	else:
-
-		var stat_dict = {}
-		for stat in character_data.stats:
-			stat_dict[stat.stat_type] = stat.value
-		
-		
 		return character_data.max_health.calculate(null) if character_data.max_health else 100
 
 func update_stats():
-	"""Updates all stat labels based on display mode"""
 	if not character_data:
 		return
 	
 	match display_mode:
 		DisplayMode.BASE_STATS:
-
 			_update_base_stats()
 		DisplayMode.COMBAT_STATS:
-
 			_update_combat_stats()
 
 func _update_base_stats():
-	"""Updates labels with base stat values (unmodified)"""
 	if not character_data.stats:
 		return
 	
 	for stat in character_data.stats:
-
 		var base_value = stat.value
 		match stat.stat_type:
 			Stat.STAT.SWAG:
@@ -134,15 +114,13 @@ func _update_base_stats():
 				mojo_label.text = str(base_value)
 
 func _update_combat_stats():
-	"""Updates labels with current combat stat values (with modifications)"""
 	if not character_instance or not character_instance.stats:
 		return
 	
 	for stat in character_instance.stats:
-		var current_value = stat.value  
+		var current_value = stat.value
 		var display_text = str(current_value)
 		
-	
 		if "base_value" in stat and stat.value != stat.base_value:
 			display_text = "%d (%d)" % [current_value, stat.base_value]
 		
@@ -161,31 +139,24 @@ func _update_combat_stats():
 				mojo_label.text = display_text
 
 func update_effects():
-	"""Updates the effects text based on special_effects array"""
-	if not character_data:
+	if not _effects_container:
 		return
-	
-	if character_data.special_effects.is_empty():
-		effects_label.text = "No special effects"
-	else:
-		var effects_text = ""
-		for effect in character_data.special_effects:
-			if effects_text != "":
-				effects_text += "\n"
-			
-			if "description" in effect:
-				effects_text += effect.description
-			elif "name" in effect:
-				effects_text += effect.name
-			else:
-				effects_text += str(effect)
-		effects_label.text = effects_text
+
+	for child in _effects_container.get_children():
+		child.queue_free()
+
+	if not character_data or character_data.special_effects.is_empty():
+		return
+
+	for effect in character_data.special_effects:
+		if effect is Condition:
+			var icon := ConditionIcon.new(effect)
+			_effects_container.add_child(icon)
+			icon.ready.connect(icon.update_display.bind(), CONNECT_ONE_SHOT)
 
 func refresh():
-	"""Refreshes all displayed data"""
 	populate_character_sheet()
 
 func _exit_tree():
-	"""Cleanup connections when sheet is removed"""
 	if character_instance and character_instance.stats_changed.is_connected(refresh):
 		character_instance.stats_changed.disconnect(refresh)

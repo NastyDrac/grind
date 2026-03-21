@@ -1,7 +1,7 @@
-extends Thingy
+extends ThingyCondition
 class_name NewtonsCradle
 
-## Newton's Cradle -- passive item.
+## Newton's Cradle — thingy condition.
 ## When the player forces an enemy to move (push or pull), every OTHER enemy
 ## in the ranges swept through takes damage.
 
@@ -11,11 +11,10 @@ class_name NewtonsCradle
 ## Formula can use: swag, guts, bang, hustle, marbles, mojo
 @export var damage_calculator: ValueCalculator
 
-# -- Lifecycle -----------------------------------------------------------------
+# -- Combat lifecycle ----------------------------------------------------------
 
-## Called by RunManager at the start of every combat wave.
-func setup(p: Character, rm: RangeManager) -> void:
-	super(p, rm)
+func setup(who, rm) -> void:
+	super(who, rm)
 
 	# Connect to enemies already present when combat starts.
 	for enemy in range_manager.get_all_enemies():
@@ -25,7 +24,6 @@ func setup(p: Character, rm: RangeManager) -> void:
 	Global.enemy_spawned.connect(_on_enemy_spawned)
 
 
-## Called by RunManager when combat ends.
 func teardown() -> void:
 	if Global.enemy_spawned.is_connected(_on_enemy_spawned):
 		Global.enemy_spawned.disconnect(_on_enemy_spawned)
@@ -45,8 +43,7 @@ func _on_enemy_spawned(enemy: Enemy) -> void:
 
 
 func _on_enemy_moved(enemy: Enemy, old_range: int, new_range: int) -> void:
-	# Combat may have ended while this signal was in-flight -- bail silently.
-	# Use is_instance_valid so a freed (but non-null) RangeManager is also caught.
+	# Combat may have ended while this signal was in-flight — bail silently.
 	if not is_instance_valid(range_manager):
 		return
 
@@ -55,7 +52,6 @@ func _on_enemy_moved(enemy: Enemy, old_range: int, new_range: int) -> void:
 		return
 
 	# Sweep through every range slot between old and new position (inclusive).
-	# min/max ensures this works correctly for both pushes and pulls.
 	for r in range(min(old_range, new_range), max(old_range, new_range) + 1):
 		for target in range_manager.get_enemies_at_range(r):
 			# Don't damage the enemy that was moved.
@@ -73,15 +69,15 @@ func _connect_enemy(enemy: Enemy) -> void:
 
 
 func _calculate_damage() -> int:
-	if damage_calculator and player:
-		return damage_calculator.calculate(player)
+	if damage_calculator and entity:
+		return damage_calculator.calculate(entity)
 	return 0
 
 
 func get_description_with_values() -> String:
-	if not damage_calculator or not player:
+	if not damage_calculator or not entity:
 		return "Forcing an enemy to move deals damage to every enemy it passes through."
-	var dmg := damage_calculator.calculate(player)
+	var dmg := damage_calculator.calculate(entity)
 	var formula := _format_formula_display(damage_calculator.formula)
 	return "Forcing an enemy to move deals §%d§ (%s) damage to every enemy in its path." % [dmg, formula]
 

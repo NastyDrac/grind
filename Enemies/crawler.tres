@@ -24,5 +24,6 @@ metadata/_custom_type_script = "uid://bpr8cwurcrxy3"
 script = ExtResource("1_8vfdf")
 enemy_name = "Crawler"
 texture = ExtResource("2_2orq7")
+max_health = 2
 conditions = Array[ExtResource("1_nkj5m")]([SubResource("Resource_grr4f")])
 metadata/_custom_type_script = "uid://tnxg66jw03v3"

@@ -1,0 +1,17 @@
+[gd_resource type="Resource" script_class="NewtonsCradle" load_steps=5 format=3 uid="uid://ciod8shdudtso"]
+
+[ext_resource type="Texture2D" uid="uid://8nc5w8chfh3m" path="res://Art/cradle.png" id="1_424vi"]
+[ext_resource type="Script" uid="uid://cgrxhw8vqenhu" path="res://Scripts/ValueCalculator.gd" id="1_srysl"]
+[ext_resource type="Script" uid="uid://bvdt23ajoaxul" path="res://Scripts/newtons_cradle.gd" id="1_xmd5f"]
+
+[sub_resource type="Resource" id="Resource_xtvuo"]
+script = ExtResource("1_srysl")
+formula = "bang"
+metadata/_custom_type_script = "uid://cgrxhw8vqenhu"
+
+[resource]
+script = ExtResource("1_xmd5f")
+damage_calculator = SubResource("Resource_xtvuo")
+condition_name = "Newton's Cradle"
+icon = ExtResource("1_424vi")
+metadata/_custom_type_script = "uid://bvdt23ajoaxul"

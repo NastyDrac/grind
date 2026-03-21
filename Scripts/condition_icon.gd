@@ -11,6 +11,9 @@ func _init(con: Condition) -> void:
 	set_condition(con)
 
 func _ready():
+	custom_minimum_size = Vector2(16, 16)
+	stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+	expand_mode = TextureRect.EXPAND_IGNORE_SIZE
 	mouse_filter = Control.MOUSE_FILTER_STOP
 	mouse_entered.connect(_on_mouse_entered)
 	mouse_exited.connect(_on_mouse_exited)
@@ -58,11 +61,16 @@ func _show_tooltip():
 
 	tooltip_instance = TOOLTIP_SCENE.instantiate()
 
-	var canvas_layer = get_tree().root.get_node_or_null("CanvasLayer")
-	if canvas_layer:
-		canvas_layer.add_child(tooltip_instance)
-	else:
-		get_tree().root.add_child(tooltip_instance)
+	# Always add the tooltip to a dedicated high-layer CanvasLayer so it
+	# renders above every other UI element, including Shop and popups.
+	var tooltip_layer := get_tree().root.get_node_or_null("TooltipLayer")
+	if not tooltip_layer:
+		tooltip_layer = CanvasLayer.new()
+		tooltip_layer.name = "TooltipLayer"
+		tooltip_layer.layer = 100
+		get_tree().root.add_child(tooltip_layer)
+
+	tooltip_layer.add_child(tooltip_instance)
 
 	_populate_tooltip()
 	_position_tooltip()
@@ -87,7 +95,9 @@ func _populate_tooltip():
 		name_node.text = condition.get_condition_name()
 
 	if desc_node:
-		var description_text = condition.description if condition.description else "No description available."
+		var description_text := condition.get_description_with_values()
+		if description_text == "":
+			description_text = "No description available."
 
 		if condition.stacks > 0:
 			description_text = "[b]Stacks:[/b] %d\n%s" % [condition.stacks, description_text]

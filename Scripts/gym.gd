@@ -7,8 +7,8 @@ const MARGIN       : float = 40.0
 
 # ─── Training config ──────────────────────────────────────────────────────────
 const TRAINING_SLOTS : int = 3          # how many choices to offer
-const BOOST_MIN      : int = 2          # minimum stat increase per choice
-const BOOST_MAX      : int = 5          # maximum stat increase per choice
+const BOOST_MIN      : int = 1          # minimum stat increase per choice
+const BOOST_MAX      : int = 3          # maximum stat increase per choice
 
 # ─── State ────────────────────────────────────────────────────────────────────
 var run  : RunManager
