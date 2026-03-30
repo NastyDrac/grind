@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://c0mry8vul074d"
-path="res://.godot/imported/WildSellswordwSword.png-c68b4df3c8bf8b3227b2abccd0bd49b8.ctex"
+uid="uid://btoj6g7v0x2vq"
+path="res://.godot/imported/ScrapCollectorIcon.png-3104bc6c2265f3f12f8bfc4471781097.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://Art/WildSellswordwSword.png"
-dest_files=["res://.godot/imported/WildSellswordwSword.png-c68b4df3c8bf8b3227b2abccd0bd49b8.ctex"]
+source_file="res://Art/Icons/ScrapCollectorIcon.png"
+dest_files=["res://.godot/imported/ScrapCollectorIcon.png-3104bc6c2265f3f12f8bfc4471781097.ctex"]
 
 [params]
 

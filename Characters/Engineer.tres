@@ -1,14 +1,16 @@
-[gd_resource type="Resource" script_class="CharacterData" load_steps=28 format=3 uid="uid://ce6l5lqjxvcs6"]
+[gd_resource type="Resource" script_class="CharacterData" load_steps=30 format=3 uid="uid://ce6l5lqjxvcs6"]
 
 [ext_resource type="Texture2D" uid="uid://bdwqxwxli60bi" path="res://Art/engineer.png" id="1_486th"]
 [ext_resource type="Script" uid="uid://dpayg0f6j5y2n" path="res://Scripts/character_data.gd" id="1_t1uqq"]
 [ext_resource type="Script" uid="uid://b1ogi3xh5xakp" path="res://Scripts/condition.gd" id="2_th448"]
 [ext_resource type="Script" uid="uid://b2h1ochum01o" path="res://Scripts/stat.gd" id="3_wqn1a"]
 [ext_resource type="Script" uid="uid://cgrxhw8vqenhu" path="res://Scripts/ValueCalculator.gd" id="4_486th"]
+[ext_resource type="Texture2D" uid="uid://dtf7m8mo3mgg1" path="res://Art/Icons/Scrap_GearIcon.png" id="5_kdvfq"]
 [ext_resource type="Texture2D" uid="uid://bd7k5vg61wl4u" path="res://Art/gear.png" id="5_xswsd"]
 [ext_resource type="Script" uid="uid://d2bewqoltjljo" path="res://Scripts/itemData.gd" id="6_kdvfq"]
 [ext_resource type="Script" uid="uid://dfo48c3dx2d7" path="res://Scripts/item_dropper.gd" id="7_qa6lw"]
 [ext_resource type="Script" uid="uid://bbikocjwp04x5" path="res://Scripts/scrap_collector.gd" id="8_486th"]
+[ext_resource type="Texture2D" uid="uid://btoj6g7v0x2vq" path="res://Art/Icons/ScrapCollectorIcon.png" id="9_qa6lw"]
 
 [sub_resource type="Resource" id="Resource_livrn"]
 script = ExtResource("4_486th")
@@ -33,7 +35,7 @@ script = ExtResource("7_qa6lw")
 chance = SubResource("Resource_5axbb")
 item = SubResource("Resource_mwbnt")
 condition_name = "Engineer"
-icon = ExtResource("5_xswsd")
+icon = ExtResource("5_kdvfq")
 description = "enemies drop scrap"
 metadata/_custom_type_script = "uid://dfo48c3dx2d7"
 
@@ -46,7 +48,7 @@ metadata/_custom_type_script = "uid://cgrxhw8vqenhu"
 script = ExtResource("8_486th")
 scrap_threshold = 1
 turret_damage = SubResource("Resource_7ytw7")
-icon = ExtResource("5_xswsd")
+icon = ExtResource("9_qa6lw")
 description = "If you have scrap, create a Deploy Turret Card"
 show_stacks = true
 metadata/_custom_type_script = "uid://bbikocjwp04x5"

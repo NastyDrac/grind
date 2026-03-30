@@ -1222,7 +1222,7 @@ func _show_pile_window(title_text: String, pile_node: Node, ordered_stack: Array
 	# Centred panel
 	var panel = PanelContainer.new()
 	panel.set_anchors_preset(Control.PRESET_CENTER)
-	panel.custom_minimum_size = Vector2(860, 560)
+	panel.custom_minimum_size = Vector2(1000, 560)
 	panel.offset_left   = -430
 	panel.offset_top    = -280
 	panel.offset_right  =  430
@@ -1258,10 +1258,10 @@ func _show_pile_window(title_text: String, pile_node: Node, ordered_stack: Array
 	scroll.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	scroll.custom_minimum_size = Vector2(840, 460)
 	vbox.add_child(scroll)
-	
+	scroll.vertical_scroll_mode = scroll.SCROLL_MODE_AUTO
 	var flow = HFlowContainer.new()
-	flow.add_theme_constant_override("h_separation", 12)
-	flow.add_theme_constant_override("v_separation", 12)
+	flow.add_theme_constant_override("h_separation", 40)
+	flow.add_theme_constant_override("v_separation", 80)
 	flow.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	scroll.add_child(flow)
 	

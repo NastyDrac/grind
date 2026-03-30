@@ -2,7 +2,7 @@
 
 [ext_resource type="Script" uid="uid://dpayg0f6j5y2n" path="res://Scripts/character_data.gd" id="1_5j4wt"]
 [ext_resource type="Script" uid="uid://b2h1ochum01o" path="res://Scripts/stat.gd" id="1_8ety0"]
-[ext_resource type="Texture2D" uid="uid://c0mry8vul074d" path="res://Art/WildSellswordwSword.png" id="1_rw86x"]
+[ext_resource type="Texture2D" uid="uid://clojht6i3thn6" path="res://Art/Characters/WildSellswordwSword(1).png" id="1_rw86x"]
 [ext_resource type="Script" uid="uid://cgrxhw8vqenhu" path="res://Scripts/ValueCalculator.gd" id="2_8k2ij"]
 [ext_resource type="Resource" uid="uid://dj6ttthval7yo" path="res://items/gold.tres" id="4_dvkhi"]
 [ext_resource type="Script" uid="uid://b1ogi3xh5xakp" path="res://Scripts/condition.gd" id="4_rw86x"]

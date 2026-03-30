@@ -2,12 +2,12 @@
 
 [ext_resource type="Script" uid="uid://tnxg66jw03v3" path="res://Scripts/enemy_data.gd" id="1_3s7dc"]
 [ext_resource type="Script" uid="uid://b1ogi3xh5xakp" path="res://Scripts/condition.gd" id="1_aa1k1"]
-[ext_resource type="Texture2D" uid="uid://dh3ghgo4uvj2i" path="res://Art/runner.png" id="2_u23b3"]
+[ext_resource type="Texture2D" uid="uid://ct72ijjtb8uub" path="res://Art/Characters/OrcVanguardClub2.png" id="3_aa1k1"]
 
 [resource]
 script = ExtResource("1_3s7dc")
 enemy_name = "Runner"
-texture = ExtResource("2_u23b3")
+texture = ExtResource("3_aa1k1")
 max_health = 4
 damage = 2
 move_speed = 2

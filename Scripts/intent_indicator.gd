@@ -5,7 +5,7 @@ var label : Label
 @export var enemy : Enemy
 
 var attack_icon = preload("res://Art/death.png")
-var move_icon = preload("res://Art/fast-forward.png")
+var move_icon = preload("res://Art/Icons/ArrowIcon.png")
 
 func _ready() -> void:
 	label = Label.new()

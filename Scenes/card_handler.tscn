@@ -1,6 +1,7 @@
-[gd_scene load_steps=5 format=3 uid="uid://vun5mwhqc014"]
+[gd_scene load_steps=6 format=3 uid="uid://vun5mwhqc014"]
 
 [ext_resource type="Script" uid="uid://qb2kyhu1kbb1" path="res://Scripts/card_handler.gd" id="1_rom71"]
+[ext_resource type="Texture2D" uid="uid://fcnd5bjeuu1" path="res://Art/Icons/ButtonBG.png" id="2_sdc1o"]
 
 [sub_resource type="Curve" id="Curve_rom71"]
 _data = [Vector2(0, 0), 0.0, 1.0, 0, 1, Vector2(1, 1), 1.0, 0.0, 1, 0]
@@ -42,26 +43,47 @@ offset_left = 39.0
 offset_top = 574.0
 offset_right = 47.0
 offset_bottom = 582.0
+theme_override_colors/icon_pressed_color = Color(0.29219002, 0.29219005, 0.29219002, 1)
+theme_override_constants/icon_max_width = 100
 text = "Draw Pile"
+icon = ExtResource("2_sdc1o")
+flat = true
+icon_alignment = 1
 
 [node name="DiscardPileButton" type="Button" parent="."]
 offset_left = 1019.0
 offset_top = 568.0
 offset_right = 1118.0
 offset_bottom = 599.0
+theme_override_colors/font_hover_pressed_color = Color(0.5921569, 1, 1, 1)
+theme_override_colors/icon_pressed_color = Color(0.29219002, 0.29219005, 0.29219002, 1)
+theme_override_constants/icon_max_width = 120
 text = "Discard Pile"
+icon = ExtResource("2_sdc1o")
+flat = true
+icon_alignment = 1
 
 [node name="ExhaustPileButton" type="Button" parent="."]
 offset_left = 1016.0
 offset_top = 510.0
 offset_right = 1118.0
 offset_bottom = 541.0
+theme_override_constants/icon_max_width = 120
 text = "Exhaust Pile
 "
+icon = ExtResource("2_sdc1o")
+flat = true
+icon_alignment = 1
 
 [node name="PassTimeButton" type="Button" parent="."]
 offset_left = 40.0
 offset_top = 531.0
 offset_right = 125.0
 offset_bottom = 562.0
+theme_override_colors/icon_pressed_color = Color(0.29219002, 0.29219005, 0.29219002, 1)
+theme_override_constants/icon_max_width = 100
 text = "Pass Time"
+icon = ExtResource("2_sdc1o")
+flat = true
+text_overrun_behavior = 2
+icon_alignment = 1

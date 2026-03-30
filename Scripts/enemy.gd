@@ -44,7 +44,7 @@ func _on_apply_condition(target, condition_to_apply: Condition):
 
 func resize_collision_shape():
 	$Sprite2D/Area2D/CollisionShape2D.shape.size = data.texture.get_size()
-	health_bar.position.y -= get_visual_height()/2
+	health_bar.position.y -= get_visual_height()/2 + health_bar.get_rect().size.y/2
 
 func set_range_manager(manager : RangeManager):
 	range_manager = manager

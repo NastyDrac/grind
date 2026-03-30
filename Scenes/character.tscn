@@ -1,10 +1,13 @@
-[gd_scene load_steps=6 format=3 uid="uid://cbl8iajlurx01"]
+[gd_scene load_steps=9 format=3 uid="uid://cbl8iajlurx01"]
 
 [ext_resource type="Script" uid="uid://bg47q17trvyam" path="res://Scripts/character.gd" id="1_owm7s"]
 [ext_resource type="Resource" uid="uid://c2xwf8l4o67yn" path="res://Characters/regalur_guy.tres" id="2_nytcm"]
 [ext_resource type="Texture2D" uid="uid://b2rjhiy4rifig" path="res://icon.svg" id="3_owm7s"]
 [ext_resource type="Script" uid="uid://tx05aeu75a0s" path="res://Scripts/condition_container.gd" id="4_ejsiy"]
-[ext_resource type="Texture2D" uid="uid://cxdbsw4i5raf4" path="res://Art/test health bar.png" id="4_nytcm"]
+[ext_resource type="Texture2D" uid="uid://nxdormegmmnt" path="res://Art/Icons/EmptyHealthbar.png" id="4_reotu"]
+[ext_resource type="Texture2D" uid="uid://b6med5yf2vbb1" path="res://Art/Icons/HealthBarBorder.png" id="5_a5ess"]
+[ext_resource type="Texture2D" uid="uid://o54dxdlmhuoy" path="res://Art/Icons/HealthBarGreen.png" id="6_wbia7"]
+[ext_resource type="Texture2D" uid="uid://uqhx3nyqje0m" path="res://Art/Icons/BlockIcon.png" id="7_a5ess"]
 
 [node name="Character" type="Node" groups=["player"]]
 script = ExtResource("1_owm7s")
@@ -15,7 +18,6 @@ scale = Vector2(0.5, 0.5)
 texture = ExtResource("3_owm7s")
 
 [node name="TextureProgressBar" type="TextureProgressBar" parent="."]
-self_modulate = Color(1, 0, 0, 1)
 anchors_preset = 8
 anchor_left = 0.5
 anchor_top = 0.5
@@ -28,31 +30,30 @@ offset_bottom = 7.5
 grow_horizontal = 2
 grow_vertical = 2
 value = 100.0
-texture_progress = ExtResource("4_nytcm")
+texture_under = ExtResource("4_reotu")
+texture_over = ExtResource("5_a5ess")
+texture_progress = ExtResource("6_wbia7")
 
-[node name="ColorRect" type="ColorRect" parent="TextureProgressBar"]
+[node name="ColorRect" type="Sprite2D" parent="TextureProgressBar"]
 visible = false
-layout_mode = 0
-offset_left = 105.0
-offset_top = -13.0
-offset_right = 145.0
-offset_bottom = 27.0
+position = Vector2(121, 10.5)
+texture = ExtResource("7_a5ess")
 
 [node name="Label" type="Label" parent="TextureProgressBar/ColorRect"]
-layout_mode = 0
-offset_left = 9.0
-offset_top = -3.0
-offset_right = 49.0
-offset_bottom = 44.0
+offset_left = -20.0
+offset_top = -25.5
+offset_right = 20.0
+offset_bottom = 21.5
 theme_override_colors/font_color = Color(0, 0, 0, 1)
 theme_override_font_sizes/font_size = 34
 text = "7"
+horizontal_alignment = 1
 
 [node name="ConditionContainer" type="GridContainer" parent="TextureProgressBar" node_paths=PackedStringArray("entity")]
 layout_mode = 0
-offset_top = 14.46
+offset_top = 20.500008
 offset_right = 40.0
-offset_bottom = 54.46
+offset_bottom = 60.500008
 script = ExtResource("4_ejsiy")
 entity = NodePath("../..")
 metadata/_custom_type_script = "uid://tx05aeu75a0s"
