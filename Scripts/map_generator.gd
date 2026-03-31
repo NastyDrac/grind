@@ -72,7 +72,7 @@ const C_ROAD_FUTURE    := Color(0.29, 0.25, 0.19, 1.0)  # locked: dark asphalt
 const C_ROAD_REACHABLE := Color(0.73, 0.63, 0.37, 1.0)  # available: warm ochre
 const C_ROAD_VISITED   := Color(0.85, 0.81, 0.68, 1.0)  # travelled: pale worn
 const C_ROAD_EDGE      := Color(0.08, 0.06, 0.04, 0.55) # edge kerb stripe
-const C_ROAD_DASH      := Color(0.70, 0.64, 0.48, 0.42) # centre-line dashes
+const C_ROAD_DASH      := Color(0.0, 0.0, 0.0, 0.42) # centre-line dashes
 
 # Junction pads — small circles where roads meet, always same colour family
 const C_JNC_CURB       := Color(0.13, 0.10, 0.07, 1.0)
@@ -157,8 +157,8 @@ func _draw() -> void:
 	_draw_parks()
 	_draw_buildings()
 	_draw_alley_lines()
-	_draw_road_curbs()      # dark casing ring — drawn under everything road-related
-	_draw_road_surfaces()   # state-coloured asphalt surface
+	#_draw_road_curbs()      # dark casing ring — drawn under everything road-related
+	#_draw_road_surfaces()   # state-coloured asphalt surface
 	_draw_road_markings()   # edge kerb lines + centre dashes
 	_draw_junctions()       # small intersection pads that knit roads together
 	_draw_stains()
@@ -218,17 +218,17 @@ func _road_surface_colour(e: Dictionary) -> Color:
 
 func _draw_road_markings() -> void:
 	## Thin edge kerb lines on both sides + dashed centre line.
-	for e in _path_edges:
-		var pts  : Array = e["pts"]
-		var half := road_width * 0.5 - 1.5
-		var left_pts  := PackedVector2Array()
-		var right_pts := PackedVector2Array()
-		for i in pts.size():
-			var n := _pts_normal(pts, i)
-			left_pts.append(pts[i]  + n * half)
-			right_pts.append(pts[i] - n * half)
-		draw_polyline(left_pts,  C_ROAD_EDGE, 1.2, true)
-		draw_polyline(right_pts, C_ROAD_EDGE, 1.2, true)
+	#for e in _path_edges:
+	#	var pts  : Array = e["pts"]
+	#	var half := road_width * 0.5 - 1.5
+	#	var left_pts  := PackedVector2Array()
+	#	var right_pts := PackedVector2Array()
+	#	for i in pts.size():
+	#		var n := _pts_normal(pts, i)
+	#		left_pts.append(pts[i]  + n * half)
+	#		right_pts.append(pts[i] - n * half)
+	#	draw_polyline(left_pts,  C_ROAD_EDGE, 1.2, true)
+	#	draw_polyline(right_pts, C_ROAD_EDGE, 1.2, true)
 
 	## Centre dashes — accumulate arc length across bezier samples.
 	for e in _path_edges:

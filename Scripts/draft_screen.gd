@@ -20,12 +20,14 @@ func _ready():
 func display_card_options(run_manager : RunManager):
 	run = run_manager
 	var card_data : Array = []
-	
-	
+	var offered_card_paths : Array[String] = []
+
 	for each : int in run_manager.draft_amount:
-		var random_card = run_manager.get_random_card_data()
+		var random_card = run_manager.get_random_card_data(offered_card_paths)
 		if random_card:
 			card_data.append(random_card)
+			if random_card.resource_path != "":
+				offered_card_paths.append(random_card.resource_path)
 	
 	
 	if card_container:

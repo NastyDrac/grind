@@ -29,3 +29,5 @@ func trigger_condition():
 	if entity:
 		entity.take_damgage(stacks)
 		stacks -= decrement
+	if stacks <= 0:
+		remove_condition(self)

@@ -182,10 +182,14 @@ func _populate_cards() -> void:
 	for child in card_container.get_children():
 		child.queue_free()
 
+	var offered_card_paths : Array[String] = []
+
 	for _i in range(CARD_SLOTS):
-		var card_data : CardData = run.get_random_card_data()
+		var card_data : CardData = run.get_random_card_data(offered_card_paths)
 		if not card_data:
 			continue
+		if card_data.resource_path != "":
+			offered_card_paths.append(card_data.resource_path)
 
 		var rarity : int = card_data.get("rarity") if card_data.get("rarity") != null else 0
 		var price  := _card_price(rarity)
@@ -229,10 +233,19 @@ func _populate_thingies() -> void:
 	for child in thingy_container.get_children():
 		child.queue_free()
 
+	# Seed exclusions with everything the player already owns.
+	var excluded_thingy_paths : Array[String] = []
+	for effect in run.character.special_effects:
+		if effect.resource_path != "":
+			excluded_thingy_paths.append(effect.resource_path)
+
 	for _i in range(THINGY_SLOTS):
-		var condition : ThingyCondition = run.get_random_thingy_condition()
+		var condition : ThingyCondition = run.get_random_thingy_condition(excluded_thingy_paths)
 		if not condition:
 			continue
+		# Exclude this thingy from subsequent slots in the same shop visit.
+		if condition.resource_path != "":
+			excluded_thingy_paths.append(condition.resource_path)
 
 		var rarity : int = condition.rarity
 		var price  := _thingy_price(rarity)
@@ -241,7 +254,8 @@ func _populate_thingies() -> void:
 		slot.alignment = BoxContainer.ALIGNMENT_CENTER
 
 		# ConditionIcon gives us the tooltip on mouse-over for free.
-		var icon := ConditionIcon.new(condition)
+		var icon := ConditionIcon.new()
+		icon.set_condition(condition)
 		icon.custom_minimum_size = Vector2(64, 64)
 		icon.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
 		icon.expand_mode = TextureRect.EXPAND_FIT_WIDTH_PROPORTIONAL

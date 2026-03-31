@@ -6,7 +6,7 @@ class_name Condition
 
 @export var icon: Texture2D
 
-@export var description: String = ""
+@export var description: String
 
 ## When true, the condition icon will display the current stacks value as a number.
 @export var show_stacks: bool = false
@@ -28,7 +28,7 @@ func remove_condition(who) -> void:
 ## Override in subclasses to include dynamic values (e.g. calculated damage).
 ## Falls back to the exported description field if not overridden.
 func get_description_with_values() -> String:
-	return description
+	return "Description must be set in condition"
 
 
 func enemy_has_condition_type(who: Enemy, condition_type) -> bool:

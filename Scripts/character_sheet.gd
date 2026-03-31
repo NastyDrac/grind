@@ -150,7 +150,8 @@ func update_effects():
 
 	for effect in character_data.special_effects:
 		if effect is Condition:
-			var icon := ConditionIcon.new(effect)
+			var icon := ConditionIcon.new()
+			icon.set_condition(effect)
 			_effects_container.add_child(icon)
 			icon.ready.connect(icon.update_display.bind(), CONNECT_ONE_SHOT)
 

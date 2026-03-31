@@ -1,0 +1,33 @@
+[gd_resource type="Resource" script_class="CardData" load_steps=8 format=3 uid="uid://dv843guh3lb80"]
+
+[ext_resource type="Script" uid="uid://dhxff5egnsgrv" path="res://Scripts/action.gd" id="1_v1pag"]
+[ext_resource type="Script" uid="uid://0gsjrx47no8b" path="res://Scripts/card_data.gd" id="2_5j4n5"]
+[ext_resource type="Script" uid="uid://cgrxhw8vqenhu" path="res://Scripts/ValueCalculator.gd" id="2_ko20i"]
+[ext_resource type="Script" uid="uid://clvjn77csx1a0" path="res://Scripts/AttackAction.gd" id="3_dfqf7"]
+
+[sub_resource type="Resource" id="Resource_rix7y"]
+script = ExtResource("2_ko20i")
+formula = "bang / marbles"
+metadata/_custom_type_script = "uid://cgrxhw8vqenhu"
+
+[sub_resource type="Resource" id="Resource_t8h5q"]
+script = ExtResource("2_ko20i")
+formula = "marbles"
+metadata/_custom_type_script = "uid://cgrxhw8vqenhu"
+
+[sub_resource type="Resource" id="Resource_d1w60"]
+script = ExtResource("3_dfqf7")
+damage_calculator = SubResource("Resource_rix7y")
+enemy_count_calculator = SubResource("Resource_t8h5q")
+target_type = 3
+max_range = 3
+animation_type = 1
+metadata/_custom_type_script = "uid://clvjn77csx1a0"
+
+[resource]
+script = ExtResource("2_5j4n5")
+card_name = "Blast"
+card_cost = 2
+rarity = 1
+actions = Array[ExtResource("1_v1pag")]([SubResource("Resource_d1w60")])
+metadata/_custom_type_script = "uid://0gsjrx47no8b"

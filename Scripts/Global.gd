@@ -6,7 +6,7 @@ signal time_passed()
 signal apply_condition(target, condition : Condition)
 signal request_animation(action: Action, target: Object, anim_type: Action.AnimationType)
 # Enemy actions
-signal enemy_advanced(enemy : Enemy, new_range : int)  # All enemies move forward or attack
+signal enemy_advanced(enemy : Enemy, old_range : int, new_range : int)  # All enemies move forward or attack
 signal enemy_spawned(enemy: Enemy)
 signal enemy_attacks_player(enemy: Enemy, damage: int)
 signal enemy_dies(enemy : Enemy)

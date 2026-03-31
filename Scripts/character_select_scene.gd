@@ -411,7 +411,8 @@ func _refresh_detail_panel(char_data: CharacterData) -> void:
 
 	for fx in char_data.special_effects:
 		if fx is Condition:
-			var icon := ConditionIcon.new(fx)
+			var icon := ConditionIcon.new()
+			icon.set_condition(fx)
 			_detail_effects.add_child(icon)
 			icon.ready.connect(icon.update_display.bind(), CONNECT_ONE_SHOT)
 

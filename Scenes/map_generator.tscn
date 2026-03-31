@@ -1,0 +1,12 @@
+[gd_scene load_steps=2 format=3 uid="uid://dn40540p4q1ve"]
+
+[ext_resource type="Script" uid="uid://ddjc2xk0gfgg1" path="res://Scripts/map_generator.gd" id="1_803pc"]
+
+[node name="MapGenerator" type="Node2D"]
+script = ExtResource("1_803pc")
+columns = 15
+rows = 5
+road_curve_amount = 0.0
+early_combat = 6
+early_services = 1
+early_gym = 1

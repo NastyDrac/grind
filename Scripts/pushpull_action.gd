@@ -34,7 +34,7 @@ func execute(target: Enemy) -> void:
 		target.current_range = new_range
 		if target.range_manager:
 			target.target_position = target.range_manager.get_position_for_enemy(target)
-		target.enemy_moved.emit(target, old_range, new_range)
+		Global.enemy_advanced.emit(target, old_range, new_range)
 		target.enemy_player_moved.emit(target, old_range, new_range)
 
 func get_description_with_values(character: Character) -> String:

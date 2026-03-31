@@ -1,6 +1,8 @@
-[gd_scene load_steps=2 format=3 uid="uid://bhe2l0aqupa46"]
+[gd_scene load_steps=4 format=3 uid="uid://bhe2l0aqupa46"]
 
 [ext_resource type="Script" uid="uid://0u18sw3gq3s2" path="res://Scripts/ui_bar.gd" id="1_e1q4v"]
+[ext_resource type="Texture2D" uid="uid://dyagyrxi8xlyo" path="res://Art/Icons/hpIcon.png" id="2_gdwv3"]
+[ext_resource type="Texture2D" uid="uid://uoxk5uid60p0" path="res://Art/Icons/goldIcon.png" id="3_71spk"]
 
 [node name="UI_Bar" type="CanvasLayer"]
 layer = 10
@@ -24,12 +26,16 @@ grow_vertical = 2
 
 [node name="hp icon" type="TextureRect" parent="UI Bar/HBoxContainer"]
 layout_mode = 2
+texture = ExtResource("2_gdwv3")
+stretch_mode = 3
 
 [node name="hp label" type="Label" parent="UI Bar/HBoxContainer"]
 layout_mode = 2
 
 [node name="gold icon" type="TextureRect" parent="UI Bar/HBoxContainer"]
 layout_mode = 2
+texture = ExtResource("3_71spk")
+stretch_mode = 3
 
 [node name="gold label" type="Label" parent="UI Bar/HBoxContainer"]
 layout_mode = 2

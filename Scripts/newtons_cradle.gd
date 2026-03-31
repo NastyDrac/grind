@@ -64,9 +64,9 @@ func _on_enemy_moved(enemy: Enemy, old_range: int, new_range: int) -> void:
 # -- Helpers -------------------------------------------------------------------
 
 func _connect_enemy(enemy: Enemy) -> void:
-	if not enemy.enemy_player_moved.is_connected(_on_enemy_moved):
-		enemy.enemy_player_moved.connect(_on_enemy_moved)
-
+	#if not enemy.enemy_player_moved.is_connected(_on_enemy_moved):
+	#	enemy.enemy_player_moved.connect(_on_enemy_moved)
+	pass
 
 func _calculate_damage() -> int:
 	if damage_calculator and entity:

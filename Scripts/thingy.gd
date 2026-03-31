@@ -22,7 +22,7 @@ class_name ThingyCondition
 @export var rarity: int = 0
 
 ## Live reference to the RangeManager for the current wave. Null outside combat.
-var range_manager
+var range_manager : RangeManager
 
 # ---------------------------------------------------------------------------
 # Condition interface

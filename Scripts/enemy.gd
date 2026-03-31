@@ -13,9 +13,9 @@ var is_targeted : bool = false
 var conditions : Array[Condition] = []
 var run_manager 
 
-signal enemy_attack_player(enemy : Enemy, damage : int)
-signal enemy_moved(enemy : Enemy, old_range : int, new_range : int)
-signal enemy_player_moved(enemy : Enemy, old_range : int, new_range : int)
+#signal enemy_attack_player(enemy : Enemy, damage : int)
+#signal enemy_moved(enemy : Enemy, old_range : int, new_range : int)
+#signal enemy_player_moved(enemy : Enemy, old_range : int, new_range : int)
 
 @onready var sprite := $Sprite2D
 
@@ -63,13 +63,18 @@ func set_data(enemy_data: EnemyData, spawn_range : int = 5):
 func take_damgage(amount : int):
 	current_health -= amount
 	set_health_bar()
+	Animations._flash_red(self, .2)
 	if current_health <= 0:
 		die()
 
 func die():
 	Global.enemy_dies.emit(self)
+	remove_all_conditions()
 	queue_free()
 
+func remove_all_conditions():
+	for con : Condition in conditions:
+		con.remove_condition(self)
 # 
 func _on_enemies_advance():
 	move_toward_player()
@@ -87,14 +92,21 @@ func move_toward_player():
 	if range_manager:
 		target_position = range_manager.get_position_for_enemy(self)
 	
-	enemy_moved.emit(self, old_range, current_range)
+	Global.enemy_advanced.emit(self, old_range, current_range)
 	
 
 
 func attack_player():
-	Global.enemy_attacks_player.emit(self, data.damage)
+	Global.enemy_attacks_player.emit(self, get_attack_damage())
 
+func get_attack_damage() -> int:
 
+	var mod_amount = data.damage
+	for con : Condition in conditions:
+		if con.has_method("modify_attack"):
+			mod_amount += con.modify_attack()
+	
+	return mod_amount
 ## Push this enemy away from the player by the given number of range steps.
 ## Always use this for push effects — it emits enemy_moved so the range manager
 ## stays in sync, and enemy_player_moved so Newton's Cradle (player-only) fires.
@@ -105,8 +117,8 @@ func push(amount: int) -> void:
 	current_range += amount
 	if range_manager:
 		target_position = range_manager.get_position_for_enemy(self)
-	enemy_moved.emit(self, old_range, current_range)
-	enemy_player_moved.emit(self, old_range, current_range)
+	Global.enemy_advanced.emit(self, old_range, current_range)
+	#enemy_player_moved.emit(self, old_range, current_range)
 
 func get_current_range() -> int:
 	return current_range

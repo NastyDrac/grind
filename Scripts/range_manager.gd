@@ -56,9 +56,8 @@ func _ready() -> void:
 	add_to_group("range_manager")
 	_initialize_ranges(5)
 	
-	
 	Global.enemy_dies.connect(_on_enemy_died)
-
+	Global.enemy_advanced.connect(_on_enemy_moved)
 
 func process_card_draw():
 	if spawn_mode == SpawnMode.ENERGY_BANKED and banked_energy > 0:
@@ -105,12 +104,10 @@ func spawn_enemy(enemy_data: EnemyData, spawn_range: int = 5) -> Enemy:
 	
 	enemy.set_range_manager(self)
 	
-	
 	enemy.global_position = get_position_for_enemy(enemy)
 	enemy.target_position = enemy.global_position  
 	
 	add_enemy(enemy)
-	
 	
 	Global.enemy_spawned.emit(enemy)
 	
@@ -134,12 +131,30 @@ func add_enemy(enemy: Enemy):
 	
 	if not enemies_by_range[range_num].has(enemy):
 		enemies_by_range[range_num].append(enemy)
-		enemy.enemy_moved.connect(_on_enemy_moved)
+		_update_enemy_positions(range_num)
+
+# =========================
+# POSITION HELPERS
+# =========================
+
+func _update_enemy_positions(range_num: int):
+	if not enemies_by_range.has(range_num):
+		return
+	for enemy in enemies_by_range[range_num]:
+		if is_instance_valid(enemy):
+			enemy.target_position = get_position_for_enemy(enemy)
 
 # =========================
 # ITEM SUPPORT
 # =========================
-
+func get_all_items():
+	var all_items: Array[Item] = []
+	for range_num in items_by_range:
+		for e in items_by_range[range_num]:
+			if is_instance_valid(e):
+				all_items.append(e)
+	return all_items
+	
 func add_item(item : Item):
 	var range_num = item.get_current_range()
 	
@@ -169,7 +184,6 @@ func _update_item_positions(range_num : int):
 	
 	for item in items_by_range[range_num]:
 		if item and item.has_method("update_target_position"):
-			# Let the item update its own target position for smooth lerping
 			item.update_target_position()
 
 func _get_y_for_item(item : Item, range_num : int) -> float:
@@ -179,6 +193,7 @@ func _get_y_for_item(item : Item, range_num : int) -> float:
 	if not item.has_meta("spawn_y"):
 		item.set_meta("spawn_y", item.global_position.y if item.global_position.y != 0 else center_y + 120.0)
 	return item.get_meta("spawn_y")
+
 func spawn_item(item_data : ItemData, spawn_range : int, spawn_position : Vector2 = Vector2.ZERO):
 	
 	var item := Item.new()
@@ -187,18 +202,14 @@ func spawn_item(item_data : ItemData, spawn_range : int, spawn_position : Vector
 	item.range_manager = self
 	add_child(item)
 	
-	
 	if not items_by_range.has(spawn_range):
 		items_by_range[spawn_range] = []
 	items_by_range[spawn_range].append(item)
 	
-	
 	if spawn_position != Vector2.ZERO:
-		
 		item.global_position = spawn_position
 		item.target_position = spawn_position
 	else:
-		
 		var calculated_pos = get_position_for_item(item)
 		item.global_position = calculated_pos
 		item.target_position = calculated_pos
@@ -212,15 +223,11 @@ func remove_enemy(enemy: Enemy):
 	
 	if enemies_by_range.has(range_num):
 		enemies_by_range[range_num].erase(enemy)
-		
-		if enemy.enemy_moved.is_connected(_on_enemy_moved):
-			enemy.enemy_moved.disconnect(_on_enemy_moved)
 
 func get_position_for_enemy(enemy: Enemy) -> Vector2:
 	var range_num = enemy.get_current_range()
 	var x_pos = _get_x_for_range(range_num)
 	var y_pos = _get_y_for_enemy(enemy, range_num)
-   
 	return Vector2(x_pos, y_pos)
 
 func get_enemies_at_range(range_num: int):
@@ -231,17 +238,21 @@ func get_enemies_at_range(range_num: int):
 func get_all_enemies() -> Array[Enemy]:
 	var all_enemies: Array[Enemy] = []
 	for range_num in enemies_by_range:
-		all_enemies.append_array(enemies_by_range[range_num])
+		for e in enemies_by_range[range_num]:
+			if is_instance_valid(e):
+				all_enemies.append(e)
 	return all_enemies
 
 func _get_x_for_range(range_num: int) -> float:
 	return range_num * range_spacing
 
 func _get_y_for_enemy(enemy: Enemy, range_num: int) -> float:
-	var enemies_at_range = enemies_by_range[range_num]
+	# Filter out any freed instances before doing layout math
+	var enemies_at_range = enemies_by_range[range_num].filter(
+		func(e): return is_instance_valid(e)
+	)
 	var enemy_count = enemies_at_range.size()
 
-	# Base center line
 	var center_y = (get_viewport().size.y * center_ratio) - screen_buffer_y
 
 	if enemy_count == 1:
@@ -251,15 +262,13 @@ func _get_y_for_enemy(enemy: Enemy, range_num: int) -> float:
 	if enemy_index == -1:
 		return center_y
 
-	
 	var max_h = get_max_enemy_height(enemies_at_range)
 	var total_spread = max_h * enemy_count * spread_multiplier
 	var spacing = total_spread / (enemy_count - 1)
 	var half_spread = total_spread / 2.0
 
-	var base_y = center_y - half_spread + (enemy_index * spacing) 
+	var base_y = center_y - half_spread + (enemy_index * spacing)
 
-	# Wobble
 	var wobble = sin(Time.get_ticks_msec() / 1000.0 * wobble_speed + enemy.get_instance_id()) * wobble_amplitude
 
 	return base_y + wobble
@@ -267,7 +276,8 @@ func _get_y_for_enemy(enemy: Enemy, range_num: int) -> float:
 func get_max_enemy_height(enemies):
 	var max_h := 0.0
 	for e in enemies:
-		max_h = max(max_h, e.get_visual_height())
+		if is_instance_valid(e):
+			max_h = max(max_h, e.get_visual_height())
 	return max_h
 
 func _on_enemy_died(enemy: Enemy):
@@ -283,13 +293,16 @@ func _on_enemy_moved(enemy: Enemy, old_range: int, new_range: int):
 	if not enemies_by_range[new_range].has(enemy):
 		enemies_by_range[new_range].append(enemy)
 
+	# Reflow layouts at both ranges so all enemies reposition
+	_update_enemy_positions(old_range)
+	_update_enemy_positions(new_range)
+
 # ============================================================================
 # TARGETING SYSTEM
 # ============================================================================
 
 func _input(event: InputEvent) -> void:
 	if targeting:
-		
 		if event.is_action_pressed("right click"):
 			cancel_targeting()
 			get_viewport().set_input_as_handled()
@@ -298,7 +311,6 @@ func _input(event: InputEvent) -> void:
 				toggle_target(enemy_hovered)
 				get_viewport().set_input_as_handled()
 		elif event.is_action_pressed("ui_accept"):
-			
 			if targets.size() > 0:
 				confirm_targets()
 				get_viewport().set_input_as_handled()
@@ -308,9 +320,7 @@ func toggle_target(enemy: Enemy):
 	if not enemy:
 		return
 	
-	
 	if current_target_type == Action.TargetType.ALL_ENEMIES_AT_RANGE:
-		
 		var enemy_range = enemy.get_current_range()
 		targets.clear()
 		
@@ -319,19 +329,15 @@ func toggle_target(enemy: Enemy):
 			targets.append(e)
 			e.set_targeted(true)
 		
-		# Auto-confirm immediately
 		confirm_targets()
 		return
-	
 	
 	if targets.has(enemy):
 		targets.erase(enemy)
 		enemy.set_targeted(false)
-	
 	elif targets.size() < number_of_targets:
 		targets.append(enemy)
 		enemy.set_targeted(true)
-	
 	
 	var selectable_count = _count_selectable_enemies()
 	if targets.size() == number_of_targets or targets.size() == selectable_count:
@@ -350,14 +356,12 @@ func start_targeting(target_type: Action.TargetType, max_range: int, num_targets
 	number_of_targets = num_targets
 	targets.clear()
 	
-	
 	match target_type:
 		Action.TargetType.SINGLE_ENEMY, Action.TargetType.X_ENEMIES_UP_TO_RANGE:
 			_make_enemies_selectable_up_to_range(max_range)
 		Action.TargetType.ALL_ENEMIES_AT_RANGE:
 			_make_enemies_selectable_up_to_range(max_range)
 		Action.TargetType.ALL_ENEMIES:
-			
 			pass
 	
 	targeting_started.emit()
@@ -378,23 +382,19 @@ func cancel_targeting():
 	targeting = false
 	number_of_targets = 0
 	
-	
 	for enemy in get_all_enemies():
 		enemy.make_unselectable()
 		enemy.set_targeted(false)
 	
 	targets.clear()
-	
 	targeting_cancelled.emit()
 
 
 func confirm_targets():
 	targeting = false
 	
-	
 	for enemy in get_all_enemies():
 		enemy.make_unselectable()
 		enemy.set_targeted(false)
-	
 	
 	targets_confirmed.emit(targets)

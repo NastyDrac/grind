@@ -29,7 +29,7 @@ enum TargetType {
 ## If false, only fires when the enemy reaches trigger_range.
 @export var fire_every_advance : bool = true
 @export var trigger_range : int = 1
-
+var targets : Array = []
 
 func apply_condition(who, condition: Condition) -> void:
 	entity = who
@@ -42,7 +42,7 @@ func apply_condition(who, condition: Condition) -> void:
 		new_cond._connect_trigger()
 	else:
 		existing.stacks += condition.stacks
-
+	
 
 func _connect_trigger() -> void:
 	match trigger_type:
@@ -52,6 +52,7 @@ func _connect_trigger() -> void:
 			Global.enemy_attacks_player.connect(_on_enemy_attacks)
 		TriggerType.ON_ADVANCE:
 			Global.enemy_advanced.connect(_on_enemy_advanced)
+			
 
 
 func _disconnect_trigger() -> void:
@@ -65,6 +66,7 @@ func _disconnect_trigger() -> void:
 		TriggerType.ON_ADVANCE:
 			if Global.enemy_advanced.is_connected(_on_enemy_advanced):
 				Global.enemy_advanced.disconnect(_on_enemy_advanced)
+			
 
 
 # ─────────────────────────────────────────────────────────────────────────────
@@ -84,13 +86,12 @@ func _on_enemy_attacks(attacker: Enemy, _damage: int) -> void:
 	_fire()
 
 
-func _on_enemy_advanced(enemy: Enemy, new_range: int) -> void:
+func _on_enemy_advanced(enemy: Enemy, old_range : int, new_range: int) -> void:
 	if enemy != entity:
 		return
+		
 	if fire_every_advance or new_range == trigger_range:
 		_fire()
-
-
 # ─────────────────────────────────────────────────────────────────────────────
 #  FIRE
 # ─────────────────────────────────────────────────────────────────────────────
@@ -102,6 +103,7 @@ func _fire() -> void:
 	for target in _resolve_targets():
 		Global.apply_condition.emit(target, triggered_effect)
 	trigger_condition()
+	
 
 
 func _resolve_targets() -> Array:
@@ -135,3 +137,27 @@ func _resolve_targets() -> Array:
 
 func trigger_condition() -> void:
 	pass  ## Override in a subclass for extra behaviour beyond triggered_effect.
+
+func get_description_with_values() -> String:
+	var trigger_text := ""
+	match trigger_type:
+		TriggerType.ON_DEATH:
+			trigger_text = "On death"
+		TriggerType.ON_ATTACK:
+			trigger_text = "On attack"
+		TriggerType.ON_ADVANCE:
+			trigger_text = "On advance" if fire_every_advance else "At range %d" % trigger_range
+
+	var target_text := _get_target_text()
+	var effect_text := triggered_effect.get_description_with_values()
+
+	return "%s, %s: %s" % [trigger_text, target_text, effect_text]
+
+
+func _get_target_text() -> String:
+	match target_type:
+		TargetType.ATTACK_TARGET: return "the attack target"
+		TargetType.ALL_ENEMIES: return "all enemies"
+		TargetType.ALL_OTHER_ENEMIES: return "all other enemies"
+		TargetType.ALL_ENEMIES_AT_RANGE: return "all enemies at the same range"
+	return "the target"

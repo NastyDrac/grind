@@ -1,14 +1,13 @@
 extends TextureRect
 class_name ConditionIcon
 
-@export var condition: Condition
+var condition: Condition
 
 const TOOLTIP_SCENE = preload("res://Scenes/tooltip.tscn")
 var tooltip_instance: Control = null
 var stacks_label: Label = null
 
-func _init(con: Condition) -> void:
-	set_condition(con)
+
 
 func _ready():
 	custom_minimum_size = Vector2(16, 16)
@@ -94,14 +93,16 @@ func _populate_tooltip():
 	if name_node:
 		name_node.text = condition.get_condition_name()
 
-	if desc_node:
-		var description_text := condition.get_description_with_values()
-		if description_text == "":
-			description_text = "No description available."
+	if not desc_node:
+		push_warning("ConditionIcon: could not find condition_description node in tooltip scene")
+		return
+	
+	var description_text = condition.get_description_with_values()
 
-		if condition.stacks > 0:
-			description_text = "[b]Stacks:[/b] %d\n%s" % [condition.stacks, description_text]
-		desc_node.text = description_text
+	if condition.stacks > 0:
+		description_text = "[b]Stacks:[/b] %d\n%s" % [condition.stacks, description_text]
+	desc_node.text = description_text
+	
 
 func _position_tooltip():
 	if not tooltip_instance:

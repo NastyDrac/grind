@@ -16,7 +16,8 @@ func _process(delta: float) -> void:
 		update_conditions()
 
 func create_icon(con: Condition):
-	var icon = ConditionIcon.new(con)
+	var icon = ConditionIcon.new()
+	icon.set_condition(con)
 	add_child(icon)
 	icon.ready.connect(icon.update_display.bind(), CONNECT_ONE_SHOT)
 

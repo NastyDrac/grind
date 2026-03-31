@@ -257,8 +257,9 @@ func create_ui():
 #  RESOLVE NODE -> RETURN TO MAP
 # ------------------------------------------------------------------------------
 
-## Called by both on_combat_won and _on_event_completed.
-func _resolve_pending_node() -> void:
+## Tears down all combat systems and advances the map node.
+## Does NOT transition to the map -- callers decide what comes next.
+func _teardown_combat() -> void:
 	if current_win_condition:
 		current_win_condition.cleanup()
 		current_win_condition = null
@@ -281,13 +282,22 @@ func _resolve_pending_node() -> void:
 		map_generator.mark_visited_and_advance(_pending_map_node)
 		_pending_map_node = null
 
+## Called by _on_event_completed. Tears down and returns to the map.
+func _resolve_pending_node() -> void:
+	_teardown_combat()
 	await Transitions.transition(func(): _show_map())
 
 func on_combat_won():
-	## Check before _resolve_pending_node clears _pending_map_node.
+	## Check before _teardown_combat clears _pending_map_node.
 	var was_boss := _pending_map_node != null \
 					and _pending_map_node.node_type == MapNode.NodeType.BOSS
-	await _resolve_pending_node()
+	_teardown_combat()
+
+	# Show the draft screen and wait for the player to pick or skip.
+	create_draft_screen()
+	await current_draft_screen.draft_completed
+
+	await Transitions.transition(func(): _show_map())
 	if was_boss:
 		_start_new_act()
 
@@ -491,7 +501,7 @@ func _on_service_chosen(service: String) -> void:
 #  CARDS
 # ------------------------------------------------------------------------------
 
-func get_random_card_data() -> CardData:
+func get_random_card_data(excluded_paths: Array[String] = []) -> CardData:
 	var dir := DirAccess.open("res://Cards/")
 	if dir == null:
 		push_error("Could not open Cards directory")
@@ -503,7 +513,9 @@ func get_random_card_data() -> CardData:
 
 	while file_name != "":
 		if not dir.current_is_dir() and file_name.ends_with(".tres"):
-			card_paths.append("res://Cards/" + file_name)
+			var path := "res://Cards/" + file_name
+			if path not in excluded_paths:
+				card_paths.append(path)
 		file_name = dir.get_next()
 
 	dir.list_dir_end()
@@ -522,7 +534,7 @@ func get_random_card_data() -> CardData:
 
 ## Scans res://Thingys/ for .tres files and returns one at random.
 ## ThingyConditions are Resources, not scenes -- save them as .tres assets.
-func get_random_thingy_condition() -> ThingyCondition:
+func get_random_thingy_condition(excluded_paths: Array[String] = []) -> ThingyCondition:
 	var dir := DirAccess.open("res://Thingys/")
 	if dir == null:
 		push_error("RunManager: could not open Thingys directory")
@@ -533,7 +545,9 @@ func get_random_thingy_condition() -> ThingyCondition:
 	var file_name := dir.get_next()
 	while file_name != "":
 		if not dir.current_is_dir() and file_name.ends_with(".tres"):
-			paths.append("res://Thingys/" + file_name)
+			var path := "res://Thingys/" + file_name
+			if path not in excluded_paths:
+				paths.append(path)
 		file_name = dir.get_next()
 	dir.list_dir_end()
 
