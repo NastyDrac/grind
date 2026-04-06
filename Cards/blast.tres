@@ -7,12 +7,12 @@
 
 [sub_resource type="Resource" id="Resource_rix7y"]
 script = ExtResource("2_ko20i")
-formula = "bang / marbles"
+formula = "bang/5"
 metadata/_custom_type_script = "uid://cgrxhw8vqenhu"
 
 [sub_resource type="Resource" id="Resource_t8h5q"]
 script = ExtResource("2_ko20i")
-formula = "marbles"
+formula = "marbles/5"
 metadata/_custom_type_script = "uid://cgrxhw8vqenhu"
 
 [sub_resource type="Resource" id="Resource_d1w60"]

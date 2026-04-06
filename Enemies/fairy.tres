@@ -4,23 +4,18 @@
 [ext_resource type="Script" uid="uid://bpr8cwurcrxy3" path="res://Scripts/triggered_condition.gd" id="2_08dct"]
 [ext_resource type="Script" uid="uid://tnxg66jw03v3" path="res://Scripts/enemy_data.gd" id="2_dtsia"]
 [ext_resource type="Texture2D" uid="uid://b2rjhiy4rifig" path="res://icon.svg" id="3_hwt7h"]
-[ext_resource type="Script" uid="uid://d0hdj6yes681x" path="res://Scripts/damage_buff.gd" id="4_nc3n5"]
+[ext_resource type="Script" uid="uid://c4ykbt10defal" path="res://Scripts/heal_condition.gd" id="4_08dct"]
 [ext_resource type="Texture2D" uid="uid://dh3ghgo4uvj2i" path="res://Art/runner.png" id="6_v0lqx"]
 
-[sub_resource type="Resource" id="Resource_q0n16"]
-script = ExtResource("4_nc3n5")
-condition_name = "Pumped"
-stacks = 1
-icon = ExtResource("3_hwt7h")
-metadata/_custom_type_script = "uid://d0hdj6yes681x"
+[sub_resource type="Resource" id="Resource_hwt7h"]
+script = ExtResource("4_08dct")
+stacks = 6
+metadata/_custom_type_script = "uid://c4ykbt10defal"
 
 [sub_resource type="Resource" id="Resource_5kg6n"]
 script = ExtResource("2_08dct")
-trigger_type = 2
 target_type = 3
-triggered_effect = SubResource("Resource_q0n16")
-fire_every_advance = false
-trigger_range = 3
+triggered_effect = SubResource("Resource_hwt7h")
 condition_name = "Hype"
 stacks = 1
 icon = ExtResource("3_hwt7h")
@@ -30,6 +25,7 @@ metadata/_custom_type_script = "uid://bpr8cwurcrxy3"
 script = ExtResource("2_dtsia")
 enemy_name = "Fairy"
 texture = ExtResource("6_v0lqx")
-max_health = 3
+max_health = 5
+damage = 2
 conditions = Array[ExtResource("1_xdsu8")]([SubResource("Resource_5kg6n")])
 metadata/_custom_type_script = "uid://tnxg66jw03v3"

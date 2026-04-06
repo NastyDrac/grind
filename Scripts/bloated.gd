@@ -31,3 +31,6 @@ func on_enemy_dies(dying_enemy: Enemy):
 			Global.enemy_attacks_player.emit(dying_enemy, stacks)
 		
 		Global.enemy_dies.disconnect(on_enemy_dies)
+
+func get_description_with_values() -> String:
+	return "If at range 1, on death, deal %s damage." % stacks

@@ -7,7 +7,7 @@
 
 [sub_resource type="Resource" id="Resource_wkm1s"]
 script = ExtResource("2_jpisu")
-formula = "bang+marbles"
+formula = "bang+marbles/2"
 metadata/_custom_type_script = "uid://cgrxhw8vqenhu"
 
 [sub_resource type="Resource" id="Resource_pw3xh"]

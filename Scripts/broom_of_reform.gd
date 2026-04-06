@@ -13,10 +13,11 @@ func setup(who, rm) -> void:
 
 
 func fire(item : Item):
-	var all_enemies := range_manager.get_all_enemies()
+	if range_manager:
+		var all_enemies := range_manager.get_all_enemies()
 	
-	var target : Enemy = all_enemies.pick_random()
-	target.take_damgage(damage_calculator.calculate(entity))
+		var target : Enemy = all_enemies.pick_random()
+		target.take_damgage(damage_calculator.calculate(entity))
 	
 
 

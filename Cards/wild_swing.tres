@@ -12,7 +12,7 @@ metadata/_custom_type_script = "uid://cgrxhw8vqenhu"
 
 [sub_resource type="Resource" id="Resource_jkusx"]
 script = ExtResource("2_6floy")
-formula = "marbles"
+formula = "marbles/4"
 metadata/_custom_type_script = "uid://cgrxhw8vqenhu"
 
 [sub_resource type="Resource" id="Resource_203qo"]
@@ -21,10 +21,12 @@ damage_calculator = SubResource("Resource_102ou")
 enemy_count_calculator = SubResource("Resource_jkusx")
 target_type = 3
 max_range = 1
+animation_type = 2
 metadata/_custom_type_script = "uid://clvjn77csx1a0"
 
 [resource]
 script = ExtResource("2_k5q0s")
 card_name = "Wild Swing"
+card_cost = 2
 actions = Array[ExtResource("1_i6nc1")]([SubResource("Resource_203qo")])
 metadata/_custom_type_script = "uid://0gsjrx47no8b"

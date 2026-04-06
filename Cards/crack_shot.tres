@@ -7,7 +7,7 @@
 
 [sub_resource type="Resource" id="Resource_tbe2w"]
 script = ExtResource("2_b01j7")
-formula = "bang"
+formula = "bang+guts"
 metadata/_custom_type_script = "uid://cgrxhw8vqenhu"
 
 [sub_resource type="Resource" id="Resource_2ry2a"]
@@ -19,8 +19,8 @@ metadata/_custom_type_script = "uid://cgrxhw8vqenhu"
 script = ExtResource("3_817mm")
 damage_calculator = SubResource("Resource_tbe2w")
 enemy_count_calculator = SubResource("Resource_2ry2a")
-target_type = 3
 max_range = 5
+animation_type = 1
 metadata/_custom_type_script = "uid://clvjn77csx1a0"
 
 [resource]

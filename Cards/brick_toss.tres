@@ -12,13 +12,16 @@ metadata/_custom_type_script = "uid://cgrxhw8vqenhu"
 
 [sub_resource type="Resource" id="Resource_0105s"]
 script = ExtResource("2_8fbks")
+formula = "grit/5"
 metadata/_custom_type_script = "uid://cgrxhw8vqenhu"
 
 [sub_resource type="Resource" id="Resource_y6pws"]
 script = ExtResource("3_ggn2u")
 damage_calculator = SubResource("Resource_xhgn2")
 enemy_count_calculator = SubResource("Resource_0105s")
+target_type = 3
 max_range = 3
+animation_type = 1
 metadata/_custom_type_script = "uid://clvjn77csx1a0"
 
 [resource]

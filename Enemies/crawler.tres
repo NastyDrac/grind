@@ -8,5 +8,6 @@
 script = ExtResource("1_8vfdf")
 enemy_name = "Crawler"
 texture = ExtResource("5_hwfw4")
-max_health = 2
+max_health = 6
+damage = 3
 metadata/_custom_type_script = "uid://tnxg66jw03v3"

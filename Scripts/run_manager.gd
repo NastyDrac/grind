@@ -174,6 +174,9 @@ func setup_win_condition():
 		if ui_bar and ui_bar.has_method("set_win_condition"):
 			ui_bar.set_win_condition(current_win_condition)
 
+		if range_manager and range_manager.has_method("set_win_condition"):
+			range_manager.set_win_condition(current_win_condition)
+
 		# Show the announcement
 		var announcer := CombatAnnouncer.new()
 		add_child(announcer)

@@ -7,7 +7,7 @@
 
 [sub_resource type="Resource" id="Resource_rlk1y"]
 script = ExtResource("2_4nr0p")
-formula = "marbles"
+formula = "marbles+5"
 metadata/_custom_type_script = "uid://cgrxhw8vqenhu"
 
 [sub_resource type="Resource" id="Resource_ogsfj"]
@@ -20,6 +20,7 @@ script = ExtResource("3_8y6d7")
 damage_calculator = SubResource("Resource_rlk1y")
 enemy_count_calculator = SubResource("Resource_ogsfj")
 max_range = 1
+animation_type = 2
 metadata/_custom_type_script = "uid://clvjn77csx1a0"
 
 [resource]

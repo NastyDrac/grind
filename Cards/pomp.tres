@@ -1,0 +1,38 @@
+[gd_resource type="Resource" script_class="CardData" load_steps=10 format=3 uid="uid://hrpng3lmbsex"]
+
+[ext_resource type="Script" uid="uid://dhxff5egnsgrv" path="res://Scripts/action.gd" id="1_kdkku"]
+[ext_resource type="Script" uid="uid://0gsjrx47no8b" path="res://Scripts/card_data.gd" id="2_jtjoy"]
+[ext_resource type="Script" uid="uid://cgrxhw8vqenhu" path="res://Scripts/ValueCalculator.gd" id="2_yoeik"]
+[ext_resource type="Script" uid="uid://bc8y3uqk02xnl" path="res://Scripts/draw_action.gd" id="3_8pb0q"]
+[ext_resource type="Script" uid="uid://y73360xhw2qs" path="res://Scripts/modify_stat_action.gd" id="4_fkdw5"]
+
+[sub_resource type="Resource" id="Resource_i2h72"]
+script = ExtResource("2_yoeik")
+formula = "2"
+metadata/_custom_type_script = "uid://cgrxhw8vqenhu"
+
+[sub_resource type="Resource" id="Resource_7h4ak"]
+script = ExtResource("3_8pb0q")
+card_count_calculator = SubResource("Resource_i2h72")
+target_type = 4
+metadata/_custom_type_script = "uid://bc8y3uqk02xnl"
+
+[sub_resource type="Resource" id="Resource_s8feu"]
+script = ExtResource("2_yoeik")
+formula = "5"
+metadata/_custom_type_script = "uid://cgrxhw8vqenhu"
+
+[sub_resource type="Resource" id="Resource_vx4vb"]
+script = ExtResource("4_fkdw5")
+modify_calculator = SubResource("Resource_s8feu")
+target_type = 4
+animation_type = 4
+metadata/_custom_type_script = "uid://y73360xhw2qs"
+
+[resource]
+script = ExtResource("2_jtjoy")
+card_name = "Pomp"
+card_cost = 2
+actions = Array[ExtResource("1_kdkku")]([SubResource("Resource_7h4ak"), SubResource("Resource_vx4vb")])
+exhaust = true
+metadata/_custom_type_script = "uid://0gsjrx47no8b"

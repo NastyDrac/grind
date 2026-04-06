@@ -32,6 +32,6 @@ metadata/_custom_type_script = "uid://c3g4jmcp7xiqk"
 [resource]
 script = ExtResource("2_046qo")
 card_name = "Cascading Blow"
-card_cost = 5
+card_cost = 3
 actions = Array[ExtResource("1_lab80")]([SubResource("Resource_01g44"), SubResource("Resource_55lqd")])
 metadata/_custom_type_script = "uid://0gsjrx47no8b"

@@ -1,0 +1,23 @@
+[gd_resource type="Resource" script_class="CardData" load_steps=7 format=3 uid="uid://bmy6vt5x0er0h"]
+
+[ext_resource type="Script" uid="uid://dhxff5egnsgrv" path="res://Scripts/action.gd" id="1_yx5wl"]
+[ext_resource type="Script" uid="uid://cgrxhw8vqenhu" path="res://Scripts/ValueCalculator.gd" id="2_f05em"]
+[ext_resource type="Script" uid="uid://0gsjrx47no8b" path="res://Scripts/card_data.gd" id="2_fbq3b"]
+[ext_resource type="Script" uid="uid://px415e6h6tao" path="res://Scripts/block_action.gd" id="3_s4xja"]
+
+[sub_resource type="Resource" id="Resource_8ahes"]
+script = ExtResource("2_f05em")
+formula = "marbles"
+metadata/_custom_type_script = "uid://cgrxhw8vqenhu"
+
+[sub_resource type="Resource" id="Resource_uoox3"]
+script = ExtResource("3_s4xja")
+block_calculator = SubResource("Resource_8ahes")
+target_type = 4
+metadata/_custom_type_script = "uid://px415e6h6tao"
+
+[resource]
+script = ExtResource("2_fbq3b")
+card_name = "Predict"
+actions = Array[ExtResource("1_yx5wl")]([SubResource("Resource_uoox3")])
+metadata/_custom_type_script = "uid://0gsjrx47no8b"

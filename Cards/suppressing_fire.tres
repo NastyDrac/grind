@@ -13,7 +13,7 @@ metadata/_custom_type_script = "uid://cgrxhw8vqenhu"
 
 [sub_resource type="Resource" id="Resource_n2un8"]
 script = ExtResource("2_n2un8")
-formula = "mojo"
+formula = "mojo/5"
 metadata/_custom_type_script = "uid://cgrxhw8vqenhu"
 
 [sub_resource type="Resource" id="Resource_n8ugr"]

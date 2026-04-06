@@ -1,0 +1,47 @@
+[gd_resource type="Resource" script_class="CardData" load_steps=11 format=3 uid="uid://cavj86f74owcg"]
+
+[ext_resource type="Script" uid="uid://dhxff5egnsgrv" path="res://Scripts/action.gd" id="1_086fe"]
+[ext_resource type="Script" uid="uid://cgrxhw8vqenhu" path="res://Scripts/ValueCalculator.gd" id="2_idqjw"]
+[ext_resource type="Script" uid="uid://0gsjrx47no8b" path="res://Scripts/card_data.gd" id="2_o84yw"]
+[ext_resource type="Script" uid="uid://clvjn77csx1a0" path="res://Scripts/AttackAction.gd" id="3_uusp8"]
+[ext_resource type="Script" uid="uid://y73360xhw2qs" path="res://Scripts/modify_stat_action.gd" id="4_8cy23"]
+
+[sub_resource type="Resource" id="Resource_odsme"]
+script = ExtResource("2_idqjw")
+formula = "bang"
+metadata/_custom_type_script = "uid://cgrxhw8vqenhu"
+
+[sub_resource type="Resource" id="Resource_e22qx"]
+script = ExtResource("2_idqjw")
+formula = "1"
+metadata/_custom_type_script = "uid://cgrxhw8vqenhu"
+
+[sub_resource type="Resource" id="Resource_jb82v"]
+script = ExtResource("3_uusp8")
+damage_calculator = SubResource("Resource_odsme")
+enemy_count_calculator = SubResource("Resource_e22qx")
+max_range = 5
+animation_type = 1
+metadata/_custom_type_script = "uid://clvjn77csx1a0"
+
+[sub_resource type="Resource" id="Resource_ncs1p"]
+script = ExtResource("2_idqjw")
+formula = "5"
+metadata/_custom_type_script = "uid://cgrxhw8vqenhu"
+
+[sub_resource type="Resource" id="Resource_48dra"]
+script = ExtResource("4_8cy23")
+modify_calculator = SubResource("Resource_ncs1p")
+stat_to_modify = 3
+target_type = 4
+animation_type = 4
+metadata/_custom_type_script = "uid://y73360xhw2qs"
+
+[resource]
+script = ExtResource("2_o84yw")
+card_name = "FMJ"
+card_cost = 2
+rarity = 1
+actions = Array[ExtResource("1_086fe")]([SubResource("Resource_jb82v"), SubResource("Resource_48dra")])
+exhaust = true
+metadata/_custom_type_script = "uid://0gsjrx47no8b"

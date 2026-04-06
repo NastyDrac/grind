@@ -31,6 +31,11 @@ func check_win_condition() -> bool:
 func get_progress_text() -> String:
 	return "Enemies Remaining: %d/%d" % [total_enemies - enemies_defeated, total_enemies]
 
+func get_progress_fraction() -> float:
+	if total_enemies <= 0:
+		return 0.0
+	return clampf(float(enemies_defeated) / float(total_enemies), 0.0, 1.0)
+
 func cleanup() -> void:
 	if Global.enemy_dies.is_connected(_on_enemy_died):
 		Global.enemy_dies.disconnect(_on_enemy_died)

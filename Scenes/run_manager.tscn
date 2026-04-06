@@ -2,21 +2,15 @@
 
 [ext_resource type="Script" uid="uid://nami4xhnpwrm" path="res://Scripts/run_manager.gd" id="1_u1n32"]
 [ext_resource type="Script" uid="uid://0gsjrx47no8b" path="res://Scripts/card_data.gd" id="2_0y178"]
-[ext_resource type="Resource" uid="uid://cccg3sg1byx10" path="res://Cards/flourish.tres" id="3_obnx0"]
-[ext_resource type="Resource" uid="uid://btueh7oj6cv7u" path="res://Cards/grenade.tres" id="4_rqa6y"]
-[ext_resource type="Resource" uid="uid://bupn6mkodwnrl" path="res://Cards/suppressing_fire.tres" id="5_fqwpn"]
-[ext_resource type="Resource" uid="uid://bcyo1vpisqc4w" path="res://Cards/cascading_blow.tres" id="6_df7m0"]
-[ext_resource type="Resource" uid="uid://cbqh0adhu4wkg" path="res://Cards/shove.tres" id="7_0c4k1"]
-[ext_resource type="Resource" uid="uid://dmr1ksvagcme8" path="res://Cards/hell_fire.tres" id="8_38h1b"]
+[ext_resource type="Script" uid="uid://clvjn77csx1a0" path="res://Scripts/AttackAction.gd" id="5_7yc03"]
+[ext_resource type="Script" uid="uid://px415e6h6tao" path="res://Scripts/block_action.gd" id="6_x7vpi"]
 [ext_resource type="Script" uid="uid://tnxg66jw03v3" path="res://Scripts/enemy_data.gd" id="8_obnx0"]
 [ext_resource type="Resource" uid="uid://bfr5bliq5oiih" path="res://Enemies/crawler.tres" id="8_qhjl3"]
 [ext_resource type="Script" uid="uid://dhxff5egnsgrv" path="res://Scripts/action.gd" id="9_x7vpi"]
-[ext_resource type="Script" uid="uid://dqr8kxmoc0iom" path="res://Scripts/burning.gd" id="10_4342n"]
-[ext_resource type="Texture2D" uid="uid://btfylcnnkerss" path="res://Art/burn.png" id="10_j41x3"]
 [ext_resource type="Script" uid="uid://c8bk1dof3250" path="res://Scripts/event_data.gd" id="10_obnx0"]
-[ext_resource type="Script" uid="uid://dm2bmau6ctnm8" path="res://Scripts/apply_condition_action.gd" id="11_j41x3"]
 [ext_resource type="Resource" uid="uid://ctuj8hs6x6q5q" path="res://events/gas_station.tres" id="11_rqa6y"]
 [ext_resource type="PackedScene" uid="uid://dc08wv3l8mie2" path="res://Scenes/character_sheet.tscn" id="12_4nan2"]
+[ext_resource type="Script" uid="uid://b6h8ntxfaauo5" path="res://Scripts/horde.gd" id="12_4342n"]
 [ext_resource type="Script" uid="uid://cgrxhw8vqenhu" path="res://Scripts/ValueCalculator.gd" id="12_awuji"]
 [ext_resource type="Resource" uid="uid://ce6l5lqjxvcs6" path="res://Characters/Engineer.tres" id="14_4342n"]
 [ext_resource type="Resource" uid="uid://byxygfcotqt5s" path="res://Enemies/runner.tres" id="15_dic3b"]
@@ -29,31 +23,65 @@
 [ext_resource type="PackedScene" uid="uid://dn40540p4q1ve" path="res://Scenes/map_generator.tscn" id="25_j41x3"]
 [ext_resource type="Script" uid="uid://obqdc13u6ea6" path="res://Scripts/animation_manager.gd" id="26_awuji"]
 
-[sub_resource type="Resource" id="Resource_1tppy"]
-script = ExtResource("10_4342n")
-icon = ExtResource("10_j41x3")
-description = "Takes damage when time passes.  Stacks reduce each time."
-metadata/_custom_type_script = "uid://dqr8kxmoc0iom"
-
-[sub_resource type="Resource" id="Resource_38h1b"]
+[sub_resource type="Resource" id="Resource_4342n"]
 script = ExtResource("12_awuji")
-formula = "mojo"
+formula = "5"
 metadata/_custom_type_script = "uid://cgrxhw8vqenhu"
 
 [sub_resource type="Resource" id="Resource_af0ja"]
-script = ExtResource("11_j41x3")
-condition_resource = SubResource("Resource_1tppy")
-stacks_calculator = SubResource("Resource_38h1b")
-target_type = 1
-animation_type = 3
-metadata/_custom_type_script = "uid://dm2bmau6ctnm8"
+script = ExtResource("5_7yc03")
+damage_calculator = SubResource("Resource_4342n")
+max_range = 4
+animation_type = 1
+metadata/_custom_type_script = "uid://clvjn77csx1a0"
 
 [sub_resource type="Resource" id="Resource_0ycsu"]
 script = ExtResource("2_0y178")
-card_name = "Flame Thrower"
-card_cost = 2
+card_name = "Shoot"
 actions = Array[ExtResource("9_x7vpi")]([SubResource("Resource_af0ja")])
 metadata/_custom_type_script = "uid://0gsjrx47no8b"
+
+[sub_resource type="Resource" id="Resource_egn0v"]
+script = ExtResource("12_awuji")
+formula = "5"
+metadata/_custom_type_script = "uid://cgrxhw8vqenhu"
+
+[sub_resource type="Resource" id="Resource_0fl43"]
+script = ExtResource("6_x7vpi")
+block_calculator = SubResource("Resource_egn0v")
+target_type = 4
+metadata/_custom_type_script = "uid://px415e6h6tao"
+
+[sub_resource type="Resource" id="Resource_lv2e2"]
+script = ExtResource("2_0y178")
+card_name = "Evade"
+actions = Array[ExtResource("9_x7vpi")]([SubResource("Resource_0fl43")])
+metadata/_custom_type_script = "uid://0gsjrx47no8b"
+
+[sub_resource type="Resource" id="Resource_j41x3"]
+script = ExtResource("12_4342n")
+enemies = Array[ExtResource("8_obnx0")]([ExtResource("8_qhjl3")])
+max_column = 3
+metadata/_custom_type_script = "uid://b6h8ntxfaauo5"
+
+[sub_resource type="Resource" id="Resource_awuji"]
+script = ExtResource("12_4342n")
+enemies = Array[ExtResource("8_obnx0")]([ExtResource("8_qhjl3"), ExtResource("21_38h1b"), ExtResource("16_tvxjp")])
+min_column = 2
+max_column = 6
+metadata/_custom_type_script = "uid://b6h8ntxfaauo5"
+
+[sub_resource type="Resource" id="Resource_1tppy"]
+script = ExtResource("12_4342n")
+enemies = Array[ExtResource("8_obnx0")]([ExtResource("16_tvxjp"), ExtResource("21_38h1b"), ExtResource("15_dic3b")])
+min_column = 4
+max_column = 12
+metadata/_custom_type_script = "uid://b6h8ntxfaauo5"
+
+[sub_resource type="Resource" id="Resource_38h1b"]
+script = ExtResource("16_1tppy")
+recipes = Array[ExtResource("12_4342n")]([SubResource("Resource_j41x3"), SubResource("Resource_awuji"), SubResource("Resource_1tppy")])
+metadata/_custom_type_script = "uid://6vpnqyvhbord"
 
 [sub_resource type="Resource" id="Resource_hl081"]
 script = ExtResource("17_boem8")
@@ -61,11 +89,11 @@ metadata/_custom_type_script = "uid://dbrkkfbjmvvar"
 
 [node name="RunManager" type="Node2D"]
 script = ExtResource("1_u1n32")
-deck = Array[ExtResource("2_0y178")]([ExtResource("3_obnx0"), ExtResource("4_rqa6y"), ExtResource("5_fqwpn"), ExtResource("6_df7m0"), ExtResource("7_0c4k1"), ExtResource("8_38h1b"), SubResource("Resource_0ycsu")])
+deck = Array[ExtResource("2_0y178")]([SubResource("Resource_0ycsu"), SubResource("Resource_0ycsu"), SubResource("Resource_0ycsu"), SubResource("Resource_0ycsu"), SubResource("Resource_0ycsu"), SubResource("Resource_lv2e2"), SubResource("Resource_lv2e2"), SubResource("Resource_lv2e2"), SubResource("Resource_lv2e2"), SubResource("Resource_lv2e2")])
 character = ExtResource("14_4342n")
 character_sheet_scene = ExtResource("12_4nan2")
-act_recipe_pools = Array[ExtResource("16_1tppy")]([null])
-horde = Array[ExtResource("8_obnx0")]([ExtResource("8_qhjl3"), ExtResource("15_dic3b"), ExtResource("16_tvxjp"), ExtResource("21_38h1b")])
+act_recipe_pools = Array[ExtResource("16_1tppy")]([SubResource("Resource_38h1b")])
+horde = Array[ExtResource("8_obnx0")]([ExtResource("8_qhjl3")])
 win_condition = SubResource("Resource_hl081")
 available_events = Array[ExtResource("10_obnx0")]([ExtResource("11_rqa6y"), ExtResource("20_h8e1q"), ExtResource("19_boem8")])
 map_generator_scene = ExtResource("25_j41x3")

@@ -1,7 +1,7 @@
 extends Resource
 class_name ValueCalculator
 
-@export_multiline var formula: String = "grit"
+@export_multiline var formula: String = "swag"
 
 
 var _expression: Expression = null

@@ -24,6 +24,11 @@ func check_win_condition() -> bool:
 func get_progress_text() -> String:
 	return "Turns Survived: %d/%d" % [turns_survived, turns_to_survive]
 
+func get_progress_fraction() -> float:
+	if turns_to_survive <= 0:
+		return 0.0
+	return clampf(float(turns_survived) / float(turns_to_survive), 0.0, 1.0)
+
 func cleanup() -> void:
 	if Global.time_passed.is_connected(_on_time_passed):
 		Global.time_passed.disconnect(_on_time_passed)

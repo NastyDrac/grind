@@ -8,7 +8,7 @@
 script = ExtResource("1_3s7dc")
 enemy_name = "Runner"
 texture = ExtResource("3_aa1k1")
-max_health = 4
-damage = 2
+max_health = 11
+damage = 7
 move_speed = 2
 metadata/_custom_type_script = "uid://tnxg66jw03v3"

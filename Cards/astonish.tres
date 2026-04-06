@@ -1,0 +1,24 @@
+[gd_resource type="Resource" script_class="CardData" load_steps=7 format=3 uid="uid://dxecknna02pxi"]
+
+[ext_resource type="Script" uid="uid://dhxff5egnsgrv" path="res://Scripts/action.gd" id="1_esmfy"]
+[ext_resource type="Script" uid="uid://cgrxhw8vqenhu" path="res://Scripts/ValueCalculator.gd" id="2_5mjol"]
+[ext_resource type="Script" uid="uid://0gsjrx47no8b" path="res://Scripts/card_data.gd" id="2_op530"]
+[ext_resource type="Script" uid="uid://clvjn77csx1a0" path="res://Scripts/AttackAction.gd" id="3_m1tgt"]
+
+[sub_resource type="Resource" id="Resource_j3ikm"]
+script = ExtResource("2_5mjol")
+formula = "swag"
+metadata/_custom_type_script = "uid://cgrxhw8vqenhu"
+
+[sub_resource type="Resource" id="Resource_ppd0e"]
+script = ExtResource("3_m1tgt")
+damage_calculator = SubResource("Resource_j3ikm")
+max_range = 5
+animation_type = 3
+metadata/_custom_type_script = "uid://clvjn77csx1a0"
+
+[resource]
+script = ExtResource("2_op530")
+card_name = "Astonish"
+actions = Array[ExtResource("1_esmfy")]([SubResource("Resource_ppd0e")])
+metadata/_custom_type_script = "uid://0gsjrx47no8b"

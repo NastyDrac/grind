@@ -7,7 +7,7 @@
 
 [sub_resource type="Resource" id="Resource_wficx"]
 script = ExtResource("2_q8vow")
-formula = "swag"
+formula = "guts"
 metadata/_custom_type_script = "uid://cgrxhw8vqenhu"
 
 [sub_resource type="Resource" id="Resource_t138t"]
@@ -19,7 +19,7 @@ metadata/_custom_type_script = "uid://cgrxhw8vqenhu"
 script = ExtResource("3_iqqcv")
 damage_calculator = SubResource("Resource_wficx")
 enemy_count_calculator = SubResource("Resource_t138t")
-max_range = 4
+max_range = 1
 animation_type = 2
 metadata/_custom_type_script = "uid://clvjn77csx1a0"
 

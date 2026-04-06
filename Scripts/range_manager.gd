@@ -13,6 +13,23 @@ class_name RangeManager
 @export var tiered_enemy_pools: Dictionary = {} 
 @export var center_ratio := .4
 
+# How far past the right edge enemies spawn from (pixels beyond viewport width)
+@export var entry_offscreen_margin: float = 200.0
+
+# Visual style for range divider lines
+@export var range_line_color: Color = Color(1, 1, 1, 0.15)
+@export var range_line_width: float = 2.0
+
+# Win condition progress bar
+@export var progress_bar_height: float = 22.0
+@export var progress_bar_margin_top: float = 475.0
+@export var progress_bar_bg_color: Color = Color(0.1, 0.1, 0.1, 0.75)
+@export var progress_bar_fill_color: Color = Color(0.2, 0.8, 0.4, 0.9)
+@export var progress_bar_border_color: Color = Color(1.0, 1.0, 1.0, 0.3)
+@export var progress_font_size: int = 13
+
+var current_win_condition: WinCondition = null
+
 enum SpawnMode {
 	IMMEDIATE,      
 	ENERGY_BANKED, 
@@ -37,6 +54,9 @@ signal targeting_started()
 signal targeting_cancelled()
 signal targets_confirmed(targets: Array[Enemy])
 
+func set_win_condition(wc: WinCondition) -> void:
+	current_win_condition = wc
+
 func _initialize_ranges(max_range: int):
 	for i in range(max_range + 1):
 		enemies_by_range[i] = []
@@ -58,6 +78,66 @@ func _ready() -> void:
 	
 	Global.enemy_dies.connect(_on_enemy_died)
 	Global.enemy_advanced.connect(_on_enemy_moved)
+
+func _process(_delta: float) -> void:
+	queue_redraw()
+
+# =========================
+# RANGE DIVIDER LINES
+# =========================
+
+func _draw() -> void:
+	var viewport_size = get_viewport().size
+	var top_y    = 0.0
+	var bottom_y = viewport_size.y
+
+	# Draw a vertical line between each pair of adjacent ranges.
+	for i in range(5):  # gaps: 0-1, 1-2, 2-3, 3-4, 4-5
+		var x = (i * range_spacing) + range_spacing * 0.5
+		draw_line(
+			Vector2(x, top_y),
+			Vector2(x, bottom_y),
+			range_line_color,
+			range_line_width
+		)
+
+	# Draw win condition progress bar across the top of the range area
+	if current_win_condition == null:
+		return
+
+	var bar_w   = 150.00
+	var bar_h   := progress_bar_height
+	var bar_x   := 1000.00
+	var bar_y   := progress_bar_margin_top
+
+	# Background
+	draw_rect(Rect2(bar_x, bar_y, bar_w, bar_h), progress_bar_bg_color)
+
+	# Fill — use get_progress_fraction() if available, else leave at 0
+	var fraction := 0.0
+	if current_win_condition.has_method("get_progress_fraction"):
+		fraction = current_win_condition.get_progress_fraction()
+
+	if fraction > 0.0:
+		draw_rect(Rect2(bar_x, bar_y, bar_w * fraction, bar_h), progress_bar_fill_color)
+
+	# Border
+	draw_rect(Rect2(bar_x, bar_y, bar_w, bar_h), progress_bar_border_color, false, 1.5)
+
+	# Progress text centered on the bar
+	var progress_text := current_win_condition.get_progress_text()
+	var font          := ThemeDB.fallback_font
+	var font_size     := progress_font_size
+	var text_size     := font.get_string_size(progress_text, HORIZONTAL_ALIGNMENT_LEFT, -1, font_size)
+	var text_x        = bar_x + (bar_w - text_size.x) * 0.5
+	var text_y        := bar_y + (bar_h + text_size.y) * 0.5 - 2.0
+
+	# Shadow
+	draw_string(font, Vector2(text_x + 1, text_y + 1), progress_text,
+		HORIZONTAL_ALIGNMENT_LEFT, -1, font_size, Color(0, 0, 0, 0.7))
+	# Text
+	draw_string(font, Vector2(text_x, text_y), progress_text,
+		HORIZONTAL_ALIGNMENT_LEFT, -1, font_size, Color(1, 1, 1, 1.0))
 
 func process_card_draw():
 	if spawn_mode == SpawnMode.ENERGY_BANKED and banked_energy > 0:
@@ -104,8 +184,13 @@ func spawn_enemy(enemy_data: EnemyData, spawn_range: int = 5) -> Enemy:
 	
 	enemy.set_range_manager(self)
 	
-	enemy.global_position = get_position_for_enemy(enemy)
-	enemy.target_position = enemy.global_position  
+	# Where the enemy should ultimately stand
+	var destination := get_position_for_enemy(enemy)
+	enemy.target_position = destination
+
+	# Start the enemy off the far right of the screen so it travels in
+	var viewport_width = get_viewport().size.x
+	enemy.global_position = Vector2(viewport_width + entry_offscreen_margin, destination.y)
 	
 	add_enemy(enemy)
 	
@@ -174,7 +259,9 @@ func remove_item(item : Item):
 
 func get_position_for_item(item : Item) -> Vector2:
 	var range_num = item.get_current_range()
-	var x_pos = _get_x_for_range(range_num)
+	# Offset by half a range_spacing so items sit on the divider lines
+	# that fall between enemy columns, rather than overlapping the enemies.
+	var x_pos = _get_x_for_range(range_num) + range_spacing * 0.5
 	var y_pos = _get_y_for_item(item, range_num)
 	return Vector2(x_pos, y_pos)
 

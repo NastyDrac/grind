@@ -1,0 +1,25 @@
+[gd_resource type="Resource" script_class="CardData" load_steps=7 format=3 uid="uid://1o52es7n3bog"]
+
+[ext_resource type="Script" uid="uid://dhxff5egnsgrv" path="res://Scripts/action.gd" id="1_56b8h"]
+[ext_resource type="Script" uid="uid://cgrxhw8vqenhu" path="res://Scripts/ValueCalculator.gd" id="2_fwmbb"]
+[ext_resource type="Script" uid="uid://y73360xhw2qs" path="res://Scripts/modify_stat_action.gd" id="3_j6ek7"]
+[ext_resource type="Script" uid="uid://0gsjrx47no8b" path="res://Scripts/card_data.gd" id="4_c2u84"]
+
+[sub_resource type="Resource" id="Resource_qpjro"]
+script = ExtResource("2_fwmbb")
+formula = "2"
+metadata/_custom_type_script = "uid://cgrxhw8vqenhu"
+
+[sub_resource type="Resource" id="Resource_enwja"]
+script = ExtResource("3_j6ek7")
+modify_calculator = SubResource("Resource_qpjro")
+stat_to_modify = 5
+target_type = 4
+animation_type = 3
+metadata/_custom_type_script = "uid://y73360xhw2qs"
+
+[resource]
+script = ExtResource("4_c2u84")
+card_name = "Ancestral Call"
+actions = Array[ExtResource("1_56b8h")]([SubResource("Resource_enwja")])
+metadata/_custom_type_script = "uid://0gsjrx47no8b"
