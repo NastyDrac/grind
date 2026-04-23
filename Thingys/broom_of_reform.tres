@@ -6,7 +6,6 @@
 
 [sub_resource type="Resource" id="Resource_u0s27"]
 script = ExtResource("1_selga")
-formula = "swag"
 metadata/_custom_type_script = "uid://cgrxhw8vqenhu"
 
 [resource]

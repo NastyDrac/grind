@@ -1,0 +1,33 @@
+[gd_resource type="Resource" script_class="EnemyData" load_steps=8 format=3 uid="uid://cuwxd1fxsxkud"]
+
+[ext_resource type="Script" uid="uid://b1ogi3xh5xakp" path="res://Scripts/condition.gd" id="1_oieog"]
+[ext_resource type="Script" uid="uid://tnxg66jw03v3" path="res://Scripts/enemy_data.gd" id="2_180f3"]
+[ext_resource type="Script" uid="uid://do7yj12cpcfq4" path="res://Scripts/trumpeteer.gd" id="2_xvd60"]
+[ext_resource type="Script" uid="uid://2jyk8uugl6c5" path="res://Scripts/fragile.gd" id="4_4uqnt"]
+[ext_resource type="Texture2D" uid="uid://b2rjhiy4rifig" path="res://icon.svg" id="4_kdapk"]
+
+[sub_resource type="Resource" id="Resource_4uqnt"]
+script = ExtResource("2_xvd60")
+fire_every_advance = false
+condition_name = "Under Pressure"
+stacks = 3
+metadata/_custom_type_script = "uid://do7yj12cpcfq4"
+
+[sub_resource type="Resource" id="Resource_sp20r"]
+script = ExtResource("4_4uqnt")
+condition_to_remove = SubResource("Resource_4uqnt")
+condition_name = "Fragile"
+stacks = 1
+icon = ExtResource("4_kdapk")
+metadata/_custom_type_script = "uid://2jyk8uugl6c5"
+
+[resource]
+script = ExtResource("2_180f3")
+enemy_name = "Balloon Fiend"
+texture = ExtResource("4_kdapk")
+min_health = 2
+max_health = 6
+damage = 3
+move_speed = 2
+conditions = Array[ExtResource("1_oieog")]([SubResource("Resource_sp20r"), SubResource("Resource_4uqnt")])
+metadata/_custom_type_script = "uid://tnxg66jw03v3"

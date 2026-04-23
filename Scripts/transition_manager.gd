@@ -8,7 +8,8 @@ extends Node
 enum TransitionStyle {
 	TV_STATIC,
 	FILM_BURN,
-	BROKEN_GLASS
+	BROKEN_GLASS,
+	FADE
 }
 
 @export var transition_style : TransitionStyle = TransitionStyle.BROKEN_GLASS
@@ -17,6 +18,10 @@ enum TransitionStyle {
 @export var buildup_duration : float = 0.30
 @export var hold_duration    : float = 0.12
 @export var clear_duration   : float = 0.55
+
+@export_group("Fade")
+## Colour the screen fades through. Black is classic; white gives a bleach cut.
+@export var fade_color : Color = Color(0.0, 0.0, 0.0, 1.0)
 
 # ── Static palette ─────────────────────────────────────────────────────────────
 const STATIC_COLORS := [
@@ -68,9 +73,42 @@ func transition(on_peak: Callable) -> void:
 			await _run_film_burn(on_peak)
 		TransitionStyle.BROKEN_GLASS:
 			await _run_broken_glass(on_peak)
+		TransitionStyle.FADE:
+			await _run_fade(on_peak)
 
 	_canvas.hide()
 	_active = false
+
+# ------------------------------------------------------------------------------
+#  FADE
+# ------------------------------------------------------------------------------
+
+func _run_fade(on_peak: Callable) -> void:
+	var overlay := ColorRect.new()
+	overlay.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	overlay.set_anchors_preset(Control.PRESET_FULL_RECT)
+	overlay.color = Color(fade_color.r, fade_color.g, fade_color.b, 0.0)
+	_container.add_child(overlay)
+
+	# Fade OUT (to opaque)
+	var elapsed := 0.0
+	while elapsed < buildup_duration:
+		overlay.color.a = elapsed / buildup_duration
+		await get_tree().process_frame
+		elapsed += get_process_delta_time()
+	overlay.color.a = 1.0
+
+	on_peak.call()
+	await get_tree().create_timer(hold_duration).timeout
+
+	# Fade IN (back to clear)
+	elapsed = 0.0
+	while elapsed < clear_duration:
+		overlay.color.a = 1.0 - (elapsed / clear_duration)
+		await get_tree().process_frame
+		elapsed += get_process_delta_time()
+
+	_clear_children()
 
 # ------------------------------------------------------------------------------
 #  TV STATIC

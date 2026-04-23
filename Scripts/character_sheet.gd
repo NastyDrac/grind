@@ -9,16 +9,16 @@ var character_data : CharacterData
 var character_instance : Character 
 
 
-@onready var character_image = $VBoxContainer/HBoxContainer/TextureRect
-@onready var health_bar = $VBoxContainer/HBoxContainer/Control/TextureProgressBar
-@onready var hp_formula_label = $VBoxContainer/HBoxContainer/Control/hp_formula_label
-@onready var swag_label = $VBoxContainer/HBoxContainer/VBoxContainer/VBoxContainer/guts_label
-@onready var guts_label = $VBoxContainer/HBoxContainer/VBoxContainer/VBoxContainer2/guts_label
-@onready var marbles_label = $VBoxContainer/HBoxContainer/VBoxContainer/VBoxContainer3/guts_label
-@onready var hustle_label = $VBoxContainer/HBoxContainer/VBoxContainer/VBoxContainer4/hustle_label
-@onready var bang_label = $VBoxContainer/HBoxContainer/VBoxContainer/VBoxContainer5/bang_label
-@onready var mojo_label = $VBoxContainer/HBoxContainer/VBoxContainer/VBoxContainer6/mojo_label
-@onready var effects_label = $VBoxContainer/VBoxContainer/Label2
+@onready var character_image = $CenterContainer/VBoxContainer/HBoxContainer/TextureRect
+@onready var health_bar = $CenterContainer/VBoxContainer/HBoxContainer/Control/TextureProgressBar
+@onready var hp_formula_label = $CenterContainer/VBoxContainer/HBoxContainer/Control/hp_formula_label
+@onready var swag_label = $CenterContainer/VBoxContainer/HBoxContainer/VBoxContainer/VBoxContainer/guts_label
+@onready var guts_label = $CenterContainer/VBoxContainer/HBoxContainer/VBoxContainer/VBoxContainer2/guts_label
+@onready var marbles_label = $CenterContainer/VBoxContainer/HBoxContainer/VBoxContainer/VBoxContainer3/guts_label
+@onready var hustle_label = $CenterContainer/VBoxContainer/HBoxContainer/VBoxContainer/VBoxContainer4/hustle_label
+@onready var bang_label = $CenterContainer/VBoxContainer/HBoxContainer/VBoxContainer/VBoxContainer5/bang_label
+@onready var mojo_label = $CenterContainer/VBoxContainer/HBoxContainer/VBoxContainer/VBoxContainer6/mojo_label
+@onready var effects_label = $CenterContainer/VBoxContainer/VBoxContainer/Label2
 
 var _effects_container : HFlowContainer
 

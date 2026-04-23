@@ -4,7 +4,7 @@ class_name IntentIndicator
 var label : Label
 @export var enemy : Enemy
 
-var attack_icon = preload("res://Art/death.png")
+var attack_icon = preload("res://Art/Icons/BATTLEIconAlt.png")
 var move_icon = preload("res://Art/Icons/ArrowIcon.png")
 
 func _ready() -> void:
@@ -13,6 +13,7 @@ func _ready() -> void:
 	label.add_theme_color_override("font_color", Color.BLACK)
 	Global.enemy_advanced.connect(get_intent.bind())
 	get_intent(enemy, 0, enemy.current_range)
+	
 
 
 func get_intent(character : Enemy, old : int, new : int):

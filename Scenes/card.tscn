@@ -3,9 +3,9 @@
 [ext_resource type="Script" uid="uid://dkqjp5qb2gfw6" path="res://Scripts/card.gd" id="1_0qqmn"]
 [ext_resource type="Script" uid="uid://0gsjrx47no8b" path="res://Scripts/card_data.gd" id="2_brehn"]
 [ext_resource type="Script" uid="uid://dhxff5egnsgrv" path="res://Scripts/action.gd" id="2_eumee"]
-[ext_resource type="Texture2D" uid="uid://cvje2yu82wwpk" path="res://Art/blank_card.png" id="2_wf8id"]
 [ext_resource type="Script" uid="uid://cgrxhw8vqenhu" path="res://Scripts/ValueCalculator.gd" id="3_bnspj"]
 [ext_resource type="Script" uid="uid://clvjn77csx1a0" path="res://Scripts/AttackAction.gd" id="4_xnv4g"]
+[ext_resource type="Texture2D" uid="uid://ctnrg0beipfc0" path="res://Art/CARDTEMPLATEEMPTY.png" id="6_bnspj"]
 
 [sub_resource type="Resource" id="Resource_u5wvb"]
 script = ExtResource("3_bnspj")
@@ -43,20 +43,21 @@ metadata/_custom_type_script = "uid://dkqjp5qb2gfw6"
 
 [node name="BlankCard" type="Sprite2D" parent="."]
 position = Vector2(100, 150)
-texture = ExtResource("2_wf8id")
+texture = ExtResource("6_bnspj")
 
 [node name="title" type="RichTextLabel" parent="BlankCard"]
-offset_left = -91.0
-offset_top = -139.0
-offset_right = 90.0
-offset_bottom = -107.0
+offset_left = -90.666664
+offset_top = -126.666664
+offset_right = 70.666664
+offset_bottom = -94.666664
 mouse_filter = 2
 
 [node name="description" type="RichTextLabel" parent="BlankCard"]
 offset_left = -88.0
-offset_top = 32.0
+offset_top = 57.333332
 offset_right = 86.0
-offset_bottom = 137.0
+offset_bottom = 133.97517
+scale = Vector2(1, 0.893335)
 mouse_filter = 2
 bbcode_enabled = true
 autowrap_mode = 2
@@ -65,15 +66,16 @@ vertical_alignment = 1
 
 [node name="cost" type="RichTextLabel" parent="BlankCard"]
 custom_minimum_size = Vector2(200, 300)
-offset_left = 68.0
-offset_top = -145.0
-offset_right = 92.0
-offset_bottom = -100.0
+offset_left = 70.666664
+offset_top = -132.0
+offset_right = 270.66666
+offset_bottom = 168.0
 mouse_filter = 2
 theme_override_colors/default_color = Color(1, 0, 0, 1)
 theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
 theme_override_constants/outline_size = 5
 theme_override_font_sizes/normal_font_size = 30
+text = "2"
 
 [connection signal="mouse_entered" from="." to="." method="_on_mouse_entered"]
 [connection signal="mouse_exited" from="." to="." method="_on_mouse_exited"]

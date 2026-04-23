@@ -4,8 +4,13 @@ class_name EnemyData
 
 @export var enemy_name : String = "Enemy"
 @export var texture : Texture2D
-@export var max_health : int = 10
+@export var min_health  :int = 9
+@export var max_health : int = 11
 @export var damage : int = 1
 @export var move_speed : int = 1
 @export var attack_range : int = 1
 @export var conditions : Array[Condition] = []
+
+# How much this enemy costs to spawn from the noise meter.
+# Cheap enemies (goblins etc.) = 1-2, elites = 4-6, bosses = 8+
+@export var noise_cost: int = 1

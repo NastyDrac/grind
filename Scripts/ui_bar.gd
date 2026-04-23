@@ -25,6 +25,10 @@ func _on_settings_pressed() -> void:
 
 
 func _on_help_pressed() -> void:
+	var deck := DeckViewer.new()
+	add_child(deck)
+	deck.setup("Deck", run_manager.deck, DeckViewer.Mode.DISPLAY)
+	
 	
 	var focused_control = get_viewport().gui_get_focus_owner()
 	if focused_control and focused_control is BaseButton:

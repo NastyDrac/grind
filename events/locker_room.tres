@@ -1,0 +1,73 @@
+[gd_resource type="Resource" script_class="EventData" load_steps=20 format=3 uid="uid://ctuj8hs6x6q5q"]
+
+[ext_resource type="Script" uid="uid://ccujthovl5rv7" path="res://Scripts/event_option.gd" id="1_lsxmj"]
+[ext_resource type="Script" uid="uid://tnxg66jw03v3" path="res://Scripts/enemy_data.gd" id="2_d5jcy"]
+[ext_resource type="Script" uid="uid://chli81s5gxydu" path="res://Scripts/event_effect.gd" id="3_eekrh"]
+[ext_resource type="Script" uid="uid://b3mi542wlp4b0" path="res://Scripts/EventEffects/effect_cost_gold.gd" id="4_iiaso"]
+[ext_resource type="Script" uid="uid://bggju16i5y2vm" path="res://Scripts/EventEffects/effect_cost_hp.gd" id="5_0vx67"]
+[ext_resource type="Script" uid="uid://cvilgkn5daoav" path="res://Scripts/EventEffects/effect_card_draft.gd" id="6_ninv6"]
+[ext_resource type="Script" uid="uid://bdr3fcs6uxkc1" path="res://Scripts/EventEffects/effect_add_action.gd" id="7_8q8ur"]
+[ext_resource type="Script" uid="uid://cgrxhw8vqenhu" path="res://Scripts/ValueCalculator.gd" id="7_eekrh"]
+[ext_resource type="Script" uid="uid://bc8y3uqk02xnl" path="res://Scripts/draw_action.gd" id="8_iiaso"]
+[ext_resource type="Script" uid="uid://c8bk1dof3250" path="res://Scripts/event_data.gd" id="8_rgrht"]
+
+[sub_resource type="Resource" id="Resource_3acma"]
+script = ExtResource("4_iiaso")
+amount = -40
+metadata/_custom_type_script = "uid://b3mi542wlp4b0"
+
+[sub_resource type="Resource" id="Resource_2gjp5"]
+script = ExtResource("5_0vx67")
+amount = 4
+metadata/_custom_type_script = "uid://bggju16i5y2vm"
+
+[sub_resource type="Resource" id="Resource_jawdy"]
+script = ExtResource("1_lsxmj")
+option_text = "Kick it down"
+result_text = "Well now… that thing’s makin’ a noise I don’t rightly trust, which means it’s probably got somethin’ worth havin’.
+Give it a good boot. Worst case, it bites back."
+effects = Array[ExtResource("3_eekrh")]([SubResource("Resource_3acma"), SubResource("Resource_2gjp5")])
+metadata/_custom_type_script = "uid://ccujthovl5rv7"
+
+[sub_resource type="Resource" id="Resource_aaytb"]
+script = ExtResource("6_ninv6")
+metadata/_custom_type_script = "uid://cvilgkn5daoav"
+
+[sub_resource type="Resource" id="Resource_ruacm"]
+script = ExtResource("1_lsxmj")
+option_text = "Take a gentle peak"
+result_text = "You could go in soft‑like, ease the door open, see what fortune left behind.
+Course, that’s how folks end up with surprises they didn’t order."
+effects = Array[ExtResource("3_eekrh")]([SubResource("Resource_aaytb")])
+metadata/_custom_type_script = "uid://ccujthovl5rv7"
+
+[sub_resource type="Resource" id="Resource_8q8ur"]
+script = ExtResource("7_eekrh")
+formula = "1"
+metadata/_custom_type_script = "uid://cgrxhw8vqenhu"
+
+[sub_resource type="Resource" id="Resource_rgrht"]
+script = ExtResource("8_iiaso")
+card_count_calculator = SubResource("Resource_8q8ur")
+target_type = 4
+metadata/_custom_type_script = "uid://bc8y3uqk02xnl"
+
+[sub_resource type="Resource" id="Resource_o4fyf"]
+script = ExtResource("7_8q8ur")
+action = SubResource("Resource_rgrht")
+metadata/_custom_type_script = "uid://bdr3fcs6uxkc1"
+
+[sub_resource type="Resource" id="Resource_hsrr7"]
+script = ExtResource("1_lsxmj")
+option_text = "Strip it for parts"
+result_text = "Now here’s a thought: locker’s busted, world’s busted, everything’s busted — might as well make the pieces useful.
+Bit of wire here, hinge there… you’d be amazed what a clever hand can bolt onto a good swing."
+effects = Array[ExtResource("3_eekrh")]([SubResource("Resource_o4fyf")])
+metadata/_custom_type_script = "uid://ccujthovl5rv7"
+
+[resource]
+script = ExtResource("8_rgrht")
+event_title = "Locker Room"
+event_description = "You push into a busted‑up locker room — lights flickering like they’re fixin’ to give up, metal doors rattling in a draft that ain’t there. One locker’s humming like it swallowed something it shouldn’t."
+options = Array[ExtResource("1_lsxmj")]([SubResource("Resource_jawdy"), SubResource("Resource_ruacm"), SubResource("Resource_hsrr7")])
+metadata/_custom_type_script = "uid://c8bk1dof3250"

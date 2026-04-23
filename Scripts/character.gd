@@ -38,7 +38,7 @@ func position_character():
 		if sprite.texture:
 			sprite_half_width = (sprite.texture.get_size().x * sprite.scale.x) / 2
 
-		var range_0_position = Vector2(range_0_x + sprite_half_width + 20, center_y)
+		var range_0_position = Vector2(range_0_x, center_y)
 		sprite.global_position = range_0_position
 
 		if sprite.texture:

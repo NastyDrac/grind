@@ -1,0 +1,27 @@
+[gd_resource type="Resource" script_class="EnemyData" load_steps=6 format=3 uid="uid://d101mwo4q35ah"]
+
+[ext_resource type="Script" uid="uid://b1ogi3xh5xakp" path="res://Scripts/condition.gd" id="1_277ci"]
+[ext_resource type="Texture2D" uid="uid://b2rjhiy4rifig" path="res://icon.svg" id="2_44d2j"]
+[ext_resource type="Script" uid="uid://do7yj12cpcfq4" path="res://Scripts/trumpeteer.gd" id="3_1tamc"]
+[ext_resource type="Script" uid="uid://tnxg66jw03v3" path="res://Scripts/enemy_data.gd" id="4_x4fjk"]
+
+[sub_resource type="Resource" id="Resource_fem11"]
+script = ExtResource("3_1tamc")
+trigger_type = 2
+fire_every_advance = false
+trigger_range = 3
+condition_name = "Noisy"
+stacks = 1
+icon = ExtResource("2_44d2j")
+metadata/_custom_type_script = "uid://do7yj12cpcfq4"
+
+[resource]
+script = ExtResource("4_x4fjk")
+enemy_name = "Bugler"
+texture = ExtResource("2_44d2j")
+min_health = 3
+max_health = 6
+damage = 0
+attack_range = 3
+conditions = Array[ExtResource("1_277ci")]([SubResource("Resource_fem11")])
+metadata/_custom_type_script = "uid://tnxg66jw03v3"

@@ -23,12 +23,20 @@ var current_character_sheet : PopupPanel = null
 ## Which act the player is currently on (0-indexed internally, displayed as 1-indexed).
 var current_act : int = 0
 
+## Tracks horde recipe_names fought so far this act so they aren't repeated.
+## Reset at run start and whenever a new act begins.
+var _used_horde_names : Array[String] = []
+
 ## One HordePool per act (index 0 = Act 1, index 1 = Act 2, etc.).
 ## If the player reaches an act beyond this array, falls back to horde.
 @export var act_recipe_pools : Array[HordePool] = []
 
 ## Fallback enemy list used when no pool is defined for the current act.
 @export var horde : Array[EnemyData] = []
+
+## The Horde resource that was selected for the current (or most recent) combat.
+## Populated by _pick_horde_for_combat(); used by the RewardScene.
+var current_horde : Horde = null
 
 @export var win_condition: WinCondition
 var current_win_condition: WinCondition = null
@@ -37,6 +45,7 @@ var current_win_condition: WinCondition = null
 var current_event_scene: EventScene = null
 
 var current_draft_screen: DraftScreen = null
+var current_reward_scene: RewardScene = null
 var current_shop: Shop = null
 var current_gym      : Gym      = null
 var current_hospital : Hospital = null
@@ -52,6 +61,11 @@ var _pending_map_node : MapNode = null
 enum GameState { MAP, EVENT, COMBAT }
 var current_state: GameState = GameState.MAP
 
+# -- Thingy dedup --------------------------------------------------------------
+## resource_path values of every ThingyCondition the player has acquired this run.
+## Used by get_unique_thingy_condition() to avoid duplicates.
+var _owned_thingy_paths : Array[String] = []
+
 # ------------------------------------------------------------------------------
 
 func begin_run(seed : int = -1):
@@ -62,6 +76,16 @@ func begin_run(seed : int = -1):
 		run_seed = seed
 	rng.seed = run_seed
 	current_act = 0
+	_used_horde_names.clear()
+	_owned_thingy_paths.clear()
+
+	# Deep-duplicate every card so each slot is an independent object.
+	# The @export deck array holds .tres resource references which Godot caches,
+	# meaning all copies of the same card share one object. Without this,
+	# any mutation (adding actions, setting flags, etc.) affects every copy.
+	for i in deck.size():
+		deck[i] = deck[i].duplicate(true)
+
 	create_ui()
 	create_player()
 	player.toggle_visible(false)
@@ -96,14 +120,19 @@ func _on_map_node_chosen(node: MapNode) -> void:
 
 	match node.node_type:
 		MapNode.NodeType.COMBAT:
+			Transitions.transition_style = Transitions.TransitionStyle.BROKEN_GLASS
 			await Transitions.transition(func(): begin_combat())
 		MapNode.NodeType.SHOP:
+			Transitions.transition_style = Transitions.TransitionStyle.FADE
 			await Transitions.transition(func(): create_shop())
 		MapNode.NodeType.GYM:
+			Transitions.transition_style = Transitions.TransitionStyle.FADE
 			await Transitions.transition(func(): create_gym())
 		MapNode.NodeType.SERVICES:
+			Transitions.transition_style = Transitions.TransitionStyle.FADE
 			await Transitions.transition(func(): create_services())
 		MapNode.NodeType.HOSPITAL:
+			Transitions.transition_style = Transitions.TransitionStyle.FADE
 			await Transitions.transition(func(): create_hospital())
 		_:
 			await Transitions.transition(func(): _show_event_for_node(node))
@@ -150,6 +179,7 @@ func begin_combat():
 
 func begin_wave():
 	create_range_manager()
+	player.position_character()
 
 	if player:
 		player.toggle_visible(true)
@@ -179,6 +209,7 @@ func setup_win_condition():
 
 		# Show the announcement
 		var announcer := CombatAnnouncer.new()
+		announcer.run_manager = self
 		add_child(announcer)
 		var subtitle := "Act %d" % (current_act + 1)
 		announcer.show_announcement(current_win_condition.get_announcement_text(), subtitle)
@@ -205,24 +236,33 @@ func _on_card_played(card_data: CardData):
 		range_manager.process_card_cost(card_data.card_cost)
 
 func create_range_manager():
-	range_manager = RangeManager.new()
+	range_manager = load("res://Scenes/range_manager.tscn").instantiate()
 	add_child(range_manager)
 	range_manager.run_manager = self
 	range_manager.enemy_pool.append_array(_pick_horde_for_combat())
 	spawn_initial_enemies()
 
 ## Selects enemies from a Horde in the current act's pool that is valid for
-## the current map column. Falls back to the legacy horde array if needed.
+## the current map column. Hordes already fought this act are avoided unless
+## there are no other column-valid options. Falls back to the legacy horde array if needed.
+## Also stores the chosen Horde resource in current_horde for use by RewardScene.
 func _pick_horde_for_combat() -> Array[EnemyData]:
 	var col : int = _pending_map_node.col if _pending_map_node else 0
 
 	if current_act < act_recipe_pools.size():
 		var pool : HordePool = act_recipe_pools[current_act]
 		if pool:
-			var recipe := pool.pick_random(rng, col)
+			var recipe := pool.pick_random(rng, col, _used_horde_names)
 			if recipe and not recipe.enemies.is_empty():
 				print("RunManager: act %d col %d using horde '%s'" % [current_act + 1, col, recipe.recipe_name])
+				if recipe.recipe_name not in _used_horde_names:
+					_used_horde_names.append(recipe.recipe_name)
+				current_horde = recipe
 				return recipe.enemies
+
+	# Fallback: no matching pool recipe -- clear current_horde since there's
+	# no Horde resource to pull rewards from.
+	current_horde = null
 
 	if not horde.is_empty():
 		push_warning("RunManager: no pool for act %d, using fallback horde." % (current_act + 1))
@@ -233,7 +273,8 @@ func _pick_horde_for_combat() -> Array[EnemyData]:
 
 func create_card_handler():
 	card_handler = load("res://Scenes/card_handler.tscn").instantiate()
-	add_child(card_handler)
+	$CanvasLayer.add_child(card_handler)
+	
 	card_handler.run_manager = self
 	card_handler.initialize()
 
@@ -296,9 +337,11 @@ func on_combat_won():
 					and _pending_map_node.node_type == MapNode.NodeType.BOSS
 	_teardown_combat()
 
-	# Show the draft screen and wait for the player to pick or skip.
-	create_draft_screen()
-	await current_draft_screen.draft_completed
+	# Show the reward scene (contains gold / card draft / thingy buttons).
+	# The reward scene handles the card draft internally and emits
+	# reward_scene_completed when the player clicks Continue.
+	create_reward_scene()
+	await current_reward_scene.reward_scene_completed
 
 	await Transitions.transition(func(): _show_map())
 	if was_boss:
@@ -307,6 +350,7 @@ func on_combat_won():
 ## Increments the act counter and generates a brand-new map for the next act.
 func _start_new_act() -> void:
 	current_act += 1
+	_used_horde_names.clear()
 	print("RunManager: beginning Act %d" % (current_act + 1))
 	if map_generator:
 		await Transitions.transition(func(): map_generator.build(rng))
@@ -325,7 +369,7 @@ func on_player_death():
 # ------------------------------------------------------------------------------
 
 ## Add a thingy condition to the run. Call this whenever the player acquires
-## a passive item (e.g. from the shop).
+## a passive item (e.g. from the shop or a reward screen).
 ##
 ## The condition is stored in character_data.special_effects so it persists
 ## across waves. reset_for_new_wave re-applies it as a fresh duplicate at the
@@ -334,11 +378,23 @@ func on_player_death():
 ## If a combat wave is already in progress, a working copy is applied to the
 ## player immediately so it takes effect without waiting for the next wave.
 func add_thingy_condition(condition: ThingyCondition) -> void:
+	# Track the resource path so get_unique_thingy_condition() can exclude it.
+	if condition.resource_path != "" and condition.resource_path not in _owned_thingy_paths:
+		_owned_thingy_paths.append(condition.resource_path)
+
 	character.special_effects.append(condition)
 
 	if current_state == GameState.COMBAT and player:
 		var fresh := condition.duplicate(true) as ThingyCondition
 		fresh.apply_condition(player, fresh)
+
+## Returns a ThingyCondition the player does not already own.
+## Pass extra_excluded to also skip thingies offered elsewhere on the same
+## reward screen (prevents two Thingy buttons showing the same item).
+func get_unique_thingy_condition(extra_excluded: Array[String] = []) -> ThingyCondition:
+	var all_excluded := _owned_thingy_paths.duplicate()
+	all_excluded.append_array(extra_excluded)
+	return get_random_thingy_condition(all_excluded)
 
 # ------------------------------------------------------------------------------
 #  CHARACTER SHEET
@@ -413,6 +469,26 @@ func close_draft_screen():
 		current_draft_screen = null
 
 # ------------------------------------------------------------------------------
+#  REWARD SCENE
+# ------------------------------------------------------------------------------
+
+func create_reward_scene() -> void:
+	if current_reward_scene:
+		current_reward_scene.queue_free()
+
+	current_reward_scene = load("res://Scenes/reward_scene.tscn").instantiate()
+	current_reward_scene.run = self
+	current_reward_scene.current_horde = current_horde
+	get_tree().root.add_child(current_reward_scene)
+	current_reward_scene.set_anchors_preset(Control.PRESET_FULL_RECT)
+	
+
+func close_reward_scene() -> void:
+	if current_reward_scene:
+		current_reward_scene.queue_free()
+		current_reward_scene = null
+
+# ------------------------------------------------------------------------------
 #  SHOP
 # ------------------------------------------------------------------------------
 
@@ -420,7 +496,7 @@ func create_shop() -> void:
 	if current_shop:
 		current_shop.queue_free()
 
-	current_shop = Shop.new()
+	current_shop = load("res://Scenes/shop.tscn").instantiate()
 	add_child(current_shop)
 	current_shop.display_shop(self)
 	current_shop.shop_closed.connect(_on_shop_closed)

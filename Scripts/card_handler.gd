@@ -40,6 +40,7 @@ var cards_in_hand : Array[Card]
 var card_position = {}
 
 var is_arranging := false
+var is_passing_time := false
 
 # Targeting state
 var is_targeting : bool = false
@@ -1024,6 +1025,12 @@ func exhaust(card : Card):
 		exhaust_stack.append(card)
 
 func pass_time():
+	if is_passing_time:
+		return
+	is_passing_time = true
+	if pass_time_button:
+		pass_time_button.disabled = true
+
 	Global.time_passed.emit()
 	
 	# Volatile cards execute their actions automatically when left in hand
@@ -1043,6 +1050,10 @@ func pass_time():
 		if not draw_stack.is_empty():
 			var card = draw_stack.pop_front()
 			draw_cards(card)
+
+	is_passing_time = false
+	if pass_time_button:
+		pass_time_button.disabled = false
 
 func draw_cards(card : Card):
 	if card:
@@ -1177,113 +1188,34 @@ func _trigger_volatile_cards():
 # ============================================================================
 
 func _on_draw_pile_button_pressed():
-	_show_pile_window("Draw Pile (%d)" % draw_stack.size(), draw_pile, draw_stack)
+	_show_pile_viewer("Draw Pile (%d)" % draw_stack.size(), _cards_to_data(draw_stack))
 
 func _on_discard_pile_button_pressed():
-	var cards = discard_pile.get_children()
-	_show_pile_window("Discard Pile (%d)" % cards.size(), discard_pile, [])
+	var cards := discard_pile.get_children()
+	_show_pile_viewer("Discard Pile (%d)" % cards.size(), _cards_to_data(cards))
 
 func _on_exhaust_pile_button_pressed():
-	var cards = exhaust_pile.get_children()
-	_show_pile_window("Exhaust Pile (%d)" % cards.size(), exhaust_pile, [])
+	var cards := exhaust_pile.get_children()
+	_show_pile_viewer("Exhaust Pile (%d)" % cards.size(), _cards_to_data(cards))
 
-func _show_pile_window(title_text: String, pile_node: Node, ordered_stack: Array):
-	# Close existing viewer first
+
+func _cards_to_data(cards: Array) -> Array[CardData]:
+	var result: Array[CardData] = []
+	for card in cards:
+		if card is Card and card.data:
+			result.append(card.data)
+	return result
+
+
+func _show_pile_viewer(title_text: String, card_data: Array[CardData]) -> void:
 	if pile_viewer:
 		pile_viewer.queue_free()
 		pile_viewer = null
-	
-	# Collect cards — prefer the ordered stack if provided, otherwise use pile children
-	var cards_to_show : Array = []
-	if not ordered_stack.is_empty():
-		cards_to_show = ordered_stack.duplicate()
-	else:
-		for child in pile_node.get_children():
-			if child is Card:
-				cards_to_show.append(child)
-	
-	pile_viewer = CanvasLayer.new()
-	pile_viewer.layer = 100
-	add_child(pile_viewer)
-	
-	# Semi-transparent backdrop — clicking it closes the window
-	var backdrop = ColorRect.new()
-	backdrop.color = Color(0, 0, 0, 0.55)
-	backdrop.set_anchors_preset(Control.PRESET_FULL_RECT)
-	backdrop.mouse_filter = Control.MOUSE_FILTER_STOP
-	backdrop.gui_input.connect(func(ev):
-		if ev is InputEventMouseButton and ev.pressed and ev.button_index == MOUSE_BUTTON_LEFT:
-			if pile_viewer:
-				pile_viewer.queue_free()
-				pile_viewer = null
-	)
-	pile_viewer.add_child(backdrop)
-	
-	# Centred panel
-	var panel = PanelContainer.new()
-	panel.set_anchors_preset(Control.PRESET_CENTER)
-	panel.custom_minimum_size = Vector2(1000, 560)
-	panel.offset_left   = -430
-	panel.offset_top    = -280
-	panel.offset_right  =  430
-	panel.offset_bottom =  280
-	panel.mouse_filter = Control.MOUSE_FILTER_STOP
-	pile_viewer.add_child(panel)
-	
-	var vbox = VBoxContainer.new()
-	vbox.add_theme_constant_override("separation", 8)
-	panel.add_child(vbox)
-	
-	# ── Title bar ──────────────────────────────────────────────────────────
-	var title_bar = HBoxContainer.new()
-	vbox.add_child(title_bar)
-	
-	var title_lbl = Label.new()
-	title_lbl.text = title_text
-	title_lbl.add_theme_font_size_override("font_size", 20)
-	title_lbl.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	title_bar.add_child(title_lbl)
-	
-	var close_btn = Button.new()
-	close_btn.text = "✕  Close"
-	close_btn.pressed.connect(func():
-		if pile_viewer:
-			pile_viewer.queue_free()
-			pile_viewer = null
-	)
-	title_bar.add_child(close_btn)
-	
-	# ── Scrollable card grid ───────────────────────────────────────────────
-	var scroll = ScrollContainer.new()
-	scroll.size_flags_vertical = Control.SIZE_EXPAND_FILL
-	scroll.custom_minimum_size = Vector2(840, 460)
-	vbox.add_child(scroll)
-	scroll.vertical_scroll_mode = scroll.SCROLL_MODE_AUTO
-	var flow = HFlowContainer.new()
-	flow.add_theme_constant_override("h_separation", 40)
-	flow.add_theme_constant_override("v_separation", 80)
-	flow.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	scroll.add_child(flow)
-	
-	if cards_to_show.is_empty():
-		var empty_lbl = Label.new()
-		empty_lbl.text = "( empty )"
-		empty_lbl.add_theme_font_size_override("font_size", 18)
-		flow.add_child(empty_lbl)
-	else:
-		for card in cards_to_show:
-			if not (card is Card) or not card.data:
-				continue
-			var preview = load("res://Scenes/card.tscn").instantiate()
-			preview.mouse_filter = Control.MOUSE_FILTER_IGNORE
-			# Scale preview cards to a readable size
-			preview.scale = Vector2(0.55, 0.55)
-			preview.custom_minimum_size = Vector2(160, 220)
-			flow.add_child(preview)
-			preview.set_data(card.data)
-			# Disable hover signals on the preview so it doesn't interfere
-			if preview.has_signal("card_hovered"):
-				for conn in preview.card_hovered.get_connections():
-					preview.card_hovered.disconnect(conn["callable"])
+
+	var viewer := DeckViewer.new()
+	add_child(viewer)
+	pile_viewer = viewer
+	viewer.setup(title_text, card_data, DeckViewer.Mode.DISPLAY)
+	viewer.closed.connect(func(): pile_viewer = null)
 func _on_pass_time_button_pressed():
 	pass_time()

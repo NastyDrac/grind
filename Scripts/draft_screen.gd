@@ -53,11 +53,9 @@ func _on_skip_pressed():
 func add_card_to_deck(data : CardData):
 	"""Called when a card is selected"""
 	
-	run.deck.append(data)
-	
+	run.deck.append(data.duplicate(true))
 	
 	card_drafted.emit(data)
-	
 	
 	draft_completed.emit()
 	

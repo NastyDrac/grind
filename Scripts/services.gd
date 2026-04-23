@@ -16,7 +16,7 @@ signal service_chosen(service: String)
 
 # ─── Service definitions ──────────────────────────────────────────────────────
 # [id, title, icon_char, color, description]
-const SERVICES_LIST : Array = [
+var SERVICES_LIST : Array = [
 	[
 		"hospital",
 		"Hospital",
@@ -29,14 +29,14 @@ const SERVICES_LIST : Array = [
 		"Gym",
 		"💪",
 		Color(0.95, 0.60, 0.15),
-		"Train hard, get\npermanent stat\nboosts. Pick one."
+		"Train hard, get\npermanent stat\nboosts. Pick one.",
 	],
 	[
 		"shop",
 		"Shop",
 		"🛒",
 		Color(0.95, 0.85, 0.20),
-		"Browse cards and\nthingies. Spend\nyour hard-earned gold."
+		"Browse cards and\nthingies. Spend\nyour hard-earned gold.",
 	],
 ]
 
@@ -124,24 +124,28 @@ func _populate_choices() -> void:
 	for child in choice_container.get_children():
 		child.queue_free()
 
+	var player_full : bool = _is_player_full()
+
 	for svc in SERVICES_LIST:
+		var already_full : bool = svc[0] == "hospital" and player_full
 		choice_container.add_child(
-			_build_service_card(svc[0], svc[1], svc[2], svc[3], svc[4])
+			_build_service_card(svc[0], svc[1], svc[2], svc[3], svc[4], already_full)
 		)
 
 func _build_service_card(
-		id    : String,
-		title : String,
-		icon  : String,
-		col   : Color,
-		desc  : String) -> PanelContainer:
+		id          : String,
+		title       : String,
+		icon        : String,
+		col         : Color,
+		desc        : String,
+		already_full: bool = false) -> PanelContainer:
 
 	var card := PanelContainer.new()
 	card.custom_minimum_size = Vector2(200, 220)
 
 	var style := StyleBoxFlat.new()
 	style.bg_color     = Color(col.r, col.g, col.b, 0.08)
-	style.border_color = col
+	style.border_color = col if not already_full else Color(0.40, 0.40, 0.40)  # grey when disabled
 	style.set_border_width_all(2)
 	style.set_corner_radius_all(8)
 	style.set_content_margin_all(18)
@@ -163,7 +167,7 @@ func _build_service_card(
 	title_lbl.text = title
 	title_lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	title_lbl.add_theme_font_size_override("font_size", 18)
-	title_lbl.add_theme_color_override("font_color", col)
+	title_lbl.add_theme_color_override("font_color", col if not already_full else Color(0.55, 0.55, 0.55))
 	vbox.add_child(title_lbl)
 
 	vbox.add_child(HSeparator.new())
@@ -178,9 +182,19 @@ func _build_service_card(
 	desc_lbl.add_theme_color_override("font_color", Color(0.78, 0.78, 0.78))
 	vbox.add_child(desc_lbl)
 
+	# ── Full health notice (hospital only) ──
+	if already_full:
+		var full_lbl := Label.new()
+		full_lbl.text = "Already at full health"
+		full_lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+		full_lbl.add_theme_font_size_override("font_size", 12)
+		full_lbl.add_theme_color_override("font_color", Color(0.55, 0.55, 0.55))
+		vbox.add_child(full_lbl)
+
 	# ── Visit button ──
 	var btn := Button.new()
-	btn.text = "Visit %s" % title
+	btn.text     = "Visit %s" % title
+	btn.disabled = already_full
 	btn.pressed.connect(_on_service_chosen.bind(id))
 	vbox.add_child(btn)
 
@@ -199,3 +213,10 @@ func _on_leave_pressed() -> void:
 func _refresh_gold() -> void:
 	if run and run.character:
 		gold_label.text = "Gold: %d" % run.character.gold
+func _get_max_health() -> int:
+	if run.character.max_health and run.player:
+		return run.character.max_health.calculate(run.player)
+	return 0
+
+func _is_player_full() -> bool:
+	return run.character.current_health >= _get_max_health()

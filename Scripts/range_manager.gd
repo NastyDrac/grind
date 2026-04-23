@@ -1,11 +1,22 @@
 extends Node2D
 class_name RangeManager
 @export var spread_multiplier : float = .6
-@export var range_spacing: float = 200.0
-@export var y_spread_min: float = -300.0
+@export var range_spacing: float = 225.0
+@export var y_spread_min: float = -400.0
 @export var y_spread_max: float = 100.0
 @export var enemy_scene: PackedScene = preload("res://Scenes/enemy.tscn")
 @export var screen_buffer_y : float = 75.0
+## Hard Y boundaries for enemy placement. Enemies will never be positioned
+## outside this band, no matter how many are stacked in a range.
+## y_min is the topmost pixel enemies may occupy (0 = top of viewport).
+## y_max is the bottommost pixel — set this above your card UI area.
+@export var y_min: float = 80.0
+@export var y_max: float = 520.0
+## Horizontal separation (in pixels) between the two columns inside a range.
+## Each column is placed this many pixels left/right of the range centre.
+@export var column_x_offset: float = 35.0
+## How many enemies fill the left column before any spill into the right column.
+@export var max_per_column: int = 4
 @export var wobble_speed := 1.0
 @export var wobble_amplitude := 2.5
 
@@ -20,25 +31,49 @@ class_name RangeManager
 @export var range_line_color: Color = Color(1, 1, 1, 0.15)
 @export var range_line_width: float = 2.0
 
-# Win condition progress bar
-@export var progress_bar_height: float = 22.0
-@export var progress_bar_margin_top: float = 475.0
-@export var progress_bar_bg_color: Color = Color(0.1, 0.1, 0.1, 0.75)
-@export var progress_bar_fill_color: Color = Color(0.2, 0.8, 0.4, 0.9)
-@export var progress_bar_border_color: Color = Color(1.0, 1.0, 1.0, 0.3)
-@export var progress_font_size: int = 13
+@export_category("UI")
+# Assign a ProgressBar node from your scene to display win condition progress.
+@export var win_condition_bar: TextureProgressBar
+# Assign a Label node to display the win condition text (e.g. "12 / 20 kills").
+@export var win_condition_label: Label
+# Assign a ProgressBar node to display the current noise meter level.
+@export var noise_meter_bar: TextureProgressBar
+# Assign a Label to show exact noise meter value next to the bar.
+@export var noise_meter_label: Label
+
+@export_category("Movement")
+# When true, enemies advance one at a time (closest first) with a short delay
+# between each so the player can see the order. When false, all move at once.
+@export var sequential_movement: bool = false
+# Seconds to wait between each enemy's move when sequential_movement is true.
+@export var sequential_move_delay: float = 0.15
 
 var current_win_condition: WinCondition = null
 
 enum SpawnMode {
-	IMMEDIATE,      
-	ENERGY_BANKED, 
-	TIERED          
+	IMMEDIATE,      # Cost = enemy count, spawn from enemy_pool right away
+	ENERGY_BANKED,  # Bank cost each card, dump the total into spawns on card draw
+	TIERED,         # Cost determines enemy tier, spawns one tiered enemy immediately
+	METER,          # Cost fills a noise meter; time passing triggers weighted spawns + passive tick
+	MIDDLE_GROUND   # Fraction of cost spawns cheap enemies immediately; remainder charges the meter for harder enemies
 }
 @export var spawn_mode: SpawnMode = SpawnMode.IMMEDIATE
 
 var banked_energy: int = 0
 var enemies_by_range: Dictionary = {}
+
+# ── Noise meter (METER and MIDDLE_GROUND modes) ──────────────────────────────
+# Passive noise added to the meter each time the player passes time.
+# Ensures pressure builds even when the player plays cheaply.
+@export_category("Noise Meter")
+@export var passive_noise_per_turn: float = 2.0
+# Meter must reach this value before a spawn attempt is made.
+@export var noise_meter_spawn_threshold: float = 5.0
+# MIDDLE_GROUND only: fraction of card cost that spawns enemies immediately.
+# The remaining fraction charges the meter. 0.5 = half-and-half.
+@export var immediate_cost_ratio: float = 0.5
+
+var noise_meter: float = 0.0
 var items_by_range : Dictionary = {}
 var run_manager : RunManager
 
@@ -71,16 +106,24 @@ func process_card_cost(cost: int):
 			_bank_energy(cost)
 		SpawnMode.TIERED:
 			_spawn_tiered(cost)
+		SpawnMode.METER:
+			noise_meter += cost
+		SpawnMode.MIDDLE_GROUND:
+			_spawn_middle_ground(cost)
 
 func _ready() -> void:
+	range_spacing = get_viewport_rect().size.x / 5
 	add_to_group("range_manager")
 	_initialize_ranges(5)
-	
+	if spawn_mode != SpawnMode.METER:
+		noise_meter_bar.visible = false
 	Global.enemy_dies.connect(_on_enemy_died)
 	Global.enemy_advanced.connect(_on_enemy_moved)
+	Global.time_passed.connect(_on_time_passed)
 
 func _process(_delta: float) -> void:
 	queue_redraw()
+	_update_ui()
 
 # =========================
 # RANGE DIVIDER LINES
@@ -88,7 +131,7 @@ func _process(_delta: float) -> void:
 
 func _draw() -> void:
 	var viewport_size = get_viewport().size
-	var top_y    = 0.0
+	var top_y    = -200.0
 	var bottom_y = viewport_size.y
 
 	# Draw a vertical line between each pair of adjacent ranges.
@@ -101,43 +144,27 @@ func _draw() -> void:
 			range_line_width
 		)
 
-	# Draw win condition progress bar across the top of the range area
-	if current_win_condition == null:
-		return
+# =========================
+# UI UPDATES
+# =========================
 
-	var bar_w   = 150.00
-	var bar_h   := progress_bar_height
-	var bar_x   := 1000.00
-	var bar_y   := progress_bar_margin_top
+func _update_ui() -> void:
+	# Win condition bar
+	if current_win_condition != null:
+		if win_condition_bar:
+			var fraction := 0.0
+			if current_win_condition.has_method("get_progress_fraction"):
+				fraction = current_win_condition.get_progress_fraction()
+			win_condition_bar.value = fraction * win_condition_bar.max_value
+		if win_condition_label:
+			win_condition_label.text = current_win_condition.get_progress_text()
 
-	# Background
-	draw_rect(Rect2(bar_x, bar_y, bar_w, bar_h), progress_bar_bg_color)
-
-	# Fill — use get_progress_fraction() if available, else leave at 0
-	var fraction := 0.0
-	if current_win_condition.has_method("get_progress_fraction"):
-		fraction = current_win_condition.get_progress_fraction()
-
-	if fraction > 0.0:
-		draw_rect(Rect2(bar_x, bar_y, bar_w * fraction, bar_h), progress_bar_fill_color)
-
-	# Border
-	draw_rect(Rect2(bar_x, bar_y, bar_w, bar_h), progress_bar_border_color, false, 1.5)
-
-	# Progress text centered on the bar
-	var progress_text := current_win_condition.get_progress_text()
-	var font          := ThemeDB.fallback_font
-	var font_size     := progress_font_size
-	var text_size     := font.get_string_size(progress_text, HORIZONTAL_ALIGNMENT_LEFT, -1, font_size)
-	var text_x        = bar_x + (bar_w - text_size.x) * 0.5
-	var text_y        := bar_y + (bar_h + text_size.y) * 0.5 - 2.0
-
-	# Shadow
-	draw_string(font, Vector2(text_x + 1, text_y + 1), progress_text,
-		HORIZONTAL_ALIGNMENT_LEFT, -1, font_size, Color(0, 0, 0, 0.7))
-	# Text
-	draw_string(font, Vector2(text_x, text_y), progress_text,
-		HORIZONTAL_ALIGNMENT_LEFT, -1, font_size, Color(1, 1, 1, 1.0))
+	# Noise meter bar (only meaningful in METER / MIDDLE_GROUND modes)
+	if noise_meter_bar:
+		noise_meter_bar.max_value = noise_meter_spawn_threshold
+		noise_meter_bar.value = minf(noise_meter, noise_meter_spawn_threshold)
+	if noise_meter_label:
+		noise_meter_label.text = "Noise: %d / %d" % [int(noise_meter), int(noise_meter_spawn_threshold)]
 
 func process_card_draw():
 	if spawn_mode == SpawnMode.ENERGY_BANKED and banked_energy > 0:
@@ -171,6 +198,115 @@ func _spawn_tiered(tier: int):
 	
 	var random_enemy = tier_pool.pick_random()
 	spawn_enemy(random_enemy, 5)
+
+# ── Noise meter handlers ──────────────────────────────────────────────────────
+
+func _on_time_passed():
+	match spawn_mode:
+		SpawnMode.METER:
+			# Ambient noise: pressure builds passively even with cheap play
+			noise_meter += passive_noise_per_turn
+			_drain_meter_into_spawns()
+		SpawnMode.MIDDLE_GROUND:
+			# No passive tick — only card costs charge the middle-ground meter —
+			# but we still drain whatever has accumulated this turn.
+			_drain_meter_into_spawns()
+
+	# Sequential movement: range_manager picks one enemy to advance this turn.
+	# Enemy._on_enemies_advance() returns early when sequential_movement is true
+	# so only the enemy chosen here actually moves.
+	if sequential_movement:
+		_advance_one_enemy()
+
+func _advance_one_enemy() -> void:
+	# Sort by range ascending, then by column (left before right) so enemies
+	# in the left column always move before those in the right column.
+	var all := get_all_enemies().filter(func(e): return is_instance_valid(e))
+	all.sort_custom(func(a, b):
+		if a.get_current_range() != b.get_current_range():
+			return a.get_current_range() < b.get_current_range()
+		return _get_enemy_column(a) < _get_enemy_column(b)
+	)
+
+	for enemy in all:
+		if is_instance_valid(enemy):
+			enemy.move_toward_player()
+			await get_tree().create_timer(sequential_move_delay).timeout
+
+func _get_enemy_column(enemy: Enemy) -> int:
+	var range_num := enemy.get_current_range()
+	if not enemies_by_range.has(range_num):
+		return 0
+	var at_range: Array = enemies_by_range[range_num].filter(
+		func(e): return is_instance_valid(e)
+	)
+	var idx := at_range.find(enemy)
+	return idx % 2 if idx != -1 else 0
+
+func _spawn_middle_ground(cost: int):
+	# Immediate half: cheap enemies spawn right now from the basic pool
+	var immediate_count := int(cost * immediate_cost_ratio)
+	for i in immediate_count:
+		if not enemy_pool.is_empty():
+			spawn_enemy(enemy_pool.pick_random(), 5)
+	
+	# Remainder: charges the meter toward harder enemies
+	noise_meter += cost - immediate_count
+
+func _drain_meter_into_spawns():
+	# Keep spending meter budget until we can no longer afford anything.
+	# Each spawn deducts that enemy's noise_cost from the meter, so the meter
+	# acts as a currency rather than a simple threshold.
+	var cheapest := _cheapest_available_noise_cost()
+	while noise_meter >= cheapest:
+		var enemy_data := _pick_weighted_enemy()
+		if enemy_data == null:
+			break
+		# Don't overspend — skip enemies we can't afford this cycle
+		if enemy_data.noise_cost > noise_meter:
+			continue
+		spawn_enemy(enemy_data, 5)
+		noise_meter -= enemy_data.noise_cost
+		noise_meter = max(noise_meter, 0.0)
+		cheapest = _cheapest_available_noise_cost()
+
+func _pick_weighted_enemy() -> EnemyData:
+	# Build a candidate list where each enemy appears a number of times
+	# proportional to how affordable it is relative to the current meter.
+	# This means cheap enemies are always possible, but as the meter grows
+	# expensive enemies become increasingly likely — without being guaranteed.
+	var candidates: Array = []
+	
+	# Base pool (cheapest enemies) — always included
+	for e: EnemyData in enemy_pool:
+		candidates.append(e)
+	
+	# Tiered pool — include tiers the meter can afford, weighted by headroom.
+	# An ogre that costs 5 gets 1 entry at meter=5, 3 entries at meter=15, etc.
+	for tier in tiered_enemy_pools:
+		if noise_meter >= tier:
+			var pool: Array = tiered_enemy_pools[tier]
+			var weight := int((noise_meter - tier) / noise_meter_spawn_threshold) + 1
+			weight = clamp(weight, 1, 6)
+			for i in weight:
+				for e: EnemyData in pool:
+					candidates.append(e)
+	
+	if candidates.is_empty():
+		push_warning("RangeManager: no enemies available to pick from noise meter.")
+		return null
+	
+	return candidates.pick_random()
+
+func _cheapest_available_noise_cost() -> float:
+	# Returns the lowest noise_cost across all pools so we know when to stop draining.
+	var cheapest := INF
+	for e: EnemyData in enemy_pool:
+		cheapest = min(cheapest, e.noise_cost)
+	for tier in tiered_enemy_pools:
+		for e: EnemyData in tiered_enemy_pools[tier]:
+			cheapest = min(cheapest, e.noise_cost)
+	return cheapest if cheapest < INF else INF
 
 func spawn_enemy(enemy_data: EnemyData, spawn_range: int = 5) -> Enemy:
 	if not enemy_scene:
@@ -313,9 +449,52 @@ func remove_enemy(enemy: Enemy):
 
 func get_position_for_enemy(enemy: Enemy) -> Vector2:
 	var range_num = enemy.get_current_range()
-	var x_pos = _get_x_for_range(range_num)
-	var y_pos = _get_y_for_enemy(enemy, range_num)
-	return Vector2(x_pos, y_pos)
+	var base_x   = _get_x_for_range(range_num)
+
+	# Filter out any freed instances before doing layout math
+	var enemies_at_range: Array = enemies_by_range[range_num].filter(
+		func(e): return is_instance_valid(e)
+	)
+
+	var enemy_index: int = enemies_at_range.find(enemy)
+	if enemy_index == -1:
+		return Vector2(base_x, (y_min + y_max) * 0.5)
+
+	var enemy_count: int = enemies_at_range.size()
+
+	# ── Two-column layout ────────────────────────────────────────────────────
+	# Fill the left column up to max_per_column enemies before using the right.
+	# Y positions stay within [y_min, y_max] — enemies can never leave that band.
+	# Alternating assignment keeps columns even: even indices go left, odd go right.
+	# Left always gets the extra enemy when the count is odd.
+	var col: int       = enemy_index % 2       # 0 = left, 1 = right
+	var col_index: int = enemy_index / 2       # position within that column
+
+	# Only apply an X offset when there are multiple enemies.
+	var x_offset: float = 0.0
+	if enemy_count > 1:
+		x_offset = column_x_offset * (1.0 if col == 1 else -1.0)
+	var x_pos: float = base_x + x_offset
+
+	# Left gets ceil(n/2), right gets floor(n/2) — always balanced.
+	var left_count: int     = ceili(float(enemy_count) / 2.0)
+	var right_count: int    = enemy_count / 2
+	var this_col_count: int = left_count if col == 0 else right_count
+
+	# Spread this column's enemies evenly within [y_min, y_max].
+	var y_pos: float
+	if this_col_count <= 1:
+		y_pos = (y_min + y_max) * 0.5
+	else:
+		var spacing: float = (y_max - y_min) / float(this_col_count - 1)
+		y_pos = y_min + col_index * spacing
+
+	# Subtle wobble so the group looks alive (always clamped to safe zone).
+	var wobble: float = sin(
+		Time.get_ticks_msec() / 1000.0 * wobble_speed + enemy.get_instance_id()
+	) * wobble_amplitude
+
+	return Vector2(x_pos, clamp(y_pos + wobble, y_min, y_max))
 
 func get_enemies_at_range(range_num: int):
 	if enemies_by_range.has(range_num):
@@ -333,32 +512,11 @@ func get_all_enemies() -> Array[Enemy]:
 func _get_x_for_range(range_num: int) -> float:
 	return range_num * range_spacing
 
+# _get_y_for_enemy is superseded by the two-column logic inside
+# get_position_for_enemy and is no longer called. Kept as a stub so any
+# external call-sites don't hard-crash before they can be updated.
 func _get_y_for_enemy(enemy: Enemy, range_num: int) -> float:
-	# Filter out any freed instances before doing layout math
-	var enemies_at_range = enemies_by_range[range_num].filter(
-		func(e): return is_instance_valid(e)
-	)
-	var enemy_count = enemies_at_range.size()
-
-	var center_y = (get_viewport().size.y * center_ratio) - screen_buffer_y
-
-	if enemy_count == 1:
-		return center_y
-
-	var enemy_index = enemies_at_range.find(enemy)
-	if enemy_index == -1:
-		return center_y
-
-	var max_h = get_max_enemy_height(enemies_at_range)
-	var total_spread = max_h * enemy_count * spread_multiplier
-	var spacing = total_spread / (enemy_count - 1)
-	var half_spread = total_spread / 2.0
-
-	var base_y = center_y - half_spread + (enemy_index * spacing)
-
-	var wobble = sin(Time.get_ticks_msec() / 1000.0 * wobble_speed + enemy.get_instance_id()) * wobble_amplitude
-
-	return base_y + wobble
+	return get_position_for_enemy(enemy).y
 
 func get_max_enemy_height(enemies):
 	var max_h := 0.0
@@ -406,19 +564,23 @@ func _input(event: InputEvent) -> void:
 func toggle_target(enemy: Enemy):
 	if not enemy:
 		return
-	
+
+	# Reject clicks on enemies outside the card's declared range.
+	var enemy_range := enemy.get_current_range()
+	if current_max_range > 0 and enemy_range > current_max_range:
+		return
+
 	if current_target_type == Action.TargetType.ALL_ENEMIES_AT_RANGE:
-		var enemy_range = enemy.get_current_range()
 		targets.clear()
-		
+
 		var enemies_at_range = get_enemies_at_range(enemy_range)
 		for e in enemies_at_range:
 			targets.append(e)
 			e.set_targeted(true)
-		
+
 		confirm_targets()
 		return
-	
+
 	if targets.has(enemy):
 		targets.erase(enemy)
 		enemy.set_targeted(false)

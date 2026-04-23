@@ -9,14 +9,14 @@
 
 [sub_resource type="Resource" id="Resource_hwt7h"]
 script = ExtResource("4_08dct")
-stacks = 6
+stacks = 5
 metadata/_custom_type_script = "uid://c4ykbt10defal"
 
 [sub_resource type="Resource" id="Resource_5kg6n"]
 script = ExtResource("2_08dct")
 target_type = 3
 triggered_effect = SubResource("Resource_hwt7h")
-condition_name = "Hype"
+condition_name = "Healing Spirit"
 stacks = 1
 icon = ExtResource("3_hwt7h")
 metadata/_custom_type_script = "uid://bpr8cwurcrxy3"
@@ -25,7 +25,8 @@ metadata/_custom_type_script = "uid://bpr8cwurcrxy3"
 script = ExtResource("2_dtsia")
 enemy_name = "Fairy"
 texture = ExtResource("6_v0lqx")
-max_health = 5
+min_health = 3
+max_health = 6
 damage = 2
 conditions = Array[ExtResource("1_xdsu8")]([SubResource("Resource_5kg6n")])
 metadata/_custom_type_script = "uid://tnxg66jw03v3"

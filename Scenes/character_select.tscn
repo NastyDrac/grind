@@ -1,16 +1,340 @@
-[gd_scene load_steps=6 format=3 uid="uid://4f2i8ovjoh3b"]
+[gd_scene load_steps=15 format=3 uid="uid://su75sjnbkeke"]
 
 [ext_resource type="Script" uid="uid://b0slo2gkxcus2" path="res://Scripts/character_select_scene.gd" id="1_2b87j"]
 [ext_resource type="Script" uid="uid://dpayg0f6j5y2n" path="res://Scripts/character_data.gd" id="2_krxhl"]
 [ext_resource type="Resource" uid="uid://ce6l5lqjxvcs6" path="res://Characters/Engineer.tres" id="3_72d1u"]
 [ext_resource type="Resource" uid="uid://c2xwf8l4o67yn" path="res://Characters/regalur_guy.tres" id="4_d1kp4"]
 [ext_resource type="PackedScene" uid="uid://cssup3trfa1rg" path="res://Scenes/run_manager.tscn" id="5_brbi3"]
+[ext_resource type="Texture2D" uid="uid://uoxk5uid60p0" path="res://Art/Icons/goldIcon.png" id="6_vueyu"]
+[ext_resource type="Texture2D" uid="uid://ter6hyu0quuy" path="res://Art/swag.png" id="7_vueyu"]
+[ext_resource type="Texture2D" uid="uid://fwthpy3l0ykm" path="res://Art/guts.png" id="8_a4vvp"]
+[ext_resource type="Texture2D" uid="uid://du7xgq856vejv" path="res://Art/marbles.png" id="9_se7r8"]
+[ext_resource type="Texture2D" uid="uid://co3msqu18ho2x" path="res://Art/hustle.png" id="10_ma4qd"]
+[ext_resource type="Texture2D" uid="uid://dy6yulqjedv40" path="res://Art/bang.png" id="11_nq02w"]
+[ext_resource type="Texture2D" uid="uid://btnp5m57fhynw" path="res://Art/mojo.png" id="12_jxsgu"]
+[ext_resource type="Shader" uid="uid://c21r8x54i1uxi" path="res://Text/text_effect.gdshader" id="13_a4vvp"]
 
-[node name="character_select" type="Control"]
-layout_mode = 3
-anchors_preset = 0
-offset_right = 40.0
-offset_bottom = 40.0
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_a4vvp"]
+shader = ExtResource("13_a4vvp")
+shader_parameter/shimmer_speed = 1.23700005549762
+shader_parameter/shimmer_width = 0.2
+shader_parameter/shimmer_strength = 0.55
+shader_parameter/shimmer_pause = 2.5
+shader_parameter/shimmer_color = Color(5.679429e-06, 0.6195035, 0.7515141, 1)
+
+[node name="character_select" type="MarginContainer" node_paths=PackedStringArray("placeholder_label", "detail_content", "detail_portrait", "detail_name", "detail_hp_bar", "detail_hp_label", "detail_hp_formula", "detail_effects", "begin_button", "card_list", "stat_label_swag", "stat_label_guts", "stat_label_marbles", "stat_label_hustle", "stat_label_bang", "stat_label_mojo", "gold_label")]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/margin_left = 24
+theme_override_constants/margin_top = 20
+theme_override_constants/margin_right = 24
+theme_override_constants/margin_bottom = 20
 script = ExtResource("1_2b87j")
 characters = Array[ExtResource("2_krxhl")]([ExtResource("3_72d1u"), ExtResource("4_d1kp4")])
 run_manager_scene = ExtResource("5_brbi3")
+placeholder_label = NodePath("RootVBox/DetailPanel/PlaceHolderLabel")
+detail_content = NodePath("RootVBox/DetailPanel/DetailContent")
+detail_portrait = NodePath("RootVBox/DetailPanel/DetailContent/DetailPortrait")
+detail_name = NodePath("RootVBox/DetailPanel/DetailContent/RightPanel/DetailName")
+detail_hp_bar = NodePath("RootVBox/DetailPanel/DetailContent/RightPanel/HPSection/DetailHPBar")
+detail_hp_label = NodePath("RootVBox/DetailPanel/DetailContent/RightPanel/HPSection/HPRow/DetailHPLabel")
+detail_hp_formula = NodePath("RootVBox/DetailPanel/DetailContent/RightPanel/HPSection/HPRow/DetailHPFormula")
+detail_effects = NodePath("RootVBox/DetailPanel/DetailContent/RightPanel/SpecialSection/DetailEffects")
+begin_button = NodePath("RootVBox/BeginButton")
+card_list = NodePath("RootVBox/CardSection/CardScroll/CharacterCards")
+stat_label_swag = NodePath("RootVBox/DetailPanel/DetailContent/RightPanel/StatsGrid/SwagRow/SwagLabel")
+stat_label_guts = NodePath("RootVBox/DetailPanel/DetailContent/RightPanel/StatsGrid/GutsRow/GutsLabel")
+stat_label_marbles = NodePath("RootVBox/DetailPanel/DetailContent/RightPanel/StatsGrid/MarblesRow/MarblesLabel")
+stat_label_hustle = NodePath("RootVBox/DetailPanel/DetailContent/RightPanel/StatsGrid/HustleRow/HustleLabel")
+stat_label_bang = NodePath("RootVBox/DetailPanel/DetailContent/RightPanel/StatsGrid/BangRow/BangLabel")
+stat_label_mojo = NodePath("RootVBox/DetailPanel/DetailContent/RightPanel/StatsGrid/MojoRow/MojoLabel")
+gold_label = NodePath("RootVBox/DetailPanel/DetailContent/RightPanel/HPSection/HBoxContainer/goldlabel")
+
+[node name="RootVBox" type="VBoxContainer" parent="."]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+theme_override_constants/separation = 16
+
+[node name="DetailPanel" type="PanelContainer" parent="RootVBox"]
+custom_minimum_size = Vector2(0, 280)
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+size_flags_stretch_ratio = 2.0
+
+[node name="PlaceHolderLabel" type="Label" parent="RootVBox/DetailPanel"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+theme_override_font_sizes/font_size = 19
+text = "Choose Your Hero"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="DetailContent" type="HBoxContainer" parent="RootVBox/DetailPanel"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+theme_override_constants/separation = 16
+
+[node name="DetailPortrait" type="TextureRect" parent="RootVBox/DetailPanel/DetailContent"]
+custom_minimum_size = Vector2(120, 120)
+layout_mode = 2
+size_flags_horizontal = 0
+size_flags_vertical = 4
+expand_mode = 3
+stretch_mode = 3
+
+[node name="VSeparator" type="VSeparator" parent="RootVBox/DetailPanel/DetailContent"]
+layout_mode = 2
+
+[node name="RightPanel" type="VBoxContainer" parent="RootVBox/DetailPanel/DetailContent"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+theme_override_constants/separation = 8
+
+[node name="DetailName" type="Label" parent="RootVBox/DetailPanel/DetailContent/RightPanel"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 22
+
+[node name="HPSection" type="VBoxContainer" parent="RootVBox/DetailPanel/DetailContent/RightPanel"]
+layout_mode = 2
+theme_override_constants/separation = 3
+
+[node name="HPTitle" type="Label" parent="RootVBox/DetailPanel/DetailContent/RightPanel/HPSection"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.7, 0.7, 0.7, 1)
+theme_override_font_sizes/font_size = 11
+text = "Health"
+
+[node name="DetailHPBar" type="ProgressBar" parent="RootVBox/DetailPanel/DetailContent/RightPanel/HPSection"]
+custom_minimum_size = Vector2(0, 16)
+layout_mode = 2
+size_flags_horizontal = 3
+show_percentage = false
+
+[node name="HPRow" type="HBoxContainer" parent="RootVBox/DetailPanel/DetailContent/RightPanel/HPSection"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="DetailHPLabel" type="Label" parent="RootVBox/DetailPanel/DetailContent/RightPanel/HPSection/HPRow"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 12
+
+[node name="DetailHPFormula" type="Label" parent="RootVBox/DetailPanel/DetailContent/RightPanel/HPSection/HPRow"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_colors/font_color = Color(0.5, 0.5, 0.5, 1)
+theme_override_font_sizes/font_size = 11
+
+[node name="HBoxContainer" type="HBoxContainer" parent="RootVBox/DetailPanel/DetailContent/RightPanel/HPSection"]
+layout_mode = 2
+
+[node name="goldicon" type="TextureRect" parent="RootVBox/DetailPanel/DetailContent/RightPanel/HPSection/HBoxContainer"]
+layout_mode = 2
+texture = ExtResource("6_vueyu")
+expand_mode = 2
+
+[node name="goldlabel" type="Label" parent="RootVBox/DetailPanel/DetailContent/RightPanel/HPSection/HBoxContainer"]
+layout_mode = 2
+
+[node name="HSeparator" type="HSeparator" parent="RootVBox/DetailPanel/DetailContent/RightPanel"]
+layout_mode = 2
+
+[node name="StatsGrid" type="GridContainer" parent="RootVBox/DetailPanel/DetailContent/RightPanel"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/h_separation = 16
+theme_override_constants/v_separation = 5
+columns = 2
+
+[node name="SwagRow" type="HBoxContainer" parent="RootVBox/DetailPanel/DetailContent/RightPanel/StatsGrid"]
+layout_mode = 2
+theme_override_constants/separation = 5
+
+[node name="SwagIcon" type="TextureRect" parent="RootVBox/DetailPanel/DetailContent/RightPanel/StatsGrid/SwagRow"]
+custom_minimum_size = Vector2(16, 16)
+layout_mode = 2
+texture = ExtResource("7_vueyu")
+expand_mode = 2
+
+[node name="SwagNameLabel" type="Label" parent="RootVBox/DetailPanel/DetailContent/RightPanel/StatsGrid/SwagRow"]
+custom_minimum_size = Vector2(52, 0)
+layout_mode = 2
+theme_override_colors/font_color = Color(0.95, 0.85, 0.2, 1)
+theme_override_font_sizes/font_size = 13
+text = "Swag:"
+
+[node name="SwagLabel" type="Label" parent="RootVBox/DetailPanel/DetailContent/RightPanel/StatsGrid/SwagRow"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 14
+text = "-"
+
+[node name="GutsRow" type="HBoxContainer" parent="RootVBox/DetailPanel/DetailContent/RightPanel/StatsGrid"]
+layout_mode = 2
+theme_override_constants/separation = 5
+
+[node name="GutsIcon" type="TextureRect" parent="RootVBox/DetailPanel/DetailContent/RightPanel/StatsGrid/GutsRow"]
+custom_minimum_size = Vector2(16, 16)
+layout_mode = 2
+texture = ExtResource("8_a4vvp")
+expand_mode = 2
+
+[node name="GutsNameLabel" type="Label" parent="RootVBox/DetailPanel/DetailContent/RightPanel/StatsGrid/GutsRow"]
+custom_minimum_size = Vector2(52, 0)
+layout_mode = 2
+theme_override_colors/font_color = Color(0.95, 0.35, 0.35, 1)
+theme_override_font_sizes/font_size = 13
+text = "Guts:"
+
+[node name="GutsLabel" type="Label" parent="RootVBox/DetailPanel/DetailContent/RightPanel/StatsGrid/GutsRow"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 14
+text = "-"
+
+[node name="MarblesRow" type="HBoxContainer" parent="RootVBox/DetailPanel/DetailContent/RightPanel/StatsGrid"]
+layout_mode = 2
+theme_override_constants/separation = 5
+
+[node name="MarblesIcon" type="TextureRect" parent="RootVBox/DetailPanel/DetailContent/RightPanel/StatsGrid/MarblesRow"]
+custom_minimum_size = Vector2(16, 16)
+layout_mode = 2
+texture = ExtResource("9_se7r8")
+expand_mode = 2
+
+[node name="MarblesNameLabel" type="Label" parent="RootVBox/DetailPanel/DetailContent/RightPanel/StatsGrid/MarblesRow"]
+custom_minimum_size = Vector2(52, 0)
+layout_mode = 2
+theme_override_colors/font_color = Color(0.3, 0.75, 1, 1)
+theme_override_font_sizes/font_size = 13
+text = "Marbles:"
+
+[node name="MarblesLabel" type="Label" parent="RootVBox/DetailPanel/DetailContent/RightPanel/StatsGrid/MarblesRow"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 14
+text = "-"
+
+[node name="HustleRow" type="HBoxContainer" parent="RootVBox/DetailPanel/DetailContent/RightPanel/StatsGrid"]
+layout_mode = 2
+theme_override_constants/separation = 5
+
+[node name="HustleIcon" type="TextureRect" parent="RootVBox/DetailPanel/DetailContent/RightPanel/StatsGrid/HustleRow"]
+custom_minimum_size = Vector2(16, 16)
+layout_mode = 2
+texture = ExtResource("10_ma4qd")
+expand_mode = 2
+
+[node name="HustleNameLabel" type="Label" parent="RootVBox/DetailPanel/DetailContent/RightPanel/StatsGrid/HustleRow"]
+custom_minimum_size = Vector2(52, 0)
+layout_mode = 2
+theme_override_colors/font_color = Color(0.4, 0.9, 0.4, 1)
+theme_override_font_sizes/font_size = 13
+text = "Hustle:"
+
+[node name="HustleLabel" type="Label" parent="RootVBox/DetailPanel/DetailContent/RightPanel/StatsGrid/HustleRow"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 14
+text = "-"
+
+[node name="BangRow" type="HBoxContainer" parent="RootVBox/DetailPanel/DetailContent/RightPanel/StatsGrid"]
+layout_mode = 2
+theme_override_constants/separation = 5
+
+[node name="BangIcon" type="TextureRect" parent="RootVBox/DetailPanel/DetailContent/RightPanel/StatsGrid/BangRow"]
+custom_minimum_size = Vector2(16, 16)
+layout_mode = 2
+texture = ExtResource("11_nq02w")
+expand_mode = 2
+
+[node name="BangNameLabel" type="Label" parent="RootVBox/DetailPanel/DetailContent/RightPanel/StatsGrid/BangRow"]
+custom_minimum_size = Vector2(52, 0)
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 0.6, 0.1, 1)
+theme_override_font_sizes/font_size = 13
+text = "Bang:"
+
+[node name="BangLabel" type="Label" parent="RootVBox/DetailPanel/DetailContent/RightPanel/StatsGrid/BangRow"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 14
+text = "-"
+
+[node name="MojoRow" type="HBoxContainer" parent="RootVBox/DetailPanel/DetailContent/RightPanel/StatsGrid"]
+layout_mode = 2
+theme_override_constants/separation = 5
+
+[node name="MojoIcon" type="TextureRect" parent="RootVBox/DetailPanel/DetailContent/RightPanel/StatsGrid/MojoRow"]
+custom_minimum_size = Vector2(16, 16)
+layout_mode = 2
+texture = ExtResource("12_jxsgu")
+expand_mode = 5
+
+[node name="MojoNameLabel" type="Label" parent="RootVBox/DetailPanel/DetailContent/RightPanel/StatsGrid/MojoRow"]
+custom_minimum_size = Vector2(52, 0)
+layout_mode = 2
+theme_override_colors/font_color = Color(0.75, 0.35, 1, 1)
+theme_override_font_sizes/font_size = 13
+text = "Mojo:"
+
+[node name="MojoLabel" type="Label" parent="RootVBox/DetailPanel/DetailContent/RightPanel/StatsGrid/MojoRow"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 14
+text = "-"
+
+[node name="HSeparator2" type="HSeparator" parent="RootVBox/DetailPanel/DetailContent/RightPanel"]
+layout_mode = 2
+
+[node name="SpecialSection" type="VBoxContainer" parent="RootVBox/DetailPanel/DetailContent/RightPanel"]
+layout_mode = 2
+theme_override_constants/separation = 6
+
+[node name="SpecialTitle" type="Label" parent="RootVBox/DetailPanel/DetailContent/RightPanel/SpecialSection"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.7, 0.7, 0.7, 1)
+theme_override_font_sizes/font_size = 13
+text = "Special"
+
+[node name="DetailEffects" type="HFlowContainer" parent="RootVBox/DetailPanel/DetailContent/RightPanel/SpecialSection"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+theme_override_constants/h_separation = 4
+theme_override_constants/v_separation = 4
+
+[node name="BeginButton" type="Button" parent="RootVBox"]
+visible = false
+layout_mode = 2
+theme_override_font_sizes/font_size = 16
+text = "Start Run"
+
+[node name="CardSection" type="VBoxContainer" parent="RootVBox"]
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_constants/separation = 8
+
+[node name="CardSectionTitle" type="RichTextLabel" parent="RootVBox/CardSection"]
+material = SubResource("ShaderMaterial_a4vvp")
+layout_mode = 2
+theme_override_font_sizes/normal_font_size = 24
+bbcode_enabled = true
+text = "Choose Your Main Character"
+fit_content = true
+horizontal_alignment = 1
+
+[node name="HSeparator3" type="HSeparator" parent="RootVBox/CardSection"]
+layout_mode = 2
+
+[node name="CardScroll" type="ScrollContainer" parent="RootVBox/CardSection"]
+layout_mode = 2
+size_flags_vertical = 3
+vertical_scroll_mode = 0
+
+[node name="CharacterCards" type="HBoxContainer" parent="RootVBox/CardSection/CardScroll"]
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_constants/separation = 8
+alignment = 1

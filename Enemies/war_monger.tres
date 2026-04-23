@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="EnemyData" load_steps=4 format=3 uid="uid://w16ibmun3dtb"]
+
+[ext_resource type="Script" uid="uid://b1ogi3xh5xakp" path="res://Scripts/condition.gd" id="1_eafp4"]
+[ext_resource type="Script" uid="uid://tnxg66jw03v3" path="res://Scripts/enemy_data.gd" id="2_tu1jw"]
+[ext_resource type="Texture2D" uid="uid://c5b0k0gqs52vr" path="res://Art/Characters/Warmonger.png" id="3_tu1jw"]
+
+[resource]
+script = ExtResource("2_tu1jw")
+enemy_name = "WarMonger"
+texture = ExtResource("3_tu1jw")
+min_health = 17
+max_health = 22
+damage = 12
+noise_cost = 6
+metadata/_custom_type_script = "uid://tnxg66jw03v3"

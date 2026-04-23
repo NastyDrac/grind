@@ -1,76 +1,141 @@
-[gd_scene load_steps=2 format=3]
+[gd_scene load_steps=2 format=3 uid="uid://shop"]
 
 [ext_resource type="Script" uid="uid://bmt6x2k5c0eih" path="res://Scripts/shop.gd" id="1_a0mxf"]
 
-[node name="Shop" type="CanvasLayer"]
+[node name="Shop" type="CanvasLayer" node_paths=PackedStringArray("gold_label", "leave_button", "card_container", "thingy_container", "remove_card_button", "remove_overlay", "deck_card_container", "cancel_remove_button")]
 script = ExtResource("1_a0mxf")
+gold_label = NodePath("MainPanel/RootVBox/TopBar/GoldLabel")
+leave_button = NodePath("MainPanel/RootVBox/TopBar/LeaveButton")
+card_container = NodePath("MainPanel/RootVBox/ScrollContainer/ScrollVBox/CardContainer")
+thingy_container = NodePath("MainPanel/RootVBox/ScrollContainer/ScrollVBox/ThingyContainer")
+remove_card_button = NodePath("MainPanel/RootVBox/RemoveCardButton")
+remove_overlay = NodePath("RemoveOverlay")
+deck_card_container = NodePath("RemoveOverlay/OverlayVBox/DeckScroll/DeckCardContainer")
+cancel_remove_button = NodePath("RemoveOverlay/OverlayVBox/OverlayTop/CancelRemoveButton")
 
-[node name="Panel_VBox_TopBar#ShopTitle" type="Label" parent="."]
+[node name="MainPanel" type="Panel" parent="."]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 40.0
+offset_top = 50.0
+offset_right = -40.0
+offset_bottom = -40.0
+
+[node name="RootVBox" type="VBoxContainer" parent="MainPanel"]
+layout_mode = 0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 12.0
+offset_top = 8.0
+offset_right = -12.0
+offset_bottom = -8.0
+theme_override_constants/separation = 6
+
+[node name="TopBar" type="HBoxContainer" parent="MainPanel/RootVBox"]
+layout_mode = 2
+
+[node name="TitleLabel" type="Label" parent="MainPanel/RootVBox/TopBar"]
+layout_mode = 2
 size_flags_horizontal = 3
 theme_override_font_sizes/font_size = 20
 text = "El Shoppe"
 horizontal_alignment = 1
 
-[node name="Panel_VBox_TopBar#GoldLabel" type="Label" parent="."]
-unique_name_in_owner = true
+[node name="GoldLabel" type="Label" parent="MainPanel/RootVBox/TopBar"]
+layout_mode = 2
 theme_override_font_sizes/font_size = 14
 text = "Gold: 0"
 
-[node name="Panel_VBox_TopBar#LeaveButton" type="Button" parent="."]
-unique_name_in_owner = true
+[node name="LeaveButton" type="Button" parent="MainPanel/RootVBox/TopBar"]
+layout_mode = 2
 text = "Leave Shop"
 
-[node name="Panel_VBox#HSep1" type="HSeparator" parent="."]
+[node name="HSeparator" type="HSeparator" parent="MainPanel/RootVBox"]
+layout_mode = 2
+
+[node name="ScrollContainer" type="ScrollContainer" parent="MainPanel/RootVBox"]
+layout_mode = 2
 size_flags_vertical = 3
+horizontal_scroll_mode = 0
 
-[node name="Panel_VBox_Scroll#ScrollVBox" type="VBoxContainer" parent="."]
+[node name="ScrollVBox" type="VBoxContainer" parent="MainPanel/RootVBox/ScrollContainer"]
+layout_mode = 2
 size_flags_horizontal = 3
+theme_override_constants/separation = 8
 
-[node name="Panel_VBox_Scroll_ScrollVBox#CardSectionLabel" type="Label" parent="."]
+[node name="CardsLabel" type="Label" parent="MainPanel/RootVBox/ScrollContainer/ScrollVBox"]
+layout_mode = 2
 theme_override_font_sizes/font_size = 14
 text = "Cards for Sale"
 
-[node name="Panel_VBox_Scroll_ScrollVBox#CardContainer" type="HBoxContainer" parent="."]
-unique_name_in_owner = true
+[node name="CardContainer" type="HBoxContainer" parent="MainPanel/RootVBox/ScrollContainer/ScrollVBox"]
+layout_mode = 2
+theme_override_constants/separation = 16
 alignment = 1
 
-[node name="Panel_VBox_Scroll_ScrollVBox#HSep2" type="HSeparator" parent="."]
+[node name="HSeparator2" type="HSeparator" parent="MainPanel/RootVBox/ScrollContainer/ScrollVBox"]
+layout_mode = 2
 
-[node name="Panel_VBox_Scroll_ScrollVBox#ThingySectionLabel" type="Label" parent="."]
+[node name="ThingiesLabel" type="Label" parent="MainPanel/RootVBox/ScrollContainer/ScrollVBox"]
+layout_mode = 2
 theme_override_font_sizes/font_size = 14
 text = "Thingies for Sale"
 
-[node name="Panel_VBox_Scroll_ScrollVBox#ThingyContainer" type="HBoxContainer" parent="."]
-unique_name_in_owner = true
+[node name="ThingyContainer" type="HBoxContainer" parent="MainPanel/RootVBox/ScrollContainer/ScrollVBox"]
+layout_mode = 2
+theme_override_constants/separation = 16
 alignment = 1
 
-[node name="Panel_VBox#RemoveSection" type="HBoxContainer" parent="."]
+[node name="HSeparator3" type="HSeparator" parent="MainPanel/RootVBox"]
+layout_mode = 2
 
-[node name="Panel_VBox_RemoveSection#RemoveCardButton" type="Button" parent="."]
-unique_name_in_owner = true
+[node name="RemoveCardButton" type="Button" parent="MainPanel/RootVBox"]
+layout_mode = 2
+text = "Remove a Card (75 Gold)"
+
+[node name="RemoveOverlay" type="Panel" parent="."]
 visible = false
-size_flags_vertical = 3
-text = "Remove a Card  (75 Gold)"
-
-[node name="Panel_VBox_RemovePanel#RemoveVBox" type="VBoxContainer" parent="."]
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
-offset_left = 8.0
+offset_left = 40.0
+offset_top = 50.0
+offset_right = -40.0
+offset_bottom = -40.0
+
+[node name="OverlayVBox" type="VBoxContainer" parent="RemoveOverlay"]
+layout_mode = 0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 12.0
 offset_top = 8.0
-offset_right = -8.0
+offset_right = -12.0
 offset_bottom = -8.0
-grow_horizontal = 2
-grow_vertical = 2
+theme_override_constants/separation = 8
 
-[node name="Panel_VBox_RemovePanel_RemoveVBox#RemoveLabel" type="Label" parent="."]
-theme_override_font_sizes/font_size = 13
-text = "Click a card from your deck to remove it:"
+[node name="OverlayTop" type="HBoxContainer" parent="RemoveOverlay/OverlayVBox"]
+layout_mode = 2
 
-[node name="Panel_VBox_RemovePanel_RemoveVBox#DeckContainer" type="HFlowContainer" parent="."]
-unique_name_in_owner = true
+[node name="OverlayLabel" type="Label" parent="RemoveOverlay/OverlayVBox/OverlayTop"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_font_sizes/font_size = 16
+text = "Choose a card to remove from your deck:"
+
+[node name="CancelRemoveButton" type="Button" parent="RemoveOverlay/OverlayVBox/OverlayTop"]
+layout_mode = 2
+text = "← Back"
+
+[node name="HSeparator" type="HSeparator" parent="RemoveOverlay/OverlayVBox"]
+layout_mode = 2
+
+[node name="DeckScroll" type="ScrollContainer" parent="RemoveOverlay/OverlayVBox"]
+layout_mode = 2
 size_flags_vertical = 3
 
-[node name="Panel_VBox_RemovePanel_RemoveVBox#CancelButton" type="Button" parent="."]
-unique_name_in_owner = true
-text = "Cancel"
+[node name="DeckCardContainer" type="HFlowContainer" parent="RemoveOverlay/OverlayVBox/DeckScroll"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/h_separation = 16
+theme_override_constants/v_separation = 16

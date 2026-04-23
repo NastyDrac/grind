@@ -12,6 +12,10 @@ class_name Horde
 ## Set to -1 for no upper limit.
 @export var max_column : int = -1
 
+## Which reward types this horde offers after it is defeated.
+## Set these in the inspector per horde recipe.
+@export var rewards : Array[RewardScene.REWARD_TYPE] = []
+
 func is_valid_for_column(col: int) -> bool:
 	if col < min_column:
 		return false

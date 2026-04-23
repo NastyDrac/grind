@@ -1,8 +1,11 @@
-[gd_scene load_steps=4 format=3 uid="uid://bhe2l0aqupa46"]
+[gd_scene load_steps=7 format=3 uid="uid://bhe2l0aqupa46"]
 
 [ext_resource type="Script" uid="uid://0u18sw3gq3s2" path="res://Scripts/ui_bar.gd" id="1_e1q4v"]
 [ext_resource type="Texture2D" uid="uid://dyagyrxi8xlyo" path="res://Art/Icons/hpIcon.png" id="2_gdwv3"]
 [ext_resource type="Texture2D" uid="uid://uoxk5uid60p0" path="res://Art/Icons/goldIcon.png" id="3_71spk"]
+[ext_resource type="Texture2D" uid="uid://saqwlnii1qfm" path="res://Art/Icons/SettingsButton.png" id="4_t2iyj"]
+[ext_resource type="Texture2D" uid="uid://deo25hpiw74mf" path="res://Art/Icons/DeckButton.png" id="5_0gtyj"]
+[ext_resource type="Texture2D" uid="uid://cfluk3hancupa" path="res://Art/Icons/CharInfoButton.png" id="6_nwxj5"]
 
 [node name="UI_Bar" type="CanvasLayer"]
 layer = 10
@@ -49,15 +52,24 @@ metadata/_edit_use_anchors_ = true
 [node name="Settings" type="Button" parent="UI Bar/HBoxContainer"]
 layout_mode = 2
 text = "Settings"
+icon = ExtResource("4_t2iyj")
+flat = true
+icon_alignment = 1
 
-[node name="Help" type="Button" parent="UI Bar/HBoxContainer"]
+[node name="DeckViewer" type="Button" parent="UI Bar/HBoxContainer"]
 layout_mode = 2
-text = "Help"
+text = "Deck"
+icon = ExtResource("5_0gtyj")
+flat = true
+icon_alignment = 1
 
 [node name="Log" type="Button" parent="UI Bar/HBoxContainer"]
 layout_mode = 2
 text = "Character Info"
+icon = ExtResource("6_nwxj5")
+flat = true
+icon_alignment = 1
 
 [connection signal="pressed" from="UI Bar/HBoxContainer/Settings" to="." method="_on_settings_pressed"]
-[connection signal="pressed" from="UI Bar/HBoxContainer/Help" to="." method="_on_help_pressed"]
+[connection signal="pressed" from="UI Bar/HBoxContainer/DeckViewer" to="." method="_on_help_pressed"]
 [connection signal="pressed" from="UI Bar/HBoxContainer/Log" to="." method="_on_log_pressed"]

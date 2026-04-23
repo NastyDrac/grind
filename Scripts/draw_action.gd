@@ -52,18 +52,18 @@ func get_description_with_values(character: Character) -> String:
 	var desc = ""
 	if count == 1:
 		if show_formula:
-			desc = "Draw §%d§ card (%s)" % [count, _format_formula_display(formula)]
+			desc = "Draw %d card (%s)" % [count, _format_formula_display(formula)]
 		else:
-			desc = "Draw §%d§ card" % count
+			desc = "Draw %d card" % count
 	else:
 		if show_formula:
-			desc = "Draw §%d§ cards (%s)" % [count, _format_formula_display(formula)]
+			desc = "Draw %d cards (%s)" % [count, _format_formula_display(formula)]
 		else:
-			desc = "Draw §%d§ cards" % count
+			desc = "Draw %d cards" % count
 	
 	# Add range inline if max_range > 0
 	if max_range > 0:
-		desc += " - Range: §%d§" % max_range
+		desc += " - Range: %d" % max_range
 	
 	return desc
 

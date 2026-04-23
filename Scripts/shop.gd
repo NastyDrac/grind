@@ -1,171 +1,40 @@
 extends CanvasLayer
 class_name Shop
 
-# ─── Layout ───────────────────────────────────────────────────────────────────
-const UIBAR_HEIGHT : float = 50.0
-const MARGIN       : float = 40.0
-
 # ─── Rarity price tables ──────────────────────────────────────────────────────
 # 0 = Common  1 = Uncommon  2 = Rare
 const CARD_PRICES   : Array[int] = [40,  75,  130]
 const THINGY_PRICES : Array[int] = [60, 110,  200]
 const REMOVE_COST   : int        = 75
 
-const CARD_SLOTS   : int = 3
-const THINGY_SLOTS : int = 2
+# ─── Layout exports ───────────────────────────────────────────────────────────
+# Assign these in the Inspector after building your shop scene.
+@export var card_slots   : int = 3
+@export var thingy_slots : int = 2
+
+@export var gold_label           : Label
+@export var leave_button         : Button
+@export var card_container       : HBoxContainer
+@export var thingy_container     : HBoxContainer
+@export var remove_card_button   : Button
+@export var remove_overlay       : Panel
+@export var deck_card_container  : HFlowContainer
+@export var cancel_remove_button : Button
 
 # ─── State ────────────────────────────────────────────────────────────────────
 var run : RunManager
 var card_scene := preload("res://Scenes/draftable_card.tscn")
 
-# ─── Built nodes ──────────────────────────────────────────────────────────────
-var gold_label           : Label
-var leave_button         : Button
-var card_container       : HBoxContainer
-var thingy_container     : HBoxContainer
-var remove_card_button   : Button
-var remove_overlay       : Panel
-var deck_card_container  : HFlowContainer
-var cancel_remove_button : Button
-
 signal shop_closed
 
-# ─── Build the UI ─────────────────────────────────────────────────────────────
+# ─── Init ─────────────────────────────────────────────────────────────────────
 
 func _ready() -> void:
 	layer = 1
-	_build_ui()
-
-func _build_ui() -> void:
-	var panel := Panel.new()
-	panel.anchor_left   = 0.0
-	panel.anchor_top    = 0.0
-	panel.anchor_right  = 1.0
-	panel.anchor_bottom = 1.0
-	panel.offset_left   =  MARGIN
-	panel.offset_top    =  UIBAR_HEIGHT
-	panel.offset_right  = -MARGIN
-	panel.offset_bottom = -MARGIN
-	add_child(panel)
-
-	var root_vbox := VBoxContainer.new()
-	root_vbox.anchor_right  = 1.0
-	root_vbox.anchor_bottom = 1.0
-	root_vbox.offset_left   =  12.0
-	root_vbox.offset_top    =  8.0
-	root_vbox.offset_right  = -12.0
-	root_vbox.offset_bottom = -8.0
-	root_vbox.add_theme_constant_override("separation", 6)
-	panel.add_child(root_vbox)
-
-	var top_bar := HBoxContainer.new()
-	root_vbox.add_child(top_bar)
-
-	var title_lbl := Label.new()
-	title_lbl.text = "El Shoppe"
-	title_lbl.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	title_lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	title_lbl.add_theme_font_size_override("font_size", 20)
-	top_bar.add_child(title_lbl)
-
-	gold_label = Label.new()
-	gold_label.text = "Gold: 0"
-	gold_label.add_theme_font_size_override("font_size", 14)
-	top_bar.add_child(gold_label)
-
-	leave_button = Button.new()
-	leave_button.text = "Leave Shop"
 	leave_button.pressed.connect(_on_leave_pressed)
-	top_bar.add_child(leave_button)
-
-	root_vbox.add_child(HSeparator.new())
-
-	var scroll := ScrollContainer.new()
-	scroll.size_flags_vertical = Control.SIZE_EXPAND_FILL
-	scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
-	root_vbox.add_child(scroll)
-
-	var scroll_vbox := VBoxContainer.new()
-	scroll_vbox.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	scroll_vbox.add_theme_constant_override("separation", 8)
-	scroll.add_child(scroll_vbox)
-
-	var cards_lbl := Label.new()
-	cards_lbl.text = "Cards for Sale"
-	cards_lbl.add_theme_font_size_override("font_size", 14)
-	scroll_vbox.add_child(cards_lbl)
-
-	card_container = HBoxContainer.new()
-	card_container.alignment = BoxContainer.ALIGNMENT_CENTER
-	card_container.add_theme_constant_override("separation", 16)
-	scroll_vbox.add_child(card_container)
-
-	scroll_vbox.add_child(HSeparator.new())
-
-	var thingies_lbl := Label.new()
-	thingies_lbl.text = "Thingies for Sale"
-	thingies_lbl.add_theme_font_size_override("font_size", 14)
-	scroll_vbox.add_child(thingies_lbl)
-
-	thingy_container = HBoxContainer.new()
-	thingy_container.alignment = BoxContainer.ALIGNMENT_CENTER
-	thingy_container.add_theme_constant_override("separation", 16)
-	scroll_vbox.add_child(thingy_container)
-
-	root_vbox.add_child(HSeparator.new())
-
-	remove_card_button = Button.new()
 	remove_card_button.pressed.connect(_on_remove_card_pressed)
-	root_vbox.add_child(remove_card_button)
-
-	remove_overlay = Panel.new()
-	remove_overlay.anchor_left   = 0.0
-	remove_overlay.anchor_top    = 0.0
-	remove_overlay.anchor_right  = 1.0
-	remove_overlay.anchor_bottom = 1.0
-	remove_overlay.offset_left   =  MARGIN
-	remove_overlay.offset_top    =  UIBAR_HEIGHT
-	remove_overlay.offset_right  = -MARGIN
-	remove_overlay.offset_bottom = -MARGIN
-	remove_overlay.visible = false
-	add_child(remove_overlay)
-
-	var overlay_vbox := VBoxContainer.new()
-	overlay_vbox.anchor_right  = 1.0
-	overlay_vbox.anchor_bottom = 1.0
-	overlay_vbox.offset_left   =  12.0
-	overlay_vbox.offset_top    =  8.0
-	overlay_vbox.offset_right  = -12.0
-	overlay_vbox.offset_bottom = -8.0
-	overlay_vbox.add_theme_constant_override("separation", 8)
-	remove_overlay.add_child(overlay_vbox)
-
-	var overlay_top := HBoxContainer.new()
-	overlay_vbox.add_child(overlay_top)
-
-	var overlay_lbl := Label.new()
-	overlay_lbl.text = "Choose a card to remove from your deck:"
-	overlay_lbl.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	overlay_lbl.add_theme_font_size_override("font_size", 16)
-	overlay_top.add_child(overlay_lbl)
-
-	cancel_remove_button = Button.new()
-	cancel_remove_button.text = "← Back"
 	cancel_remove_button.pressed.connect(_on_cancel_remove_pressed)
-	overlay_top.add_child(cancel_remove_button)
-
-	overlay_vbox.add_child(HSeparator.new())
-
-	var deck_scroll := ScrollContainer.new()
-	deck_scroll.size_flags_vertical = Control.SIZE_EXPAND_FILL
-	deck_scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_AUTO
-	overlay_vbox.add_child(deck_scroll)
-
-	deck_card_container = HFlowContainer.new()
-	deck_card_container.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	deck_card_container.add_theme_constant_override("h_separation", 16)
-	deck_card_container.add_theme_constant_override("v_separation", 16)
-	deck_scroll.add_child(deck_card_container)
+	remove_overlay.visible = false
 
 # ─── Public entry point ───────────────────────────────────────────────────────
 
@@ -184,7 +53,7 @@ func _populate_cards() -> void:
 
 	var offered_card_paths : Array[String] = []
 
-	for _i in range(CARD_SLOTS):
+	for _i in range(card_slots):
 		var card_data : CardData = run.get_random_card_data(offered_card_paths)
 		if not card_data:
 			continue
@@ -221,7 +90,7 @@ func _on_buy_card(card_data: CardData, price: int, btn: Button) -> void:
 		_flash_button(btn, "Need %d Gold!" % price)
 		return
 	run.character.gold -= price
-	run.deck.append(card_data)
+	run.deck.append(card_data.duplicate(true))
 	btn.text = "Purchased!"
 	btn.disabled = true
 	_refresh_gold_label()
@@ -239,7 +108,7 @@ func _populate_thingies() -> void:
 		if effect.resource_path != "":
 			excluded_thingy_paths.append(effect.resource_path)
 
-	for _i in range(THINGY_SLOTS):
+	for _i in range(thingy_slots):
 		var condition : ThingyCondition = run.get_random_thingy_condition(excluded_thingy_paths)
 		if not condition:
 			continue

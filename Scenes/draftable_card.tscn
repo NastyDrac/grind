@@ -1,7 +1,7 @@
 [gd_scene load_steps=3 format=3 uid="uid://bs3jsnqv11ogm"]
 
 [ext_resource type="Script" uid="uid://dq5t6xgporfgu" path="res://Scripts/draftable_card.gd" id="1_sy0bn"]
-[ext_resource type="Texture2D" uid="uid://cvje2yu82wwpk" path="res://Art/blank_card.png" id="6_v8mr2"]
+[ext_resource type="Texture2D" uid="uid://ctnrg0beipfc0" path="res://Art/CARDTEMPLATEEMPTY.png" id="2_sy0bn"]
 
 [node name="DraftableCard" type="AspectRatioContainer"]
 offset_right = 200.0
@@ -15,13 +15,13 @@ metadata/_edit_use_anchors_ = true
 
 [node name="BlankCard" type="TextureRect" parent="."]
 layout_mode = 2
-texture = ExtResource("6_v8mr2")
+texture = ExtResource("2_sy0bn")
 
 [node name="title" type="RichTextLabel" parent="BlankCard"]
 layout_mode = 0
 offset_left = 10.666667
 offset_top = 14.0
-offset_right = 191.66667
+offset_right = 168.00002
 offset_bottom = 46.0
 mouse_filter = 2
 theme_override_font_sizes/normal_font_size = 14
@@ -33,9 +33,9 @@ autowrap_mode = 2
 [node name="description" type="RichTextLabel" parent="BlankCard"]
 layout_mode = 0
 offset_left = 12.0
-offset_top = 183.33334
-offset_right = 186.0
-offset_bottom = 288.33334
+offset_top = 198.66669
+offset_right = 188.0
+offset_bottom = 264.0
 mouse_filter = 2
 theme_override_font_sizes/normal_font_size = 12
 bbcode_enabled = true
@@ -46,10 +46,10 @@ vertical_alignment = 1
 [node name="cost" type="RichTextLabel" parent="BlankCard"]
 custom_minimum_size = Vector2(200, 300)
 layout_mode = 0
-offset_left = 169.33333
-offset_top = 3.3333335
-offset_right = 369.33337
-offset_bottom = 303.33334
+offset_left = 168.0
+offset_top = 6.666667
+offset_right = 368.00006
+offset_bottom = 306.66666
 mouse_filter = 2
 theme_override_colors/default_color = Color(1, 0, 0, 1)
 theme_override_colors/font_outline_color = Color(0, 0, 0, 1)

@@ -14,7 +14,8 @@ class_name Condition
 var entity 
 
 func apply_condition(who, condition : Condition) -> void:
-	pass
+	entity = who
+	who.conditions.append(self)
 func trigger_condition() -> void:
 	pass
 
@@ -22,7 +23,7 @@ func trigger_condition() -> void:
 ## Override to disconnect signals or release references.
 ## NOTE: do NOT erase self from who.conditions here — the caller manages the array.
 func remove_condition(who) -> void:
-	pass
+	who.conditions.erase(self)
 
 ## Returns the description string shown in tooltips and the shop.
 ## Override in subclasses to include dynamic values (e.g. calculated damage).

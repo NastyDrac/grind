@@ -118,3 +118,9 @@ func remove_condition(who) -> void:
 	if Global.time_passed.is_connected(_on_time_passed):
 		Global.time_passed.disconnect(_on_time_passed)
 	who.conditions.erase(self)
+
+func get_description_with_values() -> String:
+	if description:
+		return description
+	else:
+		return "If you have scrape at the beginning of your turn, lose all scrap and create a Deploy Turret card."

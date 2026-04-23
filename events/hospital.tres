@@ -1,32 +1,53 @@
-[gd_resource type="Resource" script_class="EventData" load_steps=9 format=3 uid="uid://dl83c5o7wxf4p"]
+[gd_resource type="Resource" script_class="EventData" load_steps=15 format=3 uid="uid://dl83c5o7wxf4p"]
 
 [ext_resource type="Script" uid="uid://ccujthovl5rv7" path="res://Scripts/event_option.gd" id="1_r6vbk"]
 [ext_resource type="Script" uid="uid://c8bk1dof3250" path="res://Scripts/event_data.gd" id="2_o1fic"]
-[ext_resource type="Script" uid="uid://0gsjrx47no8b" path="res://Scripts/card_data.gd" id="2_rissf"]
 [ext_resource type="Script" uid="uid://tnxg66jw03v3" path="res://Scripts/enemy_data.gd" id="3_cxpmo"]
-[ext_resource type="Script" uid="uid://yrcvfkwpfajh" path="res://Scripts/survive_x_turns.gd" id="4_cxpmo"]
+[ext_resource type="Script" uid="uid://chli81s5gxydu" path="res://Scripts/event_effect.gd" id="3_v6gwo"]
+[ext_resource type="Script" uid="uid://ckmlhw3dcvb0k" path="res://Scripts/EventEffects/effect_mod_stat.gd" id="4_ma4jp"]
+[ext_resource type="Script" uid="uid://b2h1ochum01o" path="res://Scripts/stat.gd" id="5_wmdkq"]
+[ext_resource type="Script" uid="uid://cgrxhw8vqenhu" path="res://Scripts/ValueCalculator.gd" id="6_ldx56"]
+[ext_resource type="Script" uid="uid://bggju16i5y2vm" path="res://Scripts/EventEffects/effect_cost_hp.gd" id="7_crmv4"]
 
-[sub_resource type="Resource" id="Resource_wp0a0"]
+[sub_resource type="Resource" id="Resource_hsude"]
+script = ExtResource("6_ldx56")
+formula = "2"
+metadata/_custom_type_script = "uid://cgrxhw8vqenhu"
+
+[sub_resource type="Resource" id="Resource_djqak"]
+script = ExtResource("5_wmdkq")
+stat_type = 5
+value_calc = SubResource("Resource_hsude")
+metadata/_custom_type_script = "uid://b2h1ochum01o"
+
+[sub_resource type="Resource" id="Resource_562ls"]
+script = ExtResource("4_ma4jp")
+stat_to_mod = SubResource("Resource_djqak")
+modify_value = 1
+metadata/_custom_type_script = "uid://ckmlhw3dcvb0k"
+
+[sub_resource type="Resource" id="Resource_0hqvr"]
 script = ExtResource("1_r6vbk")
+option_text = "Search the Ambulance"
+result_text = "Some loon left a perfectly good book of matches in here."
+effects = Array[ExtResource("3_v6gwo")]([SubResource("Resource_562ls")])
 metadata/_custom_type_script = "uid://ccujthovl5rv7"
 
-[sub_resource type="Resource" id="Resource_ma4jp"]
-script = ExtResource("4_cxpmo")
-metadata/_custom_type_script = "uid://yrcvfkwpfajh"
+[sub_resource type="Resource" id="Resource_7eig2"]
+script = ExtResource("7_crmv4")
+amount = -5
+metadata/_custom_type_script = "uid://bggju16i5y2vm"
 
-[sub_resource type="Resource" id="Resource_v6gwo"]
+[sub_resource type="Resource" id="Resource_74ehx"]
 script = ExtResource("1_r6vbk")
-option_text = "Search the hospital. "
-result_text = "You find some helpful medicine."
-health_change = 5
-cards_to_remove = Array[ExtResource("2_rissf")]([null])
-combat_difficulty_modifier = 1.5
-win_con = SubResource("Resource_ma4jp")
+option_text = "Search the Hospital"
+result_text = "Well, at least the pharmacy wasn't completely empty"
+effects = Array[ExtResource("3_v6gwo")]([SubResource("Resource_7eig2")])
 metadata/_custom_type_script = "uid://ccujthovl5rv7"
 
 [resource]
 script = ExtResource("2_o1fic")
 event_title = "Hospital"
 event_description = "You see the hospital up ahead.  You reckon there might some medicine for your aches and bruises, but it could be dangerous to explore.  Then, you notice a whole heep of ambulances with their doors wide open.  "
-options = Array[ExtResource("1_r6vbk")]([SubResource("Resource_wp0a0"), SubResource("Resource_v6gwo")])
+options = Array[ExtResource("1_r6vbk")]([SubResource("Resource_0hqvr"), SubResource("Resource_74ehx")])
 metadata/_custom_type_script = "uid://c8bk1dof3250"

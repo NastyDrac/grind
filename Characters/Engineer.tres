@@ -36,7 +36,6 @@ chance = SubResource("Resource_5axbb")
 item = SubResource("Resource_mwbnt")
 condition_name = "Engineer"
 icon = ExtResource("5_kdvfq")
-description = "enemies drop scrap"
 metadata/_custom_type_script = "uid://dfo48c3dx2d7"
 
 [sub_resource type="Resource" id="Resource_7ytw7"]
@@ -49,7 +48,6 @@ script = ExtResource("8_486th")
 scrap_threshold = 1
 turret_damage = SubResource("Resource_7ytw7")
 icon = ExtResource("9_qa6lw")
-description = "If you have scrap, create a Deploy Turret Card"
 show_stacks = true
 metadata/_custom_type_script = "uid://bbikocjwp04x5"
 

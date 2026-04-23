@@ -37,3 +37,9 @@ func _on_enemy_death(enemy: Enemy):
 	
 	if roll < drop_chance:
 		drop_item(enemy.get_current_range(), enemy.global_position)
+
+func get_description_with_values() -> String:
+	if description:
+		return description
+	else:
+		return "Enemies have a " + str(chance.calculate(entity)) + "% chance of dropping " + item.item_name + " on death."

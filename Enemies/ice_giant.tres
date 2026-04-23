@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="EnemyData" load_steps=4 format=3 uid="uid://2omyroag2mcs"]
+
+[ext_resource type="Script" uid="uid://b1ogi3xh5xakp" path="res://Scripts/condition.gd" id="1_ta775"]
+[ext_resource type="Script" uid="uid://tnxg66jw03v3" path="res://Scripts/enemy_data.gd" id="1_xh5ad"]
+[ext_resource type="Texture2D" uid="uid://cic7hdkkjbfih" path="res://Art/Characters/IceGiant.png" id="5_pheru"]
+
+[resource]
+script = ExtResource("1_xh5ad")
+enemy_name = "Ice Giant"
+texture = ExtResource("5_pheru")
+min_health = 10
+max_health = 14
+damage = 6
+noise_cost = 3
+metadata/_custom_type_script = "uid://tnxg66jw03v3"

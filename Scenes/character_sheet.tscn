@@ -17,169 +17,175 @@ bg_color = Color(0.07871165, 0.1282911, 0.16969937, 1)
 disable_3d = true
 transparent_bg = false
 oversampling_override = 1.0
-size = Vector2i(396, 318)
+size = Vector2i(500, 325)
 visible = true
+min_size = Vector2i(500, 325)
 theme_override_styles/panel = SubResource("StyleBoxFlat_fe3m8")
 script = ExtResource("1_oqqt4")
 
-[node name="VBoxContainer" type="VBoxContainer" parent="."]
-offset_right = 396.0
-offset_bottom = 318.0
+[node name="CenterContainer" type="CenterContainer" parent="."]
+offset_right = 500.0
+offset_bottom = 325.0
 
-[node name="HBoxContainer" type="HBoxContainer" parent="VBoxContainer"]
+[node name="VBoxContainer" type="VBoxContainer" parent="CenterContainer"]
 layout_mode = 2
 
-[node name="TextureRect" type="TextureRect" parent="VBoxContainer/HBoxContainer"]
+[node name="HBoxContainer" type="HBoxContainer" parent="CenterContainer/VBoxContainer"]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="TextureRect" type="TextureRect" parent="CenterContainer/VBoxContainer/HBoxContainer"]
 layout_mode = 2
 texture = ExtResource("1_ipn01")
 stretch_mode = 2
 
-[node name="Control" type="VBoxContainer" parent="VBoxContainer/HBoxContainer"]
+[node name="Control" type="VBoxContainer" parent="CenterContainer/VBoxContainer/HBoxContainer"]
 layout_mode = 2
 size_flags_horizontal = 3
 
-[node name="Label" type="Label" parent="VBoxContainer/HBoxContainer/Control"]
+[node name="Label" type="Label" parent="CenterContainer/VBoxContainer/HBoxContainer/Control"]
 layout_mode = 2
 text = "Health"
 
-[node name="TextureProgressBar" type="TextureProgressBar" parent="VBoxContainer/HBoxContainer/Control"]
+[node name="TextureProgressBar" type="TextureProgressBar" parent="CenterContainer/VBoxContainer/HBoxContainer/Control"]
 self_modulate = Color(1, 0, 0, 1)
 layout_mode = 2
 value = 100.0
 texture_progress = ExtResource("2_fe3m8")
 
-[node name="hp_formula_label" type="Label" parent="VBoxContainer/HBoxContainer/Control"]
+[node name="hp_formula_label" type="Label" parent="CenterContainer/VBoxContainer/HBoxContainer/Control"]
 layout_mode = 2
 
-[node name="VBoxContainer" type="VBoxContainer" parent="VBoxContainer/HBoxContainer"]
+[node name="VBoxContainer" type="VBoxContainer" parent="CenterContainer/VBoxContainer/HBoxContainer"]
 layout_mode = 2
 size_flags_horizontal = 3
 
-[node name="Label" type="Label" parent="VBoxContainer/HBoxContainer/VBoxContainer"]
+[node name="Label" type="Label" parent="CenterContainer/VBoxContainer/HBoxContainer/VBoxContainer"]
 layout_mode = 2
 text = "Stats"
 
-[node name="VBoxContainer" type="HBoxContainer" parent="VBoxContainer/HBoxContainer/VBoxContainer"]
+[node name="VBoxContainer" type="HBoxContainer" parent="CenterContainer/VBoxContainer/HBoxContainer/VBoxContainer"]
 layout_mode = 2
+theme_override_constants/separation = 4
 
-[node name="TextureRect" type="TextureRect" parent="VBoxContainer/HBoxContainer/VBoxContainer/VBoxContainer"]
+[node name="TextureRect" type="TextureRect" parent="CenterContainer/VBoxContainer/HBoxContainer/VBoxContainer/VBoxContainer"]
 custom_minimum_size = Vector2(16, 16)
 layout_mode = 2
 texture = ExtResource("2_ky1d0")
 expand_mode = 2
 
-[node name="Label" type="Label" parent="VBoxContainer/HBoxContainer/VBoxContainer/VBoxContainer"]
+[node name="Label" type="Label" parent="CenterContainer/VBoxContainer/HBoxContainer/VBoxContainer/VBoxContainer"]
 layout_mode = 2
 text = "Swag: "
 
-[node name="guts_label" type="Label" parent="VBoxContainer/HBoxContainer/VBoxContainer/VBoxContainer"]
+[node name="guts_label" type="Label" parent="CenterContainer/VBoxContainer/HBoxContainer/VBoxContainer/VBoxContainer"]
 layout_mode = 2
 size_flags_horizontal = 3
 text = "5"
 horizontal_alignment = 2
 
-[node name="VBoxContainer2" type="HBoxContainer" parent="VBoxContainer/HBoxContainer/VBoxContainer"]
+[node name="VBoxContainer2" type="HBoxContainer" parent="CenterContainer/VBoxContainer/HBoxContainer/VBoxContainer"]
 layout_mode = 2
 
-[node name="TextureRect" type="TextureRect" parent="VBoxContainer/HBoxContainer/VBoxContainer/VBoxContainer2"]
+[node name="TextureRect" type="TextureRect" parent="CenterContainer/VBoxContainer/HBoxContainer/VBoxContainer/VBoxContainer2"]
 custom_minimum_size = Vector2(16, 16)
 layout_mode = 2
 texture = ExtResource("3_fe3m8")
 expand_mode = 2
 
-[node name="Label" type="Label" parent="VBoxContainer/HBoxContainer/VBoxContainer/VBoxContainer2"]
+[node name="Label" type="Label" parent="CenterContainer/VBoxContainer/HBoxContainer/VBoxContainer/VBoxContainer2"]
 layout_mode = 2
 text = "Guts:"
 
-[node name="guts_label" type="Label" parent="VBoxContainer/HBoxContainer/VBoxContainer/VBoxContainer2"]
+[node name="guts_label" type="Label" parent="CenterContainer/VBoxContainer/HBoxContainer/VBoxContainer/VBoxContainer2"]
 layout_mode = 2
 size_flags_horizontal = 3
 text = "5"
 horizontal_alignment = 2
 
-[node name="VBoxContainer3" type="HBoxContainer" parent="VBoxContainer/HBoxContainer/VBoxContainer"]
+[node name="VBoxContainer3" type="HBoxContainer" parent="CenterContainer/VBoxContainer/HBoxContainer/VBoxContainer"]
 layout_mode = 2
 
-[node name="TextureRect" type="TextureRect" parent="VBoxContainer/HBoxContainer/VBoxContainer/VBoxContainer3"]
+[node name="TextureRect" type="TextureRect" parent="CenterContainer/VBoxContainer/HBoxContainer/VBoxContainer/VBoxContainer3"]
 custom_minimum_size = Vector2(16, 16)
 layout_mode = 2
 texture = ExtResource("4_oqqt4")
 expand_mode = 2
 
-[node name="Label" type="Label" parent="VBoxContainer/HBoxContainer/VBoxContainer/VBoxContainer3"]
+[node name="Label" type="Label" parent="CenterContainer/VBoxContainer/HBoxContainer/VBoxContainer/VBoxContainer3"]
 layout_mode = 2
-text = "Marbles"
+text = "Marbles:"
 
-[node name="guts_label" type="Label" parent="VBoxContainer/HBoxContainer/VBoxContainer/VBoxContainer3"]
+[node name="guts_label" type="Label" parent="CenterContainer/VBoxContainer/HBoxContainer/VBoxContainer/VBoxContainer3"]
 layout_mode = 2
 size_flags_horizontal = 3
 text = "5"
 horizontal_alignment = 2
 
-[node name="VBoxContainer4" type="HBoxContainer" parent="VBoxContainer/HBoxContainer/VBoxContainer"]
+[node name="VBoxContainer4" type="HBoxContainer" parent="CenterContainer/VBoxContainer/HBoxContainer/VBoxContainer"]
 layout_mode = 2
 
-[node name="TextureRect" type="TextureRect" parent="VBoxContainer/HBoxContainer/VBoxContainer/VBoxContainer4"]
+[node name="TextureRect" type="TextureRect" parent="CenterContainer/VBoxContainer/HBoxContainer/VBoxContainer/VBoxContainer4"]
 custom_minimum_size = Vector2(16, 16)
 layout_mode = 2
 texture = ExtResource("5_gwj3g")
 expand_mode = 2
 
-[node name="Label" type="Label" parent="VBoxContainer/HBoxContainer/VBoxContainer/VBoxContainer4"]
+[node name="Label" type="Label" parent="CenterContainer/VBoxContainer/HBoxContainer/VBoxContainer/VBoxContainer4"]
 layout_mode = 2
 text = "Hustle:"
 
-[node name="hustle_label" type="Label" parent="VBoxContainer/HBoxContainer/VBoxContainer/VBoxContainer4"]
+[node name="hustle_label" type="Label" parent="CenterContainer/VBoxContainer/HBoxContainer/VBoxContainer/VBoxContainer4"]
 layout_mode = 2
 size_flags_horizontal = 3
 text = "5"
 horizontal_alignment = 2
 
-[node name="VBoxContainer5" type="HBoxContainer" parent="VBoxContainer/HBoxContainer/VBoxContainer"]
+[node name="VBoxContainer5" type="HBoxContainer" parent="CenterContainer/VBoxContainer/HBoxContainer/VBoxContainer"]
 layout_mode = 2
 
-[node name="TextureRect" type="TextureRect" parent="VBoxContainer/HBoxContainer/VBoxContainer/VBoxContainer5"]
+[node name="TextureRect" type="TextureRect" parent="CenterContainer/VBoxContainer/HBoxContainer/VBoxContainer/VBoxContainer5"]
 custom_minimum_size = Vector2(16, 16)
 layout_mode = 2
 texture = ExtResource("6_lqkta")
 expand_mode = 2
 
-[node name="Label" type="Label" parent="VBoxContainer/HBoxContainer/VBoxContainer/VBoxContainer5"]
+[node name="Label" type="Label" parent="CenterContainer/VBoxContainer/HBoxContainer/VBoxContainer/VBoxContainer5"]
 layout_mode = 2
 text = "Bang:"
 
-[node name="bang_label" type="Label" parent="VBoxContainer/HBoxContainer/VBoxContainer/VBoxContainer5"]
+[node name="bang_label" type="Label" parent="CenterContainer/VBoxContainer/HBoxContainer/VBoxContainer/VBoxContainer5"]
 layout_mode = 2
 size_flags_horizontal = 3
 text = "5"
 horizontal_alignment = 2
 
-[node name="VBoxContainer6" type="HBoxContainer" parent="VBoxContainer/HBoxContainer/VBoxContainer"]
+[node name="VBoxContainer6" type="HBoxContainer" parent="CenterContainer/VBoxContainer/HBoxContainer/VBoxContainer"]
 layout_mode = 2
 
-[node name="TextureRect" type="TextureRect" parent="VBoxContainer/HBoxContainer/VBoxContainer/VBoxContainer6"]
+[node name="TextureRect" type="TextureRect" parent="CenterContainer/VBoxContainer/HBoxContainer/VBoxContainer/VBoxContainer6"]
 custom_minimum_size = Vector2(16, 16)
 layout_mode = 2
 texture = ExtResource("7_vdo1c")
 expand_mode = 2
 
-[node name="Label" type="Label" parent="VBoxContainer/HBoxContainer/VBoxContainer/VBoxContainer6"]
+[node name="Label" type="Label" parent="CenterContainer/VBoxContainer/HBoxContainer/VBoxContainer/VBoxContainer6"]
 layout_mode = 2
 text = "Mojo:"
 
-[node name="mojo_label" type="Label" parent="VBoxContainer/HBoxContainer/VBoxContainer/VBoxContainer6"]
+[node name="mojo_label" type="Label" parent="CenterContainer/VBoxContainer/HBoxContainer/VBoxContainer/VBoxContainer6"]
 layout_mode = 2
 size_flags_horizontal = 3
 text = "5"
 horizontal_alignment = 2
 
-[node name="VBoxContainer" type="VBoxContainer" parent="VBoxContainer"]
+[node name="VBoxContainer" type="VBoxContainer" parent="CenterContainer/VBoxContainer"]
 layout_mode = 2
 
-[node name="Label" type="Label" parent="VBoxContainer/VBoxContainer"]
+[node name="Label" type="Label" parent="CenterContainer/VBoxContainer/VBoxContainer"]
 layout_mode = 2
 text = "Effects:"
 
-[node name="Label2" type="Label" parent="VBoxContainer/VBoxContainer"]
+[node name="Label2" type="Label" parent="CenterContainer/VBoxContainer/VBoxContainer"]
 layout_mode = 2
 text = "Regalur Guy is just a regular guy.  5 in all stats"
