@@ -1,29 +1,31 @@
-[gd_scene load_steps=3 format=3 uid="uid://dr7da44fhrnr6"]
+[gd_scene load_steps=4 format=3 uid="uid://dr7da44fhrnr6"]
 
 [ext_resource type="Script" uid="uid://dwf57omdtsayx" path="res://Scripts/range_manager.gd" id="1_i32wm"]
 [ext_resource type="Texture2D" uid="uid://nxdormegmmnt" path="res://Art/Icons/EmptyHealthbar.png" id="2_3sn1v"]
+[ext_resource type="Texture2D" uid="uid://c5yrw4almrlyt" path="res://Art/Icons/NoiseIcon.png" id="3_3sn1v"]
 
-[node name="RangeManager" type="Node2D" node_paths=PackedStringArray("win_condition_bar", "win_condition_label", "noise_meter_bar", "noise_meter_label")]
+[node name="RangeManager" type="Node2D" node_paths=PackedStringArray("win_condition_bar", "win_condition_label", "noise_icon", "noise_meter_label")]
 script = ExtResource("1_i32wm")
 spread_multiplier = 0.8
 y_max = 380.0
 column_x_offset = 60.0
 win_condition_bar = NodePath("CombatProgressBar")
 win_condition_label = NodePath("CombatProgressBar/Label")
-noise_meter_bar = NodePath("NoiseBar")
-noise_meter_label = NodePath("NoiseBar/Label")
+noise_icon = NodePath("Sprite2D")
+noise_meter_label = NodePath("Sprite2D/Label")
 sequential_movement = true
 sequential_move_delay = 0.25
 spawn_mode = 3
+starting_noise = 3.0
 passive_noise_per_turn = 0.5
 metadata/_custom_type_script = "uid://dwf57omdtsayx"
 
 [node name="CombatProgressBar" type="TextureProgressBar" parent="."]
 z_index = 5
-offset_left = 1147.0
-offset_top = 481.0
-offset_right = 1267.0
-offset_bottom = 521.0
+offset_left = -144.0
+offset_top = -47.0
+offset_right = -24.0
+offset_bottom = -7.0
 texture_progress = ExtResource("2_3sn1v")
 
 [node name="Label" type="Label" parent="CombatProgressBar"]
@@ -31,18 +33,23 @@ layout_mode = 0
 offset_right = 40.0
 offset_bottom = 23.0
 
-[node name="NoiseBar" type="TextureProgressBar" parent="."]
-z_index = 5
-offset_left = 1156.0
-offset_top = -40.0
-offset_right = 1196.0
-fill_mode = 4
-
-[node name="Label" type="Label" parent="NoiseBar"]
-layout_mode = 0
-offset_right = 40.0
-offset_bottom = 23.0
-
 [node name="Camera2D" type="Camera2D" parent="."]
-position = Vector2(574, 317)
+position = Vector2(574, 300)
 zoom = Vector2(0.75, 0.75)
+
+[node name="Sprite2D" type="Sprite2D" parent="."]
+position = Vector2(1280, -5)
+texture = ExtResource("3_3sn1v")
+
+[node name="Label" type="Label" parent="Sprite2D"]
+offset_left = -13.0
+offset_top = -32.0
+offset_right = 27.0
+offset_bottom = 18.0
+theme_override_colors/font_color = Color(1, 0, 0, 1)
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_override_constants/outline_size = 14
+theme_override_font_sizes/font_size = 36
+text = "2"
+horizontal_alignment = 1
+vertical_alignment = 1

@@ -12,4 +12,5 @@ min_health = 17
 max_health = 22
 damage = 12
 noise_cost = 6
+is_elite = true
 metadata/_custom_type_script = "uid://tnxg66jw03v3"

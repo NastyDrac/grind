@@ -32,7 +32,7 @@ func position_character():
 	if range_mgr:
 		var range_0_x = range_mgr._get_x_for_range(0)
 		var viewport_size = get_viewport().size
-		var center_y = viewport_size.y * range_mgr.center_ratio
+		var center_y = (range_mgr.y_min + range_mgr.y_max) * 0.5
 
 		var sprite_half_width = 0.0
 		if sprite.texture:

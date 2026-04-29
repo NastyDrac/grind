@@ -70,6 +70,7 @@ func _show_tooltip():
 		get_tree().root.add_child(tooltip_layer)
 
 	tooltip_layer.add_child(tooltip_instance)
+	tooltip_instance.visible = false
 
 	_populate_tooltip()
 	_position_tooltip()
@@ -108,23 +109,36 @@ func _position_tooltip():
 	if not tooltip_instance:
 		return
 
+	# Two frames: one to enter the tree, one for layout (fit_content RichTextLabel
+	# needs the second pass to settle its height before size is correct).
+	await get_tree().process_frame
 	await get_tree().process_frame
 
-	var icon_global_pos = global_position
-	var icon_size = size
-	var viewport_size = get_viewport_rect().size
-	var tooltip_pos = icon_global_pos + Vector2(icon_size.x + 10, 0)
+	if not tooltip_instance:
+		return
 
-	if tooltip_pos.x + tooltip_instance.size.x > viewport_size.x:
-		tooltip_pos.x = icon_global_pos.x - tooltip_instance.size.x - 10
+	var mouse_pos     := get_viewport().get_mouse_position()
+	var tooltip_size  := tooltip_instance.size
+	var viewport_size := get_viewport_rect().size
+	var margin        := 10.0
 
-	if tooltip_pos.y + tooltip_instance.size.y > viewport_size.y:
-		tooltip_pos.y = viewport_size.y - tooltip_instance.size.y - 10
+	# Default: just to the right and slightly below the cursor.
+	var pos := mouse_pos + Vector2(margin, margin)
 
-	if tooltip_pos.y < 0:
-		tooltip_pos.y = 10
+	# Right edge — flip to the left of the cursor.
+	if pos.x + tooltip_size.x > viewport_size.x - margin:
+		pos.x = mouse_pos.x - tooltip_size.x - margin
 
-	tooltip_instance.global_position = tooltip_pos
+	# Bottom edge — flip above the cursor.
+	if pos.y + tooltip_size.y > viewport_size.y - margin:
+		pos.y = mouse_pos.y - tooltip_size.y - margin
+
+	# Hard clamp — keeps it on screen even if both flips still overshoot.
+	pos.x = clampf(pos.x, margin, viewport_size.x - tooltip_size.x - margin)
+	pos.y = clampf(pos.y, margin, viewport_size.y - tooltip_size.y - margin)
+
+	tooltip_instance.global_position = pos
+	tooltip_instance.visible = true
 
 func _exit_tree():
 	_hide_tooltip()

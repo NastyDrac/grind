@@ -9,5 +9,5 @@ script = ExtResource("2_glf47")
 enemy_name = "Slime"
 texture = ExtResource("3_glf47")
 min_health = 7
-noise_cost = 3
+noise_cost = 2
 metadata/_custom_type_script = "uid://tnxg66jw03v3"

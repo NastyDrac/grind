@@ -21,7 +21,7 @@ class_name RangeManager
 @export var wobble_amplitude := 2.5
 
 @export var enemy_pool: Array[EnemyData] = []
-@export var tiered_enemy_pools: Dictionary = {} 
+@export var tiered_enemy_pools: Dictionary = {}
 @export var center_ratio := .4
 
 # How far past the right edge enemies spawn from (pixels beyond viewport width)
@@ -36,9 +36,8 @@ class_name RangeManager
 @export var win_condition_bar: TextureProgressBar
 # Assign a Label node to display the win condition text (e.g. "12 / 20 kills").
 @export var win_condition_label: Label
-# Assign a ProgressBar node to display the current noise meter level.
-@export var noise_meter_bar: TextureProgressBar
-# Assign a Label to show exact noise meter value next to the bar.
+@export var noise_icon : Sprite2D
+# Assign a Label to show the current noise value.
 @export var noise_meter_label: Label
 
 @export_category("Movement")
@@ -51,29 +50,35 @@ class_name RangeManager
 var current_win_condition: WinCondition = null
 
 enum SpawnMode {
-	IMMEDIATE,      # Cost = enemy count, spawn from enemy_pool right away
-	ENERGY_BANKED,  # Bank cost each card, dump the total into spawns on card draw
-	TIERED,         # Cost determines enemy tier, spawns one tiered enemy immediately
-	METER,          # Cost fills a noise meter; time passing triggers weighted spawns + passive tick
-	MIDDLE_GROUND   # Fraction of cost spawns cheap enemies immediately; remainder charges the meter for harder enemies
+	IMMEDIATE,      # Cost added to noise meter, drained into spawns right away
+	ENERGY_BANKED,  # Bank cost each card, add total to meter and drain on card draw
+	TIERED,         # Cost added to noise meter, drained into spawns right away (same as IMMEDIATE)
+	METER,          # Cost fills noise meter; time passing triggers drain + passive tick
+	MIDDLE_GROUND   # Fraction of cost drains immediately; remainder charges meter for later
 }
 @export var spawn_mode: SpawnMode = SpawnMode.IMMEDIATE
 
 var banked_energy: int = 0
 var enemies_by_range: Dictionary = {}
 
-# ── Noise meter (METER and MIDDLE_GROUND modes) ──────────────────────────────
-# Passive noise added to the meter each time the player passes time.
-# Ensures pressure builds even when the player plays cheaply.
+# ── Noise meter ───────────────────────────────────────────────────────────────
+# The noise level is the single source of truth for which enemy spawns.
+# Enemies are selected deterministically: the highest noise_cost enemy that
+# the current meter can afford is always chosen — no randomness involved.
+# Elites are never part of this system; they must be spawned explicitly.
 @export_category("Noise Meter")
+# How much noise the combat opens with. Applied at _ready() in all spawn modes.
+@export var starting_noise: float = 0.0
+# Passive noise added each time the player passes time (METER mode only).
 @export var passive_noise_per_turn: float = 2.0
-# Meter must reach this value before a spawn attempt is made.
+# Minimum meter value required before a spawn attempt is made.
 @export var noise_meter_spawn_threshold: float = 5.0
-# MIDDLE_GROUND only: fraction of card cost that spawns enemies immediately.
-# The remaining fraction charges the meter. 0.5 = half-and-half.
+# MIDDLE_GROUND only: fraction of card cost that drains immediately.
+# The remaining fraction charges the meter for later. 0.5 = half-and-half.
 @export var immediate_cost_ratio: float = 0.5
 
 var noise_meter: float = 0.0
+var _last_noise_display: int = -1
 var items_by_range : Dictionary = {}
 var run_manager : RunManager
 
@@ -83,6 +88,12 @@ var targets : Array[Enemy] = []
 var number_of_targets : int = 0
 var current_target_type : Action.TargetType
 var current_max_range : int = 0
+
+# ── Elite enemy tracking ──────────────────────────────────────────────────────
+# Elites are never selected by the noise system. They can only be spawned via
+# explicit spawn_enemy() calls (e.g. from a scripted encounter or boss event).
+# elite_spawned tracks whether one is already on the field to guard duplicates.
+var elite_spawned: bool = false
 
 
 signal targeting_started()
@@ -100,26 +111,30 @@ func _initialize_ranges(max_range: int):
 
 func process_card_cost(cost: int):
 	match spawn_mode:
-		SpawnMode.IMMEDIATE:
-			_spawn_immediate(cost)
+		SpawnMode.IMMEDIATE, SpawnMode.TIERED:
+			# Add cost to the meter and drain it immediately.
+			noise_meter += cost
+			_drain_meter_into_spawns()
 		SpawnMode.ENERGY_BANKED:
 			_bank_energy(cost)
-		SpawnMode.TIERED:
-			_spawn_tiered(cost)
 		SpawnMode.METER:
+			# Meter drains on time_passed, not card play.
 			noise_meter += cost
 		SpawnMode.MIDDLE_GROUND:
 			_spawn_middle_ground(cost)
 
 func _ready() -> void:
-	range_spacing = get_viewport_rect().size.x / 5
+	range_spacing = get_viewport_rect().size.x / 6
 	add_to_group("range_manager")
 	_initialize_ranges(5)
-	if spawn_mode != SpawnMode.METER:
-		noise_meter_bar.visible = false
 	Global.enemy_dies.connect(_on_enemy_died)
 	Global.enemy_advanced.connect(_on_enemy_moved)
 	Global.time_passed.connect(_on_time_passed)
+
+	# Seed starting noise and spawn from it on the first frame (all modes).
+	if starting_noise > 0.0:
+		noise_meter += starting_noise
+		_drain_meter_into_spawns.call_deferred()
 
 func _process(_delta: float) -> void:
 	queue_redraw()
@@ -135,8 +150,8 @@ func _draw() -> void:
 	var bottom_y = viewport_size.y
 
 	# Draw a vertical line between each pair of adjacent ranges.
-	for i in range(5):  # gaps: 0-1, 1-2, 2-3, 3-4, 4-5
-		var x = (i * range_spacing) + range_spacing * 0.5
+	for i in range(5):  # boundaries between: 0|1, 1|2, 2|3, 3|4, 4|5
+		var x = (i + 1) * range_spacing
 		draw_line(
 			Vector2(x, top_y),
 			Vector2(x, bottom_y),
@@ -159,68 +174,74 @@ func _update_ui() -> void:
 		if win_condition_label:
 			win_condition_label.text = current_win_condition.get_progress_text()
 
-	# Noise meter bar (only meaningful in METER / MIDDLE_GROUND modes)
-	if noise_meter_bar:
-		noise_meter_bar.max_value = noise_meter_spawn_threshold
-		noise_meter_bar.value = minf(noise_meter, noise_meter_spawn_threshold)
+	# Noise label — updates only when the displayed integer changes,
+	# and fires a brief scale-pop animation so the player notices the change.
 	if noise_meter_label:
-		noise_meter_label.text = "Noise: %d / %d" % [int(noise_meter), int(noise_meter_spawn_threshold)]
+		var current_display := int(noise_meter)
+		if current_display != _last_noise_display:
+			_last_noise_display = current_display
+			noise_meter_label.text = "%d" % current_display
+			_animate_noise_label()
+
+func _animate_noise_label() -> void:
+	# Centre the pivot so the scale-pop grows from the middle of the label.
+	noise_meter_label.pivot_offset = noise_meter_label.size / 2.0
+	var tween := create_tween()
+	tween.set_parallel(true)
+
+	# Label: scale up then spring back.
+	tween.tween_property(noise_meter_label, "scale", Vector2(1.45, 1.45), 0.08) \
+		.set_ease(Tween.EASE_OUT).set_trans(Tween.TRANS_SINE)
+	tween.tween_property(noise_meter_label, "scale", Vector2(1.0, 1.0), 0.20) \
+		.set_delay(0.08).set_ease(Tween.EASE_OUT).set_trans(Tween.TRANS_BACK)
+
+	# Icon: flash to overbright white then settle back to normal.
+	if noise_icon:
+		tween.tween_property(noise_icon, "modulate", Color(2.5, 2.5, 1.8, 1.0), 0.06) \
+			.set_ease(Tween.EASE_OUT).set_trans(Tween.TRANS_SINE)
+		tween.tween_property(noise_icon, "modulate", Color(1.0, 1.0, 1.0, 1.0), 0.30) \
+			.set_delay(0.06).set_ease(Tween.EASE_IN).set_trans(Tween.TRANS_SINE)
 
 func process_card_draw():
 	if spawn_mode == SpawnMode.ENERGY_BANKED and banked_energy > 0:
-		_spawn_immediate(banked_energy)
+		noise_meter += banked_energy
 		banked_energy = 0
-
-
-func _spawn_immediate(count: int):
-	if enemy_pool.is_empty():
-		push_warning("Enemy pool is empty!")
-		return
-	
-	for i in count:
-		var random_enemy = enemy_pool.pick_random()
-		spawn_enemy(random_enemy, 5)
+		_drain_meter_into_spawns()
 
 
 func _bank_energy(amount: int):
 	banked_energy += amount
 
 
-func _spawn_tiered(tier: int):
-	if not tiered_enemy_pools.has(tier):
-		push_warning("No enemies defined for tier %d" % tier)
-		return
-	
-	var tier_pool = tiered_enemy_pools[tier]
-	if tier_pool.is_empty():
-		push_warning("Tier %d enemy pool is empty!" % tier)
-		return
-	
-	var random_enemy = tier_pool.pick_random()
-	spawn_enemy(random_enemy, 5)
+func _spawn_middle_ground(cost: int):
+	# Immediate fraction: drain that portion of the meter right now.
+	var immediate_amount := cost * immediate_cost_ratio
+	noise_meter += immediate_amount
+	_drain_meter_into_spawns()
+
+	# Remainder charges the meter to be drained on the next time_passed.
+	noise_meter += cost - immediate_amount
 
 # ── Noise meter handlers ──────────────────────────────────────────────────────
 
 func _on_time_passed():
 	match spawn_mode:
 		SpawnMode.METER:
-			# Ambient noise: pressure builds passively even with cheap play
+			# Passive tick: pressure builds even when the player plays cheaply.
 			noise_meter += passive_noise_per_turn
 			_drain_meter_into_spawns()
 		SpawnMode.MIDDLE_GROUND:
-			# No passive tick — only card costs charge the middle-ground meter —
-			# but we still drain whatever has accumulated this turn.
+			# No passive tick — only card costs charge the meter —
+			# but drain whatever has accumulated from card plays this turn.
 			_drain_meter_into_spawns()
 
-	# Sequential movement: range_manager picks one enemy to advance this turn.
-	# Enemy._on_enemies_advance() returns early when sequential_movement is true
-	# so only the enemy chosen here actually moves.
+	# Sequential movement: pick one enemy to advance this turn.
 	if sequential_movement:
 		_advance_one_enemy()
 
 func _advance_one_enemy() -> void:
-	# Sort by range ascending, then by column (left before right) so enemies
-	# in the left column always move before those in the right column.
+	# Sort by range ascending, then by column so the left column always
+	# moves before the right column at the same range.
 	var all := get_all_enemies().filter(func(e): return is_instance_valid(e))
 	all.sort_custom(func(a, b):
 		if a.get_current_range() != b.get_current_range():
@@ -233,6 +254,7 @@ func _advance_one_enemy() -> void:
 			enemy.move_toward_player()
 			await get_tree().create_timer(sequential_move_delay).timeout
 
+
 func _get_enemy_column(enemy: Enemy) -> int:
 	var range_num := enemy.get_current_range()
 	if not enemies_by_range.has(range_num):
@@ -243,83 +265,79 @@ func _get_enemy_column(enemy: Enemy) -> int:
 	var idx := at_range.find(enemy)
 	return idx % 2 if idx != -1 else 0
 
-func _spawn_middle_ground(cost: int):
-	# Immediate half: cheap enemies spawn right now from the basic pool
-	var immediate_count := int(cost * immediate_cost_ratio)
-	for i in immediate_count:
-		if not enemy_pool.is_empty():
-			spawn_enemy(enemy_pool.pick_random(), 5)
-	
-	# Remainder: charges the meter toward harder enemies
-	noise_meter += cost - immediate_count
+# ── Deterministic noise drain ─────────────────────────────────────────────────
+# Drain the meter by spawning enemies in order of descending noise_cost.
+# The enemy that spawns is always the most "expensive" one the current meter
+# can afford — no randomness. Elites are never considered here.
 
 func _drain_meter_into_spawns():
-	# Keep spending meter budget until we can no longer afford anything.
-	# Each spawn deducts that enemy's noise_cost from the meter, so the meter
-	# acts as a currency rather than a simple threshold.
-	var cheapest := _cheapest_available_noise_cost()
-	while noise_meter >= cheapest:
-		var enemy_data := _pick_weighted_enemy()
-		if enemy_data == null:
-			break
-		# Don't overspend — skip enemies we can't afford this cycle
-		if enemy_data.noise_cost > noise_meter:
-			continue
+	var enemy_data := _pick_deterministic_enemy()
+	while enemy_data != null and noise_meter >= enemy_data.noise_cost:
 		spawn_enemy(enemy_data, 5)
 		noise_meter -= enemy_data.noise_cost
-		noise_meter = max(noise_meter, 0.0)
-		cheapest = _cheapest_available_noise_cost()
+		noise_meter = maxf(noise_meter, 0.0)
+		enemy_data = _pick_deterministic_enemy()
 
-func _pick_weighted_enemy() -> EnemyData:
-	# Build a candidate list where each enemy appears a number of times
-	# proportional to how affordable it is relative to the current meter.
-	# This means cheap enemies are always possible, but as the meter grows
-	# expensive enemies become increasingly likely — without being guaranteed.
-	var candidates: Array = []
-	
-	# Base pool (cheapest enemies) — always included
+func _pick_deterministic_enemy() -> EnemyData:
+	# Return the enemy with the highest noise_cost the meter can currently
+	# afford. Elites are included — a high enough noise level will trigger
+	# them. The elite_spawned guard in spawn_enemy() prevents a second elite
+	# from ever entering if one is already on the field.
+	# Pool order breaks ties so the result is always the same for a given
+	# meter value.
+	var best: EnemyData = null
+	var best_cost: float = -1.0
+
 	for e: EnemyData in enemy_pool:
-		candidates.append(e)
-	
-	# Tiered pool — include tiers the meter can afford, weighted by headroom.
-	# An ogre that costs 5 gets 1 entry at meter=5, 3 entries at meter=15, etc.
+		if e.is_elite and elite_spawned:
+			continue
+		if e.noise_cost <= noise_meter and e.noise_cost > best_cost:
+			best = e
+			best_cost = e.noise_cost
+
 	for tier in tiered_enemy_pools:
-		if noise_meter >= tier:
-			var pool: Array = tiered_enemy_pools[tier]
-			var weight := int((noise_meter - tier) / noise_meter_spawn_threshold) + 1
-			weight = clamp(weight, 1, 6)
-			for i in weight:
-				for e: EnemyData in pool:
-					candidates.append(e)
-	
-	if candidates.is_empty():
-		push_warning("RangeManager: no enemies available to pick from noise meter.")
-		return null
-	
-	return candidates.pick_random()
+		var pool: Array = tiered_enemy_pools[tier]
+		for e: EnemyData in pool:
+			if e.is_elite and elite_spawned:
+				continue
+			if e.noise_cost <= noise_meter and e.noise_cost > best_cost:
+				best = e
+				best_cost = e.noise_cost
+
+	return best  # null when meter is too low to afford anything
 
 func _cheapest_available_noise_cost() -> float:
-	# Returns the lowest noise_cost across all pools so we know when to stop draining.
+	# Returns the lowest noise_cost across all enemies that can still spawn.
+	# Elites are included unless one has already spawned this combat.
 	var cheapest := INF
 	for e: EnemyData in enemy_pool:
-		cheapest = min(cheapest, e.noise_cost)
+		if e.is_elite and elite_spawned:
+			continue
+		cheapest = minf(cheapest, e.noise_cost)
 	for tier in tiered_enemy_pools:
 		for e: EnemyData in tiered_enemy_pools[tier]:
-			cheapest = min(cheapest, e.noise_cost)
+			if e.is_elite and elite_spawned:
+				continue
+			cheapest = minf(cheapest, e.noise_cost)
 	return cheapest if cheapest < INF else INF
 
 func spawn_enemy(enemy_data: EnemyData, spawn_range: int = 5) -> Enemy:
 	if not enemy_scene:
 		push_error("Enemy scene not assigned to RangeManager!")
 		return null
-	
+
+	# ── Elite guard ───────────────────────────────────────────────────────────
+	# Only one elite allowed per combat; block duplicates.
+	if enemy_data.is_elite and elite_spawned:
+		return null
+
 	var enemy: Enemy = enemy_scene.instantiate()
 	enemy.data = enemy_data
 	add_child(enemy)
 	enemy.set_data(enemy_data, spawn_range)
-	
+
 	enemy.set_range_manager(self)
-	
+
 	# Where the enemy should ultimately stand
 	var destination := get_position_for_enemy(enemy)
 	enemy.target_position = destination
@@ -327,29 +345,68 @@ func spawn_enemy(enemy_data: EnemyData, spawn_range: int = 5) -> Enemy:
 	# Start the enemy off the far right of the screen so it travels in
 	var viewport_width = get_viewport().size.x
 	enemy.global_position = Vector2(viewport_width + entry_offscreen_margin, destination.y)
-	
+
 	add_enemy(enemy)
-	
+
 	Global.enemy_spawned.emit(enemy)
-	
+
+	# ── Elite spawn hook ──────────────────────────────────────────────────────
+	# Must run AFTER the enemy is fully added so win condition checks are valid.
+	if enemy_data.is_elite:
+		elite_spawned = true
+		_on_elite_spawned(enemy)
+
 	return enemy
+
+# Called once when the first (and only) elite enemy enters the field.
+# Replaces the active win condition with DefeatSingleEnemy targeting this elite,
+# hides the progress bar (bool condition needs no bar), and fires a new announcement.
+func _on_elite_spawned(elite: Enemy) -> void:
+	# Tear down the old win condition's signal connections cleanly.
+	if current_win_condition:
+		current_win_condition.cleanup()
+
+	# Build the elite-specific win condition.
+	var elite_wc := DefeatSingleEnemy.new()
+	elite_wc.target_enemy = elite
+	elite_wc.initialize(run_manager)
+
+	# Update both holders so every system sees the same object.
+	current_win_condition = elite_wc
+	if run_manager:
+		run_manager.current_win_condition = elite_wc
+
+	# Sync the HUD.
+	if run_manager and run_manager.ui_bar and run_manager.ui_bar.has_method("set_win_condition"):
+		run_manager.ui_bar.set_win_condition(elite_wc)
+
+	# Defeating a single enemy is a bool — no progress fraction to display.
+	if win_condition_bar:
+		win_condition_bar.value = 0
+
+	# Fire the new win condition announcement so the player knows the goal changed.
+	if run_manager:
+		var announcer := CombatAnnouncer.new()
+		announcer.run_manager = run_manager
+		run_manager.add_child(announcer)
+		announcer.show_announcement(elite_wc.get_announcement_text(), "Elite Incoming!")
 
 func spawn_enemies(enemy_data: EnemyData, count: int, spawn_range: int = 5) -> Array[Enemy]:
 	var spawned: Array[Enemy] = []
-	
+
 	for i in count:
 		var enemy = spawn_enemy(enemy_data, spawn_range)
 		if enemy:
 			spawned.append(enemy)
-	
+
 	return spawned
 
 func add_enemy(enemy: Enemy):
 	var range_num = enemy.get_current_range()
-	
+
 	if not enemies_by_range.has(range_num):
 		enemies_by_range[range_num] = []
-	
+
 	if not enemies_by_range[range_num].has(enemy):
 		enemies_by_range[range_num].append(enemy)
 		_update_enemy_positions(range_num)
@@ -375,20 +432,20 @@ func get_all_items():
 			if is_instance_valid(e):
 				all_items.append(e)
 	return all_items
-	
+
 func add_item(item : Item):
 	var range_num = item.get_current_range()
-	
+
 	if not items_by_range.has(range_num):
 		items_by_range[range_num] = []
-	
+
 	if not items_by_range[range_num].has(item):
 		items_by_range[range_num].append(item)
 		_update_item_positions(range_num)
 
 func remove_item(item : Item):
 	var range_num = item.get_current_range()
-	
+
 	if items_by_range.has(range_num):
 		items_by_range[range_num].erase(item)
 		_update_item_positions(range_num)
@@ -404,7 +461,7 @@ func get_position_for_item(item : Item) -> Vector2:
 func _update_item_positions(range_num : int):
 	if not items_by_range.has(range_num):
 		return
-	
+
 	for item in items_by_range[range_num]:
 		if item and item.has_method("update_target_position"):
 			item.update_target_position()
@@ -412,23 +469,23 @@ func _update_item_positions(range_num : int):
 func _get_y_for_item(item : Item, range_num : int) -> float:
 	var viewport_size = get_viewport().size
 	var center_y = viewport_size.y * center_ratio
-	
+
 	if not item.has_meta("spawn_y"):
 		item.set_meta("spawn_y", item.global_position.y if item.global_position.y != 0 else center_y + 120.0)
 	return item.get_meta("spawn_y")
 
 func spawn_item(item_data : ItemData, spawn_range : int, spawn_position : Vector2 = Vector2.ZERO):
-	
+
 	var item := Item.new()
 	item.set_item(item_data)
 	item.set_range(spawn_range)
 	item.range_manager = self
 	add_child(item)
-	
+
 	if not items_by_range.has(spawn_range):
 		items_by_range[spawn_range] = []
 	items_by_range[spawn_range].append(item)
-	
+
 	if spawn_position != Vector2.ZERO:
 		item.global_position = spawn_position
 		item.target_position = spawn_position
@@ -436,14 +493,14 @@ func spawn_item(item_data : ItemData, spawn_range : int, spawn_position : Vector
 		var calculated_pos = get_position_for_item(item)
 		item.global_position = calculated_pos
 		item.target_position = calculated_pos
-	
+
 	return item
 
 # =========================
 
 func remove_enemy(enemy: Enemy):
 	var range_num = enemy.get_current_range()
-	
+
 	if enemies_by_range.has(range_num):
 		enemies_by_range[range_num].erase(enemy)
 
@@ -465,8 +522,6 @@ func get_position_for_enemy(enemy: Enemy) -> Vector2:
 	# ── Two-column layout ────────────────────────────────────────────────────
 	# Fill the left column up to max_per_column enemies before using the right.
 	# Y positions stay within [y_min, y_max] — enemies can never leave that band.
-	# Alternating assignment keeps columns even: even indices go left, odd go right.
-	# Left always gets the extra enemy when the count is odd.
 	var col: int       = enemy_index % 2       # 0 = left, 1 = right
 	var col_index: int = enemy_index / 2       # position within that column
 
@@ -510,7 +565,7 @@ func get_all_enemies() -> Array[Enemy]:
 	return all_enemies
 
 func _get_x_for_range(range_num: int) -> float:
-	return range_num * range_spacing
+	return range_num * range_spacing + range_spacing * 0.5
 
 # _get_y_for_enemy is superseded by the two-column logic inside
 # get_position_for_enemy and is no longer called. Kept as a stub so any
@@ -531,10 +586,10 @@ func _on_enemy_died(enemy: Enemy):
 func _on_enemy_moved(enemy: Enemy, old_range: int, new_range: int):
 	if enemies_by_range.has(old_range):
 		enemies_by_range[old_range].erase(enemy)
-	
+
 	if not enemies_by_range.has(new_range):
 		enemies_by_range[new_range] = []
-	
+
 	if not enemies_by_range[new_range].has(enemy):
 		enemies_by_range[new_range].append(enemy)
 
@@ -587,7 +642,7 @@ func toggle_target(enemy: Enemy):
 	elif targets.size() < number_of_targets:
 		targets.append(enemy)
 		enemy.set_targeted(true)
-	
+
 	var selectable_count = _count_selectable_enemies()
 	if targets.size() == number_of_targets or targets.size() == selectable_count:
 		confirm_targets()
@@ -604,7 +659,7 @@ func start_targeting(target_type: Action.TargetType, max_range: int, num_targets
 	current_max_range = max_range
 	number_of_targets = num_targets
 	targets.clear()
-	
+
 	match target_type:
 		Action.TargetType.SINGLE_ENEMY, Action.TargetType.X_ENEMIES_UP_TO_RANGE:
 			_make_enemies_selectable_up_to_range(max_range)
@@ -612,7 +667,7 @@ func start_targeting(target_type: Action.TargetType, max_range: int, num_targets
 			_make_enemies_selectable_up_to_range(max_range)
 		Action.TargetType.ALL_ENEMIES:
 			pass
-	
+
 	targeting_started.emit()
 
 func _make_enemies_selectable_up_to_range(max_range: int):
@@ -630,20 +685,20 @@ func _make_all_ranges_selectable():
 func cancel_targeting():
 	targeting = false
 	number_of_targets = 0
-	
+
 	for enemy in get_all_enemies():
 		enemy.make_unselectable()
 		enemy.set_targeted(false)
-	
+
 	targets.clear()
 	targeting_cancelled.emit()
 
 
 func confirm_targets():
 	targeting = false
-	
+
 	for enemy in get_all_enemies():
 		enemy.make_unselectable()
 		enemy.set_targeted(false)
-	
+
 	targets_confirmed.emit(targets)

@@ -17,8 +17,9 @@ var ui_bar : UIBar
 @export var character_sheet_scene : PackedScene
 var current_character_sheet : PopupPanel = null
 
-@export var initial_enemy_count : int = 3
-@export var initial_spawn_range : int = 5
+## Starting noise handed to the RangeManager at combat open.
+## This is the sole driver of the first wave of spawns — no random picking.
+@export var initial_noise : float = 0.0
 
 ## Which act the player is currently on (0-indexed internally, displayed as 1-indexed).
 var current_act : int = 0
@@ -26,7 +27,7 @@ var current_act : int = 0
 ## Tracks horde recipe_names fought so far this act so they aren't repeated.
 ## Reset at run start and whenever a new act begins.
 var _used_horde_names : Array[String] = []
-
+var _used_event_names : Array[String] = []
 ## One HordePool per act (index 0 = Act 1, index 1 = Act 2, etc.).
 ## If the player reaches an act beyond this array, falls back to horde.
 @export var act_recipe_pools : Array[HordePool] = []
@@ -77,6 +78,7 @@ func begin_run(seed : int = -1):
 	rng.seed = run_seed
 	current_act = 0
 	_used_horde_names.clear()
+	_used_event_names.clear()
 	_owned_thingy_paths.clear()
 
 	# Deep-duplicate every card so each slot is an independent object.
@@ -156,8 +158,19 @@ func _show_event_for_node(node: MapNode) -> void:
 		if ev.event_type == target_exit_type:
 			matching.append(ev)
 
-	var chosen_event : EventData = matching.pick_random() if not matching.is_empty() \
-									else available_events.pick_random()
+	# Prefer events not yet seen this act, falling back to all matching only
+	# when every option has already been used -- mirrors the horde dedup logic.
+	var candidate_pool : Array[EventData] = matching if not matching.is_empty() \
+												else available_events
+	var fresh_events : Array[EventData] = []
+	for ev in candidate_pool:
+		if ev.resource_path not in _used_event_names:
+			fresh_events.append(ev)
+	var chosen_event : EventData = (fresh_events if not fresh_events.is_empty() \
+									else candidate_pool).pick_random()
+
+	if chosen_event.resource_path != "" and chosen_event.resource_path not in _used_event_names:
+		_used_event_names.append(chosen_event.resource_path)
 
 	current_event_scene = load("res://Scenes/event_scene.tscn").instantiate()
 	current_event_scene.run_manager = self
@@ -216,31 +229,19 @@ func setup_win_condition():
 	else:
 		push_warning("No win condition set! Combat will not have a win condition.")
 
-func spawn_initial_enemies():
-	if current_win_condition is DefeatAllEnemies:
-		return
-
-	if current_win_condition is SurviveXTurns:
-		pass
-
-	if range_manager.enemy_pool.is_empty():
-		push_warning("No enemies in enemy_pool -- cannot spawn initial enemies")
-		return
-
-	for i in initial_enemy_count:
-		var random_enemy = range_manager.enemy_pool.pick_random()
-		range_manager.spawn_enemy(random_enemy, initial_spawn_range)
-
 func _on_card_played(card_data: CardData):
 	if card_data and range_manager:
 		range_manager.process_card_cost(card_data.card_cost)
 
 func create_range_manager():
 	range_manager = load("res://Scenes/range_manager.tscn").instantiate()
-	add_child(range_manager)
 	range_manager.run_manager = self
+	# Populate the pool and set noise BEFORE add_child so _ready() fires
+	# with everything in place. The deferred drain in _ready() then handles
+	# the first wave of spawns through the noise system.
 	range_manager.enemy_pool.append_array(_pick_horde_for_combat())
-	spawn_initial_enemies()
+	range_manager.starting_noise = initial_noise
+	add_child(range_manager)
 
 ## Selects enemies from a Horde in the current act's pool that is valid for
 ## the current map column. Hordes already fought this act are avoided unless
@@ -351,6 +352,7 @@ func on_combat_won():
 func _start_new_act() -> void:
 	current_act += 1
 	_used_horde_names.clear()
+	_used_event_names.clear()
 	print("RunManager: beginning Act %d" % (current_act + 1))
 	if map_generator:
 		await Transitions.transition(func(): map_generator.build(rng))

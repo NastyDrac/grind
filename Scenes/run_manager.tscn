@@ -1,4 +1,4 @@
-[gd_scene load_steps=35 format=3 uid="uid://cssup3trfa1rg"]
+[gd_scene load_steps=36 format=3 uid="uid://cssup3trfa1rg"]
 
 [ext_resource type="Script" uid="uid://nami4xhnpwrm" path="res://Scripts/run_manager.gd" id="1_u1n32"]
 [ext_resource type="Script" uid="uid://0gsjrx47no8b" path="res://Scripts/card_data.gd" id="2_0y178"]
@@ -22,6 +22,7 @@
 [ext_resource type="Script" uid="uid://dbrkkfbjmvvar" path="res://Scripts/defeat_x_enemies.gd" id="17_boem8"]
 [ext_resource type="Resource" uid="uid://kpb85v6hd13i" path="res://Enemies/ember_bones.tres" id="18_j41x3"]
 [ext_resource type="Resource" uid="uid://dl83c5o7wxf4p" path="res://events/hospital.tres" id="19_h8e1q"]
+[ext_resource type="Resource" uid="uid://cg683od81fpbl" path="res://events/wish_vending_machine.tres" id="23_4342n"]
 [ext_resource type="PackedScene" uid="uid://dn40540p4q1ve" path="res://Scenes/map_generator.tscn" id="25_j41x3"]
 
 [sub_resource type="Resource" id="Resource_4342n"]
@@ -62,7 +63,7 @@ metadata/_custom_type_script = "uid://0gsjrx47no8b"
 [sub_resource type="Resource" id="Resource_j41x3"]
 script = ExtResource("12_4342n")
 recipe_name = "Vermin"
-enemies = Array[ExtResource("8_obnx0")]([ExtResource("12_x7vpi"), ExtResource("13_h8e1q")])
+enemies = Array[ExtResource("8_obnx0")]([ExtResource("12_x7vpi"), ExtResource("13_h8e1q"), ExtResource("16_4342n")])
 max_column = 3
 rewards = Array[int]([0, 1])
 metadata/_custom_type_script = "uid://b6h8ntxfaauo5"
@@ -97,9 +98,10 @@ script = ExtResource("1_u1n32")
 deck = Array[ExtResource("2_0y178")]([SubResource("Resource_0ycsu"), SubResource("Resource_0ycsu"), SubResource("Resource_0ycsu"), SubResource("Resource_0ycsu"), SubResource("Resource_0ycsu"), SubResource("Resource_lv2e2"), SubResource("Resource_lv2e2"), SubResource("Resource_lv2e2"), SubResource("Resource_lv2e2"), SubResource("Resource_lv2e2")])
 character = ExtResource("14_4342n")
 character_sheet_scene = ExtResource("12_4nan2")
+initial_noise = 3.0
 act_recipe_pools = Array[ExtResource("16_1tppy")]([SubResource("Resource_38h1b")])
 win_condition = SubResource("Resource_hl081")
-available_events = Array[ExtResource("10_obnx0")]([ExtResource("11_rqa6y"), ExtResource("19_h8e1q")])
+available_events = Array[ExtResource("10_obnx0")]([ExtResource("11_rqa6y"), ExtResource("19_h8e1q"), ExtResource("23_4342n")])
 map_generator_scene = ExtResource("25_j41x3")
 
 [node name="CanvasLayer" type="CanvasLayer" parent="."]

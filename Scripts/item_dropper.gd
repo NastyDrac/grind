@@ -41,5 +41,5 @@ func _on_enemy_death(enemy: Enemy):
 func get_description_with_values() -> String:
 	if description:
 		return description
-	else:
-		return "Enemies have a " + str(chance.calculate(entity)) + "% chance of dropping " + item.item_name + " on death."
+	var chance_str := str(chance.calculate(entity)) if entity else chance.get_formula_display().capitalize()
+	return "Enemies have a " + chance_str + "% chance of dropping " + item.item_name + " on death."

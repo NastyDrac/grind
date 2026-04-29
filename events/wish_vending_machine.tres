@@ -1,0 +1,63 @@
+[gd_resource type="Resource" script_class="EventData" load_steps=19 format=3 uid="uid://cg683od81fpbl"]
+
+[ext_resource type="Script" uid="uid://ccujthovl5rv7" path="res://Scripts/event_option.gd" id="1_hurph"]
+[ext_resource type="Script" uid="uid://tnxg66jw03v3" path="res://Scripts/enemy_data.gd" id="2_38pva"]
+[ext_resource type="Script" uid="uid://c8bk1dof3250" path="res://Scripts/event_data.gd" id="2_tfdy5"]
+[ext_resource type="Script" uid="uid://chli81s5gxydu" path="res://Scripts/event_effect.gd" id="3_q1gdi"]
+[ext_resource type="Script" uid="uid://b3mi542wlp4b0" path="res://Scripts/EventEffects/effect_cost_gold.gd" id="4_xqptf"]
+[ext_resource type="Script" uid="uid://bggju16i5y2vm" path="res://Scripts/EventEffects/effect_cost_hp.gd" id="5_3j1uo"]
+[ext_resource type="Script" uid="uid://vdwy0p0apc5" path="res://Scripts/EventEffects/effect_remove_card.gd" id="6_70x5e"]
+[ext_resource type="Script" uid="uid://ckmlhw3dcvb0k" path="res://Scripts/EventEffects/effect_mod_stat.gd" id="7_m0dh6"]
+[ext_resource type="Script" uid="uid://b2h1ochum01o" path="res://Scripts/stat.gd" id="8_oc2iv"]
+[ext_resource type="Script" uid="uid://cgrxhw8vqenhu" path="res://Scripts/ValueCalculator.gd" id="9_3rd5c"]
+
+[sub_resource type="Resource" id="Resource_krlb8"]
+script = ExtResource("4_xqptf")
+amount = -10
+metadata/_custom_type_script = "uid://b3mi542wlp4b0"
+
+[sub_resource type="Resource" id="Resource_luar8"]
+script = ExtResource("5_3j1uo")
+amount = 4
+metadata/_custom_type_script = "uid://bggju16i5y2vm"
+
+[sub_resource type="Resource" id="Resource_6qdns"]
+script = ExtResource("1_hurph")
+option_text = "Kick it."
+result_text = "The machine seems to be made of an alloy of adamantium and mithil, but some coins fell out."
+effects = Array[ExtResource("3_q1gdi")]([SubResource("Resource_krlb8"), SubResource("Resource_luar8")])
+metadata/_custom_type_script = "uid://ccujthovl5rv7"
+
+[sub_resource type="Resource" id="Resource_2dx1q"]
+script = ExtResource("6_70x5e")
+metadata/_custom_type_script = "uid://vdwy0p0apc5"
+
+[sub_resource type="Resource" id="Resource_jtqdj"]
+script = ExtResource("9_3rd5c")
+formula = "1"
+metadata/_custom_type_script = "uid://cgrxhw8vqenhu"
+
+[sub_resource type="Resource" id="Resource_jpvj4"]
+script = ExtResource("8_oc2iv")
+stat_type = 2
+value_calc = SubResource("Resource_jtqdj")
+metadata/_custom_type_script = "uid://b2h1ochum01o"
+
+[sub_resource type="Resource" id="Resource_ew6wc"]
+script = ExtResource("7_m0dh6")
+stat_to_mod = SubResource("Resource_jpvj4")
+metadata/_custom_type_script = "uid://ckmlhw3dcvb0k"
+
+[sub_resource type="Resource" id="Resource_rqyfs"]
+script = ExtResource("1_hurph")
+option_text = "Feed it a card."
+result_text = "Good, it takes a card. You try a new snack."
+effects = Array[ExtResource("3_q1gdi")]([SubResource("Resource_2dx1q"), SubResource("Resource_ew6wc")])
+metadata/_custom_type_script = "uid://ccujthovl5rv7"
+
+[resource]
+script = ExtResource("2_tfdy5")
+event_title = "The Wish Vending Machine"
+event_description = "A busted vending machine hums with unnatural energy. The keypad flickers symbols you don’t recognize."
+options = Array[ExtResource("1_hurph")]([SubResource("Resource_6qdns"), SubResource("Resource_rqyfs")])
+metadata/_custom_type_script = "uid://c8bk1dof3250"
