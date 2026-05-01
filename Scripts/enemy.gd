@@ -55,7 +55,7 @@ func set_range_manager(manager : RangeManager):
 	range_manager = manager
 
 func set_data(enemy_data: EnemyData, spawn_range : int = 5):
-	data = enemy_data
+	data = enemy_data.duplicate()
 	max_health = randi_range(data.min_health, data.max_health)
 	current_health = max_health
 	current_range = spawn_range
@@ -93,20 +93,73 @@ func _on_enemies_advance():
 	move_toward_player()
 
 func move_toward_player():
+	if data.move_pattern:
+		var step = data.move_pattern.get_active_step(self)
+		if step:
+			_execute_action(step.action)
+			return
+	# Default behavior — no pattern assigned, or no step matched.
 	if current_range <= data.attack_range:
 		attack_player()
 		return
-	
-	
-	var old_range = current_range
+	_do_advance()
+
+
+# ── Movement primitives ───────────────────────────────────────────────────────
+
+func _do_advance() -> void:
+	var old_range := current_range
 	current_range = max(1, current_range - data.move_speed)
-	
-	
 	if range_manager:
 		target_position = range_manager.get_position_for_enemy(self)
-	
 	Global.enemy_advanced.emit(self, old_range, current_range)
-	
+
+
+func _do_retreat() -> void:
+	var old_range := current_range
+	# Use the initialised dictionary size so this automatically respects any
+	# future change to the max range passed into _initialize_ranges().
+	var max_range := range_manager.enemies_by_range.size() - 1 if range_manager else 5
+	current_range = min(max_range, current_range + data.move_speed)
+	if range_manager:
+		target_position = range_manager.get_position_for_enemy(self)
+	Global.enemy_advanced.emit(self, old_range, current_range)
+
+
+func _execute_action(action: MoveStep.MoveAction) -> void:
+	match action:
+		MoveStep.MoveAction.ADVANCE:
+			_do_advance()
+		MoveStep.MoveAction.RETREAT:
+			_do_retreat()
+		MoveStep.MoveAction.HOLD:
+			pass  # Intentionally do nothing.
+		MoveStep.MoveAction.ATTACK:
+			if current_range <= data.attack_range:
+				attack_player()
+			else:
+				_do_advance()
+		MoveStep.MoveAction.ATTACK_THEN_RETREAT:
+			if current_range <= data.attack_range:
+				attack_player()
+			_do_retreat()
+		MoveStep.MoveAction.ATTACK_THEN_ADVANCE:
+			if current_range <= data.attack_range:
+				attack_player()
+			_do_advance()
+
+
+## Returns what this enemy will do on the next advance, given its current state.
+## Used by IntentIndicator to preview the upcoming action without executing it.
+func get_next_intent() -> MoveStep.MoveAction:
+	if data and data.move_pattern:
+		var step = data.move_pattern.get_active_step(self)
+		if step:
+			return step.action
+	# Mirror default behavior.
+	if current_range <= data.attack_range:
+		return MoveStep.MoveAction.ATTACK
+	return MoveStep.MoveAction.ADVANCE
 
 
 func attack_player():

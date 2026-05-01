@@ -1,8 +1,22 @@
-[gd_resource type="Resource" script_class="EnemyData" load_steps=4 format=3 uid="uid://w16ibmun3dtb"]
+[gd_resource type="Resource" script_class="EnemyData" load_steps=8 format=3 uid="uid://w16ibmun3dtb"]
 
 [ext_resource type="Script" uid="uid://b1ogi3xh5xakp" path="res://Scripts/condition.gd" id="1_eafp4"]
+[ext_resource type="Script" uid="uid://b2o6hip7peiwb" path="res://Scripts/move_pattern.gd" id="2_5gshk"]
 [ext_resource type="Script" uid="uid://tnxg66jw03v3" path="res://Scripts/enemy_data.gd" id="2_tu1jw"]
+[ext_resource type="Script" uid="uid://rf04wb68htw8" path="res://Scripts/move_step.gd" id="3_2yql6"]
 [ext_resource type="Texture2D" uid="uid://c5b0k0gqs52vr" path="res://Art/Characters/Warmonger.png" id="3_tu1jw"]
+
+[sub_resource type="Resource" id="Resource_7bxrx"]
+script = ExtResource("3_2yql6")
+predicate = 1
+action = 1
+threshold = 50.0
+metadata/_custom_type_script = "uid://rf04wb68htw8"
+
+[sub_resource type="Resource" id="Resource_b5cgc"]
+script = ExtResource("2_5gshk")
+steps = Array[ExtResource("3_2yql6")]([SubResource("Resource_7bxrx")])
+metadata/_custom_type_script = "uid://b2o6hip7peiwb"
 
 [resource]
 script = ExtResource("2_tu1jw")
@@ -11,6 +25,7 @@ texture = ExtResource("3_tu1jw")
 min_health = 17
 max_health = 22
 damage = 12
+move_pattern = SubResource("Resource_b5cgc")
 noise_cost = 6
 is_elite = true
 metadata/_custom_type_script = "uid://tnxg66jw03v3"

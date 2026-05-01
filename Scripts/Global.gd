@@ -10,6 +10,9 @@ signal enemy_advanced(enemy : Enemy, old_range : int, new_range : int)  # All en
 signal enemy_spawned(enemy: Enemy)
 signal enemy_attacks_player(enemy: Enemy, damage: int)
 signal enemy_dies(enemy : Enemy)
+# Hand actions
+signal card_added_to_hand(card: Card)
+signal card_removed_from_hand(card: Card)
 # Player actions
 signal player_attacks(attacker: Character, target: Enemy, damage: int)
 signal item_dropped(item : Item, location : Vector2)

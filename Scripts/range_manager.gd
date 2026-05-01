@@ -123,18 +123,40 @@ func process_card_cost(cost: int):
 		SpawnMode.MIDDLE_GROUND:
 			_spawn_middle_ground(cost)
 
+@export var camera: Camera2D
+
 func _ready() -> void:
-	range_spacing = get_viewport_rect().size.x / 6
 	add_to_group("range_manager")
+	_recalculate_spacing()
 	_initialize_ranges(5)
 	Global.enemy_dies.connect(_on_enemy_died)
 	Global.enemy_advanced.connect(_on_enemy_moved)
 	Global.time_passed.connect(_on_time_passed)
+	get_viewport().size_changed.connect(_on_viewport_size_changed)
 
 	# Seed starting noise and spawn from it on the first frame (all modes).
 	if starting_noise > 0.0:
 		noise_meter += starting_noise
 		_drain_meter_into_spawns.call_deferred()
+
+func _recalculate_spacing() -> void:
+	var zoom_x := camera.zoom.x if camera else 1.0
+	range_spacing = get_viewport_rect().size.x / (zoom_x * 6.0)
+	# Keep the camera horizontally centred over all 6 ranges regardless of
+	# viewport width. The Y position is set in the scene editor.
+	if camera:
+		camera.position.x = range_spacing * 3.0
+
+func _on_viewport_size_changed() -> void:
+	_recalculate_spacing()
+	for range_num in enemies_by_range:
+		_update_enemy_positions(range_num)
+	for range_num in items_by_range:
+		_update_item_positions(range_num)
+	var character = get_tree().get_first_node_in_group("character")
+	if character and character.has_method("position_character"):
+		character.position_character()
+
 
 func _process(_delta: float) -> void:
 	queue_redraw()
@@ -150,7 +172,7 @@ func _draw() -> void:
 	var bottom_y = viewport_size.y
 
 	# Draw a vertical line between each pair of adjacent ranges.
-	for i in range(5):  # boundaries between: 0|1, 1|2, 2|3, 3|4, 4|5
+	for i in range(5):  # boundaries: 0|1, 1|2, 2|3, 3|4, 4|5
 		var x = (i + 1) * range_spacing
 		draw_line(
 			Vector2(x, top_y),

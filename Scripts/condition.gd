@@ -15,7 +15,7 @@ var entity
 
 func apply_condition(who, condition : Condition) -> void:
 	entity = who
-	who.conditions.append(self)
+	who.conditions.append(self.duplicate())
 func trigger_condition() -> void:
 	pass
 

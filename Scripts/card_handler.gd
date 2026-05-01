@@ -1011,12 +1011,14 @@ func _complete_card_play():
 # ============================================================================
 
 func discard(card : Card):
+	Global.card_removed_from_hand.emit(card)
 	var tween = create_tween()
 	tween.tween_property(card, "position", discard_pile.global_position, .5)
 	await tween.finished
 	card.reparent(discard_pile)
 
 func exhaust(card : Card):
+	Global.card_removed_from_hand.emit(card)
 	var tween = create_tween()
 	tween.tween_property(card, "position", exhaust_pile.global_position, .5)
 	await tween.finished
@@ -1068,6 +1070,7 @@ func discard_hand():
 	var discard_tweens = []
 	var fickle_cards = []
 	for card in cards_to_discard:
+		Global.card_removed_from_hand.emit(card)
 		card.reparent(self)
 		if card.data and card.data.fickle:
 			fickle_cards.append(card)
@@ -1133,6 +1136,7 @@ func add_card_to_hand(card : Card):
 	
 	card.reparent(hand)
 	cards_in_hand.append(card)
+	Global.card_added_to_hand.emit(card)
 	arrange_cards()
 
 # ============================================================================

@@ -10,6 +10,8 @@ class_name EnemyData
 @export var move_speed : int = 1
 @export var attack_range : int = 1
 @export var conditions : Array[Condition] = []
+## Optional movement pattern. If unset, the enemy uses default advance-or-attack behavior.
+@export var move_pattern: MovePattern
 
 # How much this enemy costs to spawn from the noise meter.
 # Cheap enemies (goblins etc.) = 1-2, elites = 4-6, bosses = 8+

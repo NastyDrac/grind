@@ -9,6 +9,37 @@ signal card_hovered(card : Card)
 
 var player_reference : Character = null
 
+# ── Cost modification ─────────────────────────────────────────────────────────
+## Set a specific cost, ignoring modifiers. -1 = inactive (use base cost + modifiers).
+var cost_override: int = -1
+## Relative adjustments from multiple independent sources (conditions, cards, etc.).
+var cost_modifiers: Array[int] = []
+
+func get_cost() -> int:
+	if cost_override >= 0:
+		return cost_override
+	var total = data.card_cost
+	for mod in cost_modifiers:
+		total += mod
+	return max(0, total)
+
+func set_cost_override(new_cost: int) -> void:
+	cost_override = new_cost
+	cost.text = str(get_cost())
+
+func clear_cost_override() -> void:
+	cost_override = -1
+	cost.text = str(get_cost())
+
+func add_cost_modifier(amount: int) -> void:
+	cost_modifiers.append(amount)
+	cost.text = str(get_cost())
+
+func remove_cost_modifier(amount: int) -> void:
+	cost_modifiers.erase(amount)
+	cost.text = str(get_cost())
+# ─────────────────────────────────────────────────────────────────────────────
+
 # Visual selection for card targeting
 var is_selected_for_targeting: bool = false
 var selection_highlight: ColorRect
@@ -22,7 +53,7 @@ func _on_mouse_exited() -> void:
 func set_data(card_data : CardData):
 	data = card_data
 	title.text = data.card_name
-	cost.text = str(data.card_cost)
+	cost.text = str(get_cost())
 	
 	if description is RichTextLabel:
 		description.bbcode_enabled = true
