@@ -19,7 +19,7 @@ metadata/_custom_type_script = "uid://clvjn77csx1a0"
 
 [resource]
 script = ExtResource("2_e8rvd")
-card_name = "Crack Shot"
+card_name = "No Scope"
 card_cost = 2
 actions = Array[ExtResource("1_vbduw")]([SubResource("Resource_epyjt")])
 metadata/_custom_type_script = "uid://0gsjrx47no8b"

@@ -2,6 +2,7 @@ extends Node2D
 class_name Enemy
 
 var data : EnemyData
+var _movement_data : EnemyData  # original un-duplicated reference for virtual dispatch
 var current_health : int
 var max_health : int
 var current_range : int = 5
@@ -48,13 +49,17 @@ func _on_apply_condition(target, condition_to_apply: Condition):
 	condition_to_apply.apply_condition(self, condition_to_apply)
 
 func resize_collision_shape():
-	$Sprite2D/Area2D/CollisionShape2D.shape.size = data.texture.get_size()
+	if data.texture:
+		$Sprite2D/Area2D/CollisionShape2D.shape.size = data.texture.get_size()
 	health_bar.position.y -= get_visual_height()/2 + health_bar.get_rect().size.y/2
 
 func set_range_manager(manager : RangeManager):
 	range_manager = manager
 
 func set_data(enemy_data: EnemyData, spawn_range : int = 5):
+	_movement_data = enemy_data
+	if _movement_data.has_method("reset_movement_state"):
+		_movement_data.call("reset_movement_state")
 	data = enemy_data.duplicate()
 	max_health = randi_range(data.min_health, data.max_health)
 	current_health = max_health
@@ -93,6 +98,8 @@ func _on_enemies_advance():
 	move_toward_player()
 
 func move_toward_player():
+	if _movement_data and _movement_data.override_movement(self):
+		return
 	if data.move_pattern:
 		var step = data.move_pattern.get_active_step(self)
 		if step:
@@ -152,6 +159,9 @@ func _execute_action(action: MoveStep.MoveAction) -> void:
 ## Returns what this enemy will do on the next advance, given its current state.
 ## Used by IntentIndicator to preview the upcoming action without executing it.
 func get_next_intent() -> MoveStep.MoveAction:
+	# Custom movement data (e.g. WereOstrichData) can report its own intent.
+	if _movement_data and _movement_data.has_method("get_current_intent"):
+		return _movement_data.call("get_current_intent") as MoveStep.MoveAction
 	if data and data.move_pattern:
 		var step = data.move_pattern.get_active_step(self)
 		if step:
@@ -164,6 +174,13 @@ func get_next_intent() -> MoveStep.MoveAction:
 
 func attack_player():
 	Global.enemy_attacks_player.emit(self, get_attack_damage())
+
+func get_intent_damage() -> int:
+	# Allows custom movement data to report a different damage value for the
+	# intent indicator (e.g. WereOstrichData reports charge damage, not base damage).
+	if _movement_data and _movement_data.has_method("get_display_damage"):
+		return _movement_data.call("get_display_damage", self)
+	return get_attack_damage()
 
 func get_attack_damage() -> int:
 
@@ -208,7 +225,7 @@ func _on_area_2d_mouse_exited() -> void:
 	_hide_hover_feedback()
 
 func get_visual_height() -> float:
-	if has_node("Sprite2D"):
+	if has_node("Sprite2D") and $Sprite2D.texture:
 		return $Sprite2D.texture.get_height() * $Sprite2D.scale.y
 	return 100.0
 

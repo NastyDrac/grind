@@ -1,4 +1,4 @@
-[gd_scene load_steps=36 format=3 uid="uid://cssup3trfa1rg"]
+[gd_scene load_steps=44 format=3 uid="uid://cssup3trfa1rg"]
 
 [ext_resource type="Script" uid="uid://nami4xhnpwrm" path="res://Scripts/run_manager.gd" id="1_u1n32"]
 [ext_resource type="Script" uid="uid://0gsjrx47no8b" path="res://Scripts/card_data.gd" id="2_0y178"]
@@ -21,9 +21,15 @@
 [ext_resource type="Resource" uid="uid://2omyroag2mcs" path="res://Enemies/ice_giant.tres" id="16_tvxjp"]
 [ext_resource type="Script" uid="uid://dbrkkfbjmvvar" path="res://Scripts/defeat_x_enemies.gd" id="17_boem8"]
 [ext_resource type="Resource" uid="uid://kpb85v6hd13i" path="res://Enemies/ember_bones.tres" id="18_j41x3"]
+[ext_resource type="Resource" uid="uid://bullfr0gaaa1" path="res://Enemies/bullfrog.tres" id="19_38h1b"]
 [ext_resource type="Resource" uid="uid://dl83c5o7wxf4p" path="res://events/hospital.tres" id="19_h8e1q"]
+[ext_resource type="Resource" uid="uid://bxjko7vp64qs5" path="res://Enemies/gator.tres" id="20_af0ja"]
+[ext_resource type="Resource" uid="uid://du1l2khaw7wly" path="res://Enemies/snapping_turtle.tres" id="21_0ycsu"]
+[ext_resource type="Resource" uid="uid://y3t2nkpl5ldc" path="res://Enemies/water_moccasin.tres" id="22_egn0v"]
 [ext_resource type="Resource" uid="uid://cg683od81fpbl" path="res://events/wish_vending_machine.tres" id="23_4342n"]
+[ext_resource type="Resource" uid="uid://d0jqhw35a5vs3" path="res://Enemies/bosses/were_ostrich.tres" id="23_af0ja"]
 [ext_resource type="PackedScene" uid="uid://dn40540p4q1ve" path="res://Scenes/map_generator.tscn" id="25_j41x3"]
+[ext_resource type="Resource" uid="uid://cuwxd1fxsxkud" path="res://Enemies/balloon_fiend.tres" id="30_0ycsu"]
 
 [sub_resource type="Resource" id="Resource_4342n"]
 script = ExtResource("12_awuji")
@@ -39,7 +45,7 @@ metadata/_custom_type_script = "uid://clvjn77csx1a0"
 
 [sub_resource type="Resource" id="Resource_0ycsu"]
 script = ExtResource("2_0y178")
-card_name = "Shoot"
+card_name = "Attack"
 actions = Array[ExtResource("9_x7vpi")]([SubResource("Resource_af0ja")])
 metadata/_custom_type_script = "uid://0gsjrx47no8b"
 
@@ -84,14 +90,28 @@ min_column = 7
 max_column = 12
 metadata/_custom_type_script = "uid://b6h8ntxfaauo5"
 
+[sub_resource type="Resource" id="Resource_8dfvf"]
+script = ExtResource("12_4342n")
+recipe_name = "Swamp"
+enemies = Array[ExtResource("8_obnx0")]([ExtResource("19_38h1b"), ExtResource("20_af0ja"), ExtResource("21_0ycsu"), ExtResource("22_egn0v")])
+min_column = 1
+max_column = 4
+metadata/_custom_type_script = "uid://b6h8ntxfaauo5"
+
 [sub_resource type="Resource" id="Resource_38h1b"]
 script = ExtResource("16_1tppy")
-recipes = Array[ExtResource("12_4342n")]([SubResource("Resource_j41x3"), SubResource("Resource_awuji"), SubResource("Resource_1tppy")])
+recipes = Array[ExtResource("12_4342n")]([SubResource("Resource_j41x3"), SubResource("Resource_awuji"), SubResource("Resource_1tppy"), SubResource("Resource_8dfvf")])
 metadata/_custom_type_script = "uid://6vpnqyvhbord"
 
 [sub_resource type="Resource" id="Resource_hl081"]
 script = ExtResource("17_boem8")
 metadata/_custom_type_script = "uid://dbrkkfbjmvvar"
+
+[sub_resource type="Resource" id="Resource_lrsvn"]
+script = ExtResource("12_4342n")
+recipe_name = "Cult of the WereOstrich"
+enemies = Array[ExtResource("8_obnx0")]([ExtResource("22_egn0v"), ExtResource("23_af0ja"), ExtResource("30_0ycsu"), ExtResource("12_x7vpi")])
+metadata/_custom_type_script = "uid://b6h8ntxfaauo5"
 
 [node name="RunManager" type="Node2D"]
 script = ExtResource("1_u1n32")
@@ -103,5 +123,6 @@ act_recipe_pools = Array[ExtResource("16_1tppy")]([SubResource("Resource_38h1b")
 win_condition = SubResource("Resource_hl081")
 available_events = Array[ExtResource("10_obnx0")]([ExtResource("11_rqa6y"), ExtResource("19_h8e1q"), ExtResource("23_4342n")])
 map_generator_scene = ExtResource("25_j41x3")
+act_boss_hordes = Array[ExtResource("12_4342n")]([SubResource("Resource_lrsvn")])
 
 [node name="CanvasLayer" type="CanvasLayer" parent="."]

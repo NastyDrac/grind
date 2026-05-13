@@ -1,0 +1,17 @@
+[gd_resource type="Resource" script_class="EnemyData" load_steps=4 format=3 uid="uid://du1l2khaw7wly"]
+
+[ext_resource type="Script" uid="uid://tnxg66jw03v3" path="res://Scripts/enemy_data.gd" id="1_st"]
+[ext_resource type="Script" uid="uid://b1ogi3xh5xakp" path="res://Scripts/condition.gd" id="2_st"]
+[ext_resource type="Texture2D" uid="uid://b2rjhiy4rifig" path="res://icon.svg" id="3_st"]
+
+[resource]
+script = ExtResource("1_st")
+enemy_name = "The Snapping Turtle"
+texture = ExtResource("3_st")
+min_health = 22
+max_health = 28
+damage = 8
+move_speed = 1
+attack_range = 1
+noise_cost = 4
+metadata/_custom_type_script = "uid://tnxg66jw03v3"

@@ -124,6 +124,9 @@ func _on_map_node_chosen(node: MapNode) -> void:
 		MapNode.NodeType.COMBAT:
 			Transitions.transition_style = Transitions.TransitionStyle.BROKEN_GLASS
 			await Transitions.transition(func(): begin_combat())
+		MapNode.NodeType.BOSS:
+			Transitions.transition_style = Transitions.TransitionStyle.BROKEN_GLASS
+			await Transitions.transition(func(): begin_boss_combat())
 		MapNode.NodeType.SHOP:
 			Transitions.transition_style = Transitions.TransitionStyle.FADE
 			await Transitions.transition(func(): create_shop())
@@ -186,9 +189,59 @@ func _on_event_completed():
 #  COMBAT
 # ------------------------------------------------------------------------------
 
+## One Horde per act for boss fights. Index 0 = Act 1, index 1 = Act 2, etc.
+## The first enemy in the horde with is_elite = true is the boss — spawned
+## immediately. All other enemies go into the noise pool and spawn as the
+## player plays cards, just like a normal combat.
+@export var act_boss_hordes : Array[Horde] = []
+
 func begin_combat():
 	current_state = GameState.COMBAT
 	begin_wave()
+
+func begin_boss_combat():
+	current_state = GameState.COMBAT
+
+	var boss_horde : Horde = null
+	if current_act < act_boss_hordes.size():
+		boss_horde = act_boss_hordes[current_act]
+
+	if boss_horde == null:
+		push_error("RunManager: no boss horde for act %d in act_boss_hordes!" % (current_act + 1))
+		return
+
+	# Split the horde into the boss (first elite) and the minion noise pool.
+	var boss_data   : EnemyData          = null
+	var minion_pool : Array[EnemyData]   = []
+	for ed in boss_horde.enemies:
+		if ed.is_elite and boss_data == null:
+			boss_data = ed       # first elite is the boss
+		else:
+			minion_pool.append(ed)
+
+	if boss_data == null:
+		push_error("RunManager: boss horde for act %d has no elite enemy!" % (current_act + 1))
+		return
+
+	# Build the range manager with the minion pool and normal card-driven noise.
+	range_manager = load("res://Scenes/range_manager.tscn").instantiate()
+	range_manager.run_manager = self
+	range_manager.enemy_pool.append_array(minion_pool)
+	range_manager.starting_noise = initial_noise
+	add_child(range_manager)
+
+	if not player:
+		create_player()
+	player.position_character()
+	player.toggle_visible(true)
+	player.reset_for_new_wave()
+
+	create_card_handler()
+	ui_bar.set_health()
+
+	# Spawn the boss. Because is_elite = true, range_manager._on_elite_spawned()
+	# fires automatically and wires up DefeatSingleEnemy + the announcement.
+	range_manager.spawn_enemy(boss_data, 5)
 
 func begin_wave():
 	create_range_manager()

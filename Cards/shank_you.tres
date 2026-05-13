@@ -25,7 +25,7 @@ metadata/_custom_type_script = "uid://clvjn77csx1a0"
 
 [resource]
 script = ExtResource("2_5hcsj")
-card_name = "Knife"
+card_name = "Shank You Very Much"
 card_cost = 0
 actions = Array[ExtResource("1_o1lv3")]([SubResource("Resource_f2uno")])
 exhaust = true

@@ -1,0 +1,35 @@
+[gd_resource type="Resource" script_class="EnemyData" load_steps=9 format=3 uid="uid://bxjko7vp64qs5"]
+
+[ext_resource type="Script" uid="uid://b1ogi3xh5xakp" path="res://Scripts/condition.gd" id="1_gat"]
+[ext_resource type="Script" uid="uid://b2o6hip7peiwb" path="res://Scripts/move_pattern.gd" id="2_gat"]
+[ext_resource type="Script" uid="uid://tnxg66jw03v3" path="res://Scripts/enemy_data.gd" id="3_gat"]
+[ext_resource type="Script" uid="uid://rf04wb68htw8" path="res://Scripts/move_step.gd" id="4_gat"]
+[ext_resource type="Texture2D" uid="uid://b2rjhiy4rifig" path="res://icon.svg" id="5_gat"]
+
+[sub_resource type="Resource" id="Resource_gat_attack"]
+script = ExtResource("4_gat")
+predicate = 3
+action = 4
+metadata/_custom_type_script = "uid://rf04wb68htw8"
+
+[sub_resource type="Resource" id="Resource_gat_advance"]
+script = ExtResource("4_gat")
+metadata/_custom_type_script = "uid://rf04wb68htw8"
+
+[sub_resource type="Resource" id="Resource_gat_pattern"]
+script = ExtResource("2_gat")
+steps = Array[ExtResource("4_gat")]([SubResource("Resource_gat_attack"), SubResource("Resource_gat_advance")])
+metadata/_custom_type_script = "uid://b2o6hip7peiwb"
+
+[resource]
+script = ExtResource("3_gat")
+enemy_name = "The Gator"
+texture = ExtResource("5_gat")
+min_health = 35
+max_health = 45
+damage = 10
+move_speed = 2
+move_pattern = SubResource("Resource_gat_pattern")
+noise_cost = 8
+is_elite = true
+metadata/_custom_type_script = "uid://tnxg66jw03v3"

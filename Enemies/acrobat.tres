@@ -1,0 +1,37 @@
+[gd_resource type="Resource" script_class="EnemyData" load_steps=9 format=3 uid="uid://cawv6qeibuvxw"]
+
+[ext_resource type="Script" uid="uid://b1ogi3xh5xakp" path="res://Scripts/condition.gd" id="1_ac"]
+[ext_resource type="Script" uid="uid://b2o6hip7peiwb" path="res://Scripts/move_pattern.gd" id="2_ac"]
+[ext_resource type="Script" uid="uid://tnxg66jw03v3" path="res://Scripts/enemy_data.gd" id="3_ac"]
+[ext_resource type="Script" uid="uid://rf04wb68htw8" path="res://Scripts/move_step.gd" id="4_ac"]
+[ext_resource type="Texture2D" uid="uid://b2rjhiy4rifig" path="res://icon.svg" id="5_ac"]
+
+[sub_resource type="Resource" id="Resource_ac_attack"]
+script = ExtResource("4_ac")
+predicate = 3
+action = 4
+metadata/_custom_type_script = "uid://rf04wb68htw8"
+
+[sub_resource type="Resource" id="Resource_ac_advance"]
+script = ExtResource("4_ac")
+predicate = 0
+action = 0
+metadata/_custom_type_script = "uid://rf04wb68htw8"
+
+[sub_resource type="Resource" id="Resource_ac_pattern"]
+script = ExtResource("2_ac")
+steps = Array[ExtResource("4_ac")]([SubResource("Resource_ac_attack"), SubResource("Resource_ac_advance")])
+metadata/_custom_type_script = "uid://b2o6hip7peiwb"
+
+[resource]
+script = ExtResource("3_ac")
+enemy_name = "The Acrobat"
+texture = ExtResource("5_ac")
+min_health = 5
+max_health = 7
+damage = 5
+move_speed = 2
+attack_range = 2
+move_pattern = SubResource("Resource_ac_pattern")
+noise_cost = 2
+metadata/_custom_type_script = "uid://tnxg66jw03v3"

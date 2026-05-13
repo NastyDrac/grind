@@ -1,0 +1,29 @@
+[gd_resource type="Resource" script_class="EnemyData" load_steps=6 format=3 uid="uid://b34r3l1t3aaa1"]
+
+[ext_resource type="Script" uid="uid://b1ogi3xh5xakp" path="res://Scripts/condition.gd" id="1_bear"]
+[ext_resource type="Texture2D" uid="uid://b2rjhiy4rifig" path="res://icon.svg" id="2_bear"]
+[ext_resource type="Script" uid="uid://do7yj12cpcfq4" path="res://Scripts/trumpeteer.gd" id="3_bear"]
+[ext_resource type="Script" uid="uid://tnxg66jw03v3" path="res://Scripts/enemy_data.gd" id="4_bear"]
+
+[sub_resource type="Resource" id="Resource_bear"]
+script = ExtResource("3_bear")
+trigger_type = 2
+fire_every_advance = true
+condition_name = "The Parade"
+stacks = 2
+icon = ExtResource("2_bear")
+metadata/_custom_type_script = "uid://do7yj12cpcfq4"
+
+[resource]
+script = ExtResource("4_bear")
+enemy_name = "The Bear"
+texture = ExtResource("2_bear")
+min_health = 32
+max_health = 42
+damage = 9
+move_speed = 2
+attack_range = 1
+conditions = Array[ExtResource("1_bear")]([SubResource("Resource_bear")])
+noise_cost = 8
+is_elite = true
+metadata/_custom_type_script = "uid://tnxg66jw03v3"

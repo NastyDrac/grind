@@ -25,7 +25,7 @@ metadata/_custom_type_script = "uid://dm2bmau6ctnm8"
 
 [resource]
 script = ExtResource("2_yocjn")
-card_name = "Flame Thower"
+card_name = "Burnin' Love"
 card_cost = 3
 rarity = 2
 actions = Array[ExtResource("1_ykda3")]([SubResource("Resource_w7wd4")])

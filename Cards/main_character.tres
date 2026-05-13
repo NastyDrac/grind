@@ -31,7 +31,7 @@ metadata/_custom_type_script = "uid://y73360xhw2qs"
 
 [resource]
 script = ExtResource("2_jtjoy")
-card_name = "Pomp"
+card_name = "Main Character Energy"
 card_cost = 2
 actions = Array[ExtResource("1_kdkku")]([SubResource("Resource_7h4ak"), SubResource("Resource_vx4vb")])
 exhaust = true

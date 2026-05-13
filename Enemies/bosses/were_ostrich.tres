@@ -1,0 +1,22 @@
+[gd_resource type="Resource" script_class="WereOstrichData" load_steps=3 format=3 uid="uid://d0jqhw35a5vs3"]
+
+[ext_resource type="Script" uid="uid://b84lcjd65hr2m" path="res://Scripts/were-ostrich.gd" id="2_elhfv"]
+[ext_resource type="Texture2D" uid="uid://c50c16qnyv3tl" path="res://Art/Walk (1).png" id="2_vgo0j"]
+
+[resource]
+script = ExtResource("2_elhfv")
+day_turns = null
+night_turns = null
+night_retreat_speed = null
+charge_damage_per_range = null
+enemy_name = "WereOstrich"
+texture = ExtResource("2_vgo0j")
+min_health = 45
+max_health = 52
+damage = 5
+move_speed = null
+attack_range = null
+conditions = null
+noise_cost = null
+is_elite = true
+metadata/_custom_type_script = "uid://b84lcjd65hr2m"

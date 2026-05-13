@@ -1,22 +1,22 @@
 [gd_resource type="Resource" script_class="CardData" load_steps=8 format=3 uid="uid://cdkflxdpog2v4"]
 
-[ext_resource type="Script" uid="uid://dhxff5egnsgrv" path="res://Scripts/action.gd" id="1_5gwck"]
-[ext_resource type="Script" uid="uid://cgrxhw8vqenhu" path="res://Scripts/ValueCalculator.gd" id="2_lm86l"]
-[ext_resource type="Script" uid="uid://clvjn77csx1a0" path="res://Scripts/AttackAction.gd" id="3_a3u7m"]
-[ext_resource type="Script" uid="uid://0gsjrx47no8b" path="res://Scripts/card_data.gd" id="4_qumlp"]
+[ext_resource type="Script" uid="uid://dhxff5egnsgrv" path="res://Scripts/action.gd" id="1_vdjui"]
+[ext_resource type="Script" uid="uid://cgrxhw8vqenhu" path="res://Scripts/ValueCalculator.gd" id="2_j5yjb"]
+[ext_resource type="Script" uid="uid://clvjn77csx1a0" path="res://Scripts/AttackAction.gd" id="3_c34xf"]
+[ext_resource type="Script" uid="uid://0gsjrx47no8b" path="res://Scripts/card_data.gd" id="4_y121g"]
 
 [sub_resource type="Resource" id="Resource_k4ykt"]
-script = ExtResource("2_lm86l")
+script = ExtResource("2_j5yjb")
 formula = "bang"
 metadata/_custom_type_script = "uid://cgrxhw8vqenhu"
 
 [sub_resource type="Resource" id="Resource_uyoyk"]
-script = ExtResource("2_lm86l")
+script = ExtResource("2_j5yjb")
 formula = "1"
 metadata/_custom_type_script = "uid://cgrxhw8vqenhu"
 
 [sub_resource type="Resource" id="Resource_5j30c"]
-script = ExtResource("3_a3u7m")
+script = ExtResource("3_c34xf")
 damage_calculator = SubResource("Resource_k4ykt")
 enemy_count_calculator = SubResource("Resource_uyoyk")
 max_range = 5
@@ -24,7 +24,7 @@ animation_type = 1
 metadata/_custom_type_script = "uid://clvjn77csx1a0"
 
 [resource]
-script = ExtResource("4_qumlp")
-card_name = "Small Caliber"
-actions = Array[ExtResource("1_5gwck")]([SubResource("Resource_5j30c")])
+script = ExtResource("4_y121g")
+card_name = "Pew Pew"
+actions = Array[ExtResource("1_vdjui")]([SubResource("Resource_5j30c")])
 metadata/_custom_type_script = "uid://0gsjrx47no8b"

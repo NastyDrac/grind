@@ -19,6 +19,6 @@ metadata/_custom_type_script = "uid://c3g4jmcp7xiqk"
 
 [resource]
 script = ExtResource("2_63kow")
-card_name = "Shove"
+card_name = "Excuse Me"
 actions = Array[ExtResource("1_rnsco")]([SubResource("Resource_2pfhn")])
 metadata/_custom_type_script = "uid://0gsjrx47no8b"

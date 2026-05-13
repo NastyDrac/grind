@@ -1,0 +1,27 @@
+[gd_resource type="Resource" script_class="EnemyData" load_steps=6 format=3 uid="uid://ch1hu4hu4aaa1"]
+
+[ext_resource type="Script" uid="uid://b1ogi3xh5xakp" path="res://Scripts/condition.gd" id="1_ch1"]
+[ext_resource type="Texture2D" uid="uid://b2rjhiy4rifig" path="res://icon.svg" id="2_ch1"]
+[ext_resource type="Script" uid="uid://do7yj12cpcfq4" path="res://Scripts/trumpeteer.gd" id="3_ch1"]
+[ext_resource type="Script" uid="uid://tnxg66jw03v3" path="res://Scripts/enemy_data.gd" id="4_ch1"]
+
+[sub_resource type="Resource" id="Resource_ch1"]
+script = ExtResource("3_ch1")
+trigger_type = 0
+condition_name = "Yapping"
+stacks = 2
+icon = ExtResource("2_ch1")
+metadata/_custom_type_script = "uid://do7yj12cpcfq4"
+
+[resource]
+script = ExtResource("4_ch1")
+enemy_name = "The Chihuahua"
+texture = ExtResource("2_ch1")
+min_health = 3
+max_health = 5
+damage = 2
+move_speed = 3
+attack_range = 1
+conditions = Array[ExtResource("1_ch1")]([SubResource("Resource_ch1")])
+noise_cost = 1
+metadata/_custom_type_script = "uid://tnxg66jw03v3"

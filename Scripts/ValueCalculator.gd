@@ -72,7 +72,7 @@ func _calculate_formula(player : Character) -> int:
 		push_error("Expression execution failed: %s" % _expression.get_error_text())
 		return 0
 	
-	return int(result)
+	return int(round(result))
 
 func _find_stat_from_character(player: Character, stat_type: Stat.STAT) -> int:
 	for stat in player.stats:

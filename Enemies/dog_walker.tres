@@ -1,0 +1,28 @@
+[gd_resource type="Resource" script_class="EnemyData" load_steps=6 format=3 uid="uid://d0gw4lk3raaa1"]
+
+[ext_resource type="Script" uid="uid://b1ogi3xh5xakp" path="res://Scripts/condition.gd" id="1_dw"]
+[ext_resource type="Texture2D" uid="uid://b2rjhiy4rifig" path="res://icon.svg" id="2_dw"]
+[ext_resource type="Script" uid="uid://do7yj12cpcfq4" path="res://Scripts/trumpeteer.gd" id="3_dw"]
+[ext_resource type="Script" uid="uid://tnxg66jw03v3" path="res://Scripts/enemy_data.gd" id="4_dw"]
+
+[sub_resource type="Resource" id="Resource_dw"]
+script = ExtResource("3_dw")
+trigger_type = 1
+condition_name = "Still Got The Leash"
+stacks = 2
+icon = ExtResource("2_dw")
+metadata/_custom_type_script = "uid://do7yj12cpcfq4"
+
+[resource]
+script = ExtResource("4_dw")
+enemy_name = "The Dog Walker"
+texture = ExtResource("2_dw")
+min_health = 28
+max_health = 35
+damage = 5
+move_speed = 1
+attack_range = 2
+noise_cost = 8
+is_elite = true
+conditions = Array[ExtResource("1_dw")]([SubResource("Resource_dw")])
+metadata/_custom_type_script = "uid://tnxg66jw03v3"

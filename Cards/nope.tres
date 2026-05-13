@@ -18,6 +18,6 @@ metadata/_custom_type_script = "uid://px415e6h6tao"
 
 [resource]
 script = ExtResource("2_dally")
-card_name = "dodge"
+card_name = "Nope"
 actions = Array[ExtResource("1_skb6b")]([SubResource("Resource_pjqxp")])
 metadata/_custom_type_script = "uid://0gsjrx47no8b"

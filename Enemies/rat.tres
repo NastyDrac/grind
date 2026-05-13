@@ -1,14 +1,17 @@
-[gd_resource type="Resource" script_class="EnemyData" load_steps=6 format=3 uid="uid://cair0ptjatmlo"]
+[gd_resource type="Resource" script_class="EnemyData" load_steps=7 format=3 uid="uid://cair0ptjatmlo"]
 
 [ext_resource type="Script" uid="uid://b1ogi3xh5xakp" path="res://Scripts/condition.gd" id="1_jpuur"]
 [ext_resource type="Script" uid="uid://tnxg66jw03v3" path="res://Scripts/enemy_data.gd" id="2_606al"]
 [ext_resource type="Script" uid="uid://bgw241a265wyo" path="res://Scripts/bloated.gd" id="2_lrykk"]
+[ext_resource type="Texture2D" uid="uid://b2rjhiy4rifig" path="res://icon.svg" id="2_v00mg"]
 [ext_resource type="Texture2D" uid="uid://b0y4mc7kwmcct" path="res://Art/Characters/RatEnemy.png" id="4_v00mg"]
 
 [sub_resource type="Resource" id="Resource_vay2w"]
 script = ExtResource("2_lrykk")
 condition_name = "Infected"
 stacks = 3
+icon = ExtResource("2_v00mg")
+show_stacks = true
 metadata/_custom_type_script = "uid://bgw241a265wyo"
 
 [resource]

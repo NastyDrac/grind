@@ -20,14 +20,18 @@ func get_intent(character : Enemy, old : int, new : int):
 		return
 	match enemy.get_next_intent():
 		MoveStep.MoveAction.ATTACK, MoveStep.MoveAction.ATTACK_THEN_RETREAT, MoveStep.MoveAction.ATTACK_THEN_ADVANCE:
+			flip_h = false
 			texture = attack_icon
-			label.text = str(enemy.get_attack_damage())
+			label.text = str(enemy.get_intent_damage())
 		MoveStep.MoveAction.RETREAT:
+			flip_h = true
 			texture = move_icon
-			label.text = "←"
+			label.text = str(enemy.data.move_speed)
 		MoveStep.MoveAction.HOLD:
+			flip_h = false
 			texture = move_icon
 			label.text = "•"
 		_: # ADVANCE or unmatched
+			flip_h = false
 			texture = move_icon
 			label.text = str(enemy.data.move_speed)

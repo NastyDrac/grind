@@ -1,0 +1,27 @@
+[gd_resource type="Resource" script_class="EnemyData" load_steps=6 format=3 uid="uid://myjyvx80hi77"]
+
+[ext_resource type="Script" uid="uid://b1ogi3xh5xakp" path="res://Scripts/condition.gd" id="1_pel"]
+[ext_resource type="Texture2D" uid="uid://b2rjhiy4rifig" path="res://icon.svg" id="2_pel"]
+[ext_resource type="Script" uid="uid://do7yj12cpcfq4" path="res://Scripts/trumpeteer.gd" id="3_pel"]
+[ext_resource type="Script" uid="uid://tnxg66jw03v3" path="res://Scripts/enemy_data.gd" id="4_pel"]
+
+[sub_resource type="Resource" id="Resource_pel"]
+script = ExtResource("3_pel")
+trigger_type = 0
+condition_name = "Squawk"
+stacks = 3
+icon = ExtResource("2_pel")
+metadata/_custom_type_script = "uid://do7yj12cpcfq4"
+
+[resource]
+script = ExtResource("4_pel")
+enemy_name = "The Pelican"
+texture = ExtResource("2_pel")
+min_health = 12
+max_health = 16
+damage = 4
+move_speed = 1
+attack_range = 2
+conditions = Array[ExtResource("1_pel")]([SubResource("Resource_pel")])
+noise_cost = 3
+metadata/_custom_type_script = "uid://tnxg66jw03v3"

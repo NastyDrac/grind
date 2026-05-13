@@ -1,0 +1,34 @@
+[gd_resource type="Resource" script_class="EnemyData" load_steps=9 format=3 uid="uid://bullfr0gaaa1"]
+
+[ext_resource type="Script" uid="uid://b1ogi3xh5xakp" path="res://Scripts/condition.gd" id="1_bf"]
+[ext_resource type="Script" uid="uid://b2o6hip7peiwb" path="res://Scripts/move_pattern.gd" id="2_bf"]
+[ext_resource type="Script" uid="uid://tnxg66jw03v3" path="res://Scripts/enemy_data.gd" id="3_bf"]
+[ext_resource type="Script" uid="uid://rf04wb68htw8" path="res://Scripts/move_step.gd" id="4_bf"]
+[ext_resource type="Texture2D" uid="uid://b2rjhiy4rifig" path="res://icon.svg" id="5_bf"]
+
+[sub_resource type="Resource" id="Resource_bf_hold"]
+script = ExtResource("4_bf")
+predicate = 3
+action = 3
+metadata/_custom_type_script = "uid://rf04wb68htw8"
+
+[sub_resource type="Resource" id="Resource_bf_advance"]
+script = ExtResource("4_bf")
+metadata/_custom_type_script = "uid://rf04wb68htw8"
+
+[sub_resource type="Resource" id="Resource_bf_pattern"]
+script = ExtResource("2_bf")
+steps = Array[ExtResource("4_bf")]([SubResource("Resource_bf_hold"), SubResource("Resource_bf_advance")])
+metadata/_custom_type_script = "uid://b2o6hip7peiwb"
+
+[resource]
+script = ExtResource("3_bf")
+enemy_name = "The Bullfrog"
+texture = ExtResource("5_bf")
+min_health = 6
+max_health = 9
+damage = 3
+attack_range = 2
+move_pattern = SubResource("Resource_bf_pattern")
+noise_cost = 2
+metadata/_custom_type_script = "uid://tnxg66jw03v3"

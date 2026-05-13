@@ -21,3 +21,9 @@ class_name EnemyData
 # When it spawns the win condition switches to DefeatSingleEnemy targeting it,
 # the progress bar is hidden, and a new announcement fires.
 @export var is_elite: bool = false
+
+## Override in a subclass to define custom per-turn movement behaviour.
+## Return true if the subclass handled movement — Enemy will skip its default logic.
+## Return false (default) to use Enemy's standard advance-or-attack behaviour.
+func override_movement(enemy) -> bool:
+	return false
