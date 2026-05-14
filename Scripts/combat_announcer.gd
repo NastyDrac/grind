@@ -12,6 +12,7 @@ class_name CombatAnnouncer
 var run_manager : RunManager
 
 func show_announcement(title: String, subtitle: String = "") -> void:
+	add_to_group("active_announcement")
 	var canvas := CanvasLayer.new()
 	canvas.layer = 100   # On top of everything
 	add_child(canvas)
@@ -86,3 +87,4 @@ func show_announcement(title: String, subtitle: String = "") -> void:
 	tween.set_parallel(false)
 	await tween.finished
 	canvas.queue_free()
+	remove_from_group("active_announcement")

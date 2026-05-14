@@ -99,6 +99,7 @@ var elite_spawned: bool = false
 signal targeting_started()
 signal targeting_cancelled()
 signal targets_confirmed(targets: Array[Enemy])
+signal enemies_finished_turn
 
 func set_win_condition(wc: WinCondition) -> void:
 	current_win_condition = wc
@@ -259,7 +260,12 @@ func _on_time_passed():
 
 	# Sequential movement: pick one enemy to advance this turn.
 	if sequential_movement:
-		_advance_one_enemy()
+		await _advance_one_enemy()
+		enemies_finished_turn.emit()
+	else:
+		# Non-sequential enemies move synchronously via the time_passed signal.
+		# Defer so pass_time() can set up its await before the signal fires.
+		enemies_finished_turn.emit.call_deferred()
 
 func _advance_one_enemy() -> void:
 	# Sort by range ascending, then by column so the left column always
@@ -344,6 +350,9 @@ func _cheapest_available_noise_cost() -> float:
 	return cheapest if cheapest < INF else INF
 
 func spawn_enemy(enemy_data: EnemyData, spawn_range: int = 5) -> Enemy:
+	#var scene_to_use : PackedScene = enemy_data.override_scene \
+		#if enemy_data.override_scene else enemy_scene
+
 	if not enemy_scene:
 		push_error("Enemy scene not assigned to RangeManager!")
 		return null
@@ -411,7 +420,11 @@ func _on_elite_spawned(elite: Enemy) -> void:
 		var announcer := CombatAnnouncer.new()
 		announcer.run_manager = run_manager
 		run_manager.add_child(announcer)
-		announcer.show_announcement(elite_wc.get_announcement_text(), "Elite Incoming!")
+		var subtitle := "Elite Incoming!"
+		if run_manager._pending_map_node and \
+				run_manager._pending_map_node.node_type == MapNode.NodeType.BOSS:
+			subtitle = "Act %d Boss" % (run_manager.current_act + 1)
+		announcer.show_announcement(elite_wc.get_announcement_text(), subtitle)
 
 func spawn_enemies(enemy_data: EnemyData, count: int, spawn_range: int = 5) -> Array[Enemy]:
 	var spawned: Array[Enemy] = []

@@ -1033,8 +1033,16 @@ func pass_time():
 	if pass_time_button:
 		pass_time_button.disabled = true
 
+	# Wait for any active combat announcements before doing anything.
+	while get_tree().get_nodes_in_group("active_announcement").size() > 0:
+		await get_tree().process_frame
+
 	Global.time_passed.emit()
-	
+
+	# Wait for all enemies to finish acting before drawing cards.
+	if run_manager and run_manager.range_manager:
+		await run_manager.range_manager.enemies_finished_turn
+
 	# Volatile cards execute their actions automatically when left in hand
 	await _trigger_volatile_cards()
 	
