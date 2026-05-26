@@ -20,7 +20,6 @@ texture = ExtResource("2_fish")
 min_health = 30
 max_health = 38
 damage = 5
-move_speed = 1
 attack_range = 3
 conditions = Array[ExtResource("1_fish")]([SubResource("Resource_fish")])
 noise_cost = 8

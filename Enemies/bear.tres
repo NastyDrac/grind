@@ -8,7 +8,6 @@
 [sub_resource type="Resource" id="Resource_bear"]
 script = ExtResource("3_bear")
 trigger_type = 2
-fire_every_advance = true
 condition_name = "The Parade"
 stacks = 2
 icon = ExtResource("2_bear")
@@ -22,7 +21,6 @@ min_health = 32
 max_health = 42
 damage = 9
 move_speed = 2
-attack_range = 1
 conditions = Array[ExtResource("1_bear")]([SubResource("Resource_bear")])
 noise_cost = 8
 is_elite = true

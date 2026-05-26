@@ -1,0 +1,22 @@
+[gd_resource type="Resource" script_class="Horde" load_steps=8 format=3 uid="uid://ccuum4068tu4w"]
+
+[ext_resource type="Script" uid="uid://tnxg66jw03v3" path="res://Scripts/enemy_data.gd" id="1_v8par"]
+[ext_resource type="Script" uid="uid://b6h8ntxfaauo5" path="res://Scripts/horde.gd" id="2_m3fpm"]
+[ext_resource type="Resource" uid="uid://kpb85v6hd13i" path="res://Enemies/ember_bones.tres" id="2_r65fv"]
+[ext_resource type="Resource" uid="uid://2omyroag2mcs" path="res://Enemies/ice_giant.tres" id="3_cxbfi"]
+[ext_resource type="Resource" uid="uid://cjfdeb3dnv3g0" path="res://Enemies/slime.tres" id="4_xnyjx"]
+[ext_resource type="Script" uid="uid://dbrkkfbjmvvar" path="res://Scripts/defeat_x_enemies.gd" id="6_l61kk"]
+
+[sub_resource type="Resource" id="Resource_hqhms"]
+script = ExtResource("6_l61kk")
+metadata/_custom_type_script = "uid://dbrkkfbjmvvar"
+
+[resource]
+script = ExtResource("2_m3fpm")
+recipe_name = "Elementals"
+enemies = Array[ExtResource("1_v8par")]([ExtResource("2_r65fv"), ExtResource("3_cxbfi"), ExtResource("4_xnyjx")])
+min_column = 3
+max_column = 9
+rewards = Array[int]([0, 1])
+win_con = SubResource("Resource_hqhms")
+metadata/_custom_type_script = "uid://b6h8ntxfaauo5"

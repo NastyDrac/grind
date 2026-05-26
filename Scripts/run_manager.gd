@@ -17,10 +17,6 @@ var ui_bar : UIBar
 @export var character_sheet_scene : PackedScene
 var current_character_sheet : PopupPanel = null
 
-## Starting noise handed to the RangeManager at combat open.
-## This is the sole driver of the first wave of spawns — no random picking.
-@export var initial_noise : float = 0.0
-
 ## Which act the player is currently on (0-indexed internally, displayed as 1-indexed).
 var current_act : int = 0
 
@@ -39,7 +35,6 @@ var _used_event_names : Array[String] = []
 ## Populated by _pick_horde_for_combat(); used by the RewardScene.
 var current_horde : Horde = null
 
-@export var win_condition: WinCondition
 var current_win_condition: WinCondition = null
 
 @export var available_events: Array[EventData] = []
@@ -210,6 +205,8 @@ func begin_boss_combat():
 		push_error("RunManager: no boss horde for act %d in act_boss_hordes!" % (current_act + 1))
 		return
 
+	current_horde = boss_horde
+
 	# Split the horde into the boss (first elite) and the minion noise pool.
 	var boss_data   : EnemyData          = null
 	var minion_pool : Array[EnemyData]   = []
@@ -227,7 +224,7 @@ func begin_boss_combat():
 	range_manager = load("res://Scenes/range_manager.tscn").instantiate()
 	range_manager.run_manager = self
 	range_manager.enemy_pool.append_array(minion_pool)
-	range_manager.starting_noise = initial_noise
+	range_manager.starting_noise = boss_horde.starting_noise
 	add_child(range_manager)
 
 	if not player:
@@ -263,8 +260,10 @@ func begin_wave():
 	setup_win_condition()
 
 func setup_win_condition():
-	if win_condition:
-		current_win_condition = win_condition.duplicate(true)
+	var wc_source : WinCondition = current_horde.win_con if current_horde else null
+
+	if wc_source:
+		current_win_condition = wc_source.duplicate(true)
 		current_win_condition.initialize(self)
 
 		if ui_bar and ui_bar.has_method("set_win_condition"):
@@ -273,7 +272,6 @@ func setup_win_condition():
 		if range_manager and range_manager.has_method("set_win_condition"):
 			range_manager.set_win_condition(current_win_condition)
 
-		# Show the announcement
 		var announcer := CombatAnnouncer.new()
 		announcer.run_manager = self
 		add_child(announcer)
@@ -293,7 +291,7 @@ func create_range_manager():
 	# with everything in place. The deferred drain in _ready() then handles
 	# the first wave of spawns through the noise system.
 	range_manager.enemy_pool.append_array(_pick_horde_for_combat())
-	range_manager.starting_noise = initial_noise
+	range_manager.starting_noise = current_horde.starting_noise if current_horde else 0.0
 	add_child(range_manager)
 
 ## Selects enemies from a Horde in the current act's pool that is valid for

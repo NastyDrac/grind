@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="Horde" load_steps=5 format=3 uid="uid://b3yhra7fl1txv"]
+
+[ext_resource type="Script" uid="uid://tnxg66jw03v3" path="res://Scripts/enemy_data.gd" id="1_bith5"]
+[ext_resource type="Script" uid="uid://b6h8ntxfaauo5" path="res://Scripts/horde.gd" id="2_gkkk1"]
+[ext_resource type="Script" uid="uid://dbrkkfbjmvvar" path="res://Scripts/defeat_x_enemies.gd" id="3_gkkk1"]
+
+[sub_resource type="Resource" id="Resource_15vlg"]
+script = ExtResource("3_gkkk1")
+metadata/_custom_type_script = "uid://dbrkkfbjmvvar"
+
+[resource]
+script = ExtResource("2_gkkk1")
+recipe_name = "Swamp"
+max_column = 7
+win_con = SubResource("Resource_15vlg")
+metadata/_custom_type_script = "uid://b6h8ntxfaauo5"

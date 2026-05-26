@@ -10,7 +10,7 @@ var stacks_label: Label = null
 
 
 func _ready():
-	custom_minimum_size = Vector2(16, 16)
+	custom_minimum_size = Vector2(32, 32)
 	stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
 	expand_mode = TextureRect.EXPAND_IGNORE_SIZE
 	mouse_filter = Control.MOUSE_FILTER_STOP

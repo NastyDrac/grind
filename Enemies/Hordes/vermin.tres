@@ -1,0 +1,20 @@
+[gd_resource type="Resource" script_class="Horde" load_steps=7 format=3 uid="uid://cub55opeeyjlm"]
+
+[ext_resource type="Script" uid="uid://tnxg66jw03v3" path="res://Scripts/enemy_data.gd" id="1_oefb4"]
+[ext_resource type="Script" uid="uid://b6h8ntxfaauo5" path="res://Scripts/horde.gd" id="2_f6w4n"]
+[ext_resource type="Resource" uid="uid://cjfdeb3dnv3g0" path="res://Enemies/slime.tres" id="3_7p6vt"]
+[ext_resource type="Resource" uid="uid://cair0ptjatmlo" path="res://Enemies/rat.tres" id="3_u2u86"]
+[ext_resource type="Script" uid="uid://dbrkkfbjmvvar" path="res://Scripts/defeat_x_enemies.gd" id="8_lgte3"]
+
+[sub_resource type="Resource" id="Resource_jc8i7"]
+script = ExtResource("8_lgte3")
+metadata/_custom_type_script = "uid://dbrkkfbjmvvar"
+
+[resource]
+script = ExtResource("2_f6w4n")
+recipe_name = "Vermin"
+enemies = Array[ExtResource("1_oefb4")]([ExtResource("3_u2u86"), ExtResource("3_7p6vt")])
+max_column = 7
+rewards = Array[int]([0, 1])
+win_con = SubResource("Resource_jc8i7")
+metadata/_custom_type_script = "uid://b6h8ntxfaauo5"

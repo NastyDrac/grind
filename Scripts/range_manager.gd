@@ -195,7 +195,9 @@ func _update_ui() -> void:
 				fraction = current_win_condition.get_progress_fraction()
 			win_condition_bar.value = fraction * win_condition_bar.max_value
 		if win_condition_label:
-			win_condition_label.text = current_win_condition.get_progress_text()
+			var horde_name := run_manager.current_horde.recipe_name if run_manager and run_manager.current_horde else ""
+			var progress := current_win_condition.get_progress_text()
+			win_condition_label.text = "%s\n%s" % [horde_name, progress] if horde_name != "" else progress
 
 	# Noise label — updates only when the displayed integer changes,
 	# and fires a brief scale-pop animation so the player notices the change.

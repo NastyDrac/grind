@@ -21,5 +21,6 @@ texture = ExtResource("4_v00mg")
 min_health = 3
 max_health = 6
 damage = 3
+move_speed = 2
 conditions = Array[ExtResource("1_jpuur")]([SubResource("Resource_vay2w")])
 metadata/_custom_type_script = "uid://tnxg66jw03v3"

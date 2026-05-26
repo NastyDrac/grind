@@ -1013,7 +1013,7 @@ func _complete_card_play():
 func discard(card : Card):
 	Global.card_removed_from_hand.emit(card)
 	var tween = create_tween()
-	tween.tween_property(card, "position", discard_pile.global_position, .5)
+	tween.tween_property(card, "position", discard_pile.global_position, .3)
 	await tween.finished
 	card.reparent(discard_pile)
 
@@ -1037,26 +1037,26 @@ func pass_time():
 	while get_tree().get_nodes_in_group("active_announcement").size() > 0:
 		await get_tree().process_frame
 
+	# Volatile cards fire before the hand is discarded.
+	await _trigger_volatile_cards()
+
+	# Discard immediately so the player sees an empty hand while enemies act.
+	if discard_and_draw_mode:
+		await discard_hand()
+
+	# Trigger enemy turn.
 	Global.time_passed.emit()
 
-	# Wait for all enemies to finish acting before drawing cards.
+	# Wait for all enemies to finish acting before drawing.
 	if run_manager and run_manager.range_manager:
 		await run_manager.range_manager.enemies_finished_turn
 
-	# Volatile cards execute their actions automatically when left in hand
-	await _trigger_volatile_cards()
-	
+	# Now draw.
 	if discard_and_draw_mode:
-		
-		await discard_hand()
-		
 		await draw_multiple_cards(cards_to_draw)
 	else:
-	
 		if draw_stack.is_empty():
 			reshuffle_discard_into_draw()
-			
-		
 		if not draw_stack.is_empty():
 			var card = draw_stack.pop_front()
 			draw_cards(card)

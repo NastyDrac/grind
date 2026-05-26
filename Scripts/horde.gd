@@ -16,6 +16,12 @@ class_name Horde
 ## Set these in the inspector per horde recipe.
 @export var rewards : Array[RewardScene.REWARD_TYPE] = []
 
+## Win condition for this specific horde combat.
+@export var win_con : WinCondition
+
+## How much noise the combat opens with. Drives the first wave of spawns.
+@export var starting_noise : float = 3.0
+
 func is_valid_for_column(col: int) -> bool:
 	if col < min_column:
 		return false
