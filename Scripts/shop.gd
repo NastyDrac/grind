@@ -90,7 +90,7 @@ func _on_buy_card(card_data: CardData, price: int, btn: Button) -> void:
 		_flash_button(btn, "Need %d Gold!" % price)
 		return
 	run.character.gold -= price
-	run.deck.append(card_data.duplicate(true))
+	run.add_card_to_deck(card_data)
 	btn.text = "Purchased!"
 	btn.disabled = true
 	_refresh_gold_label()

@@ -20,6 +20,7 @@ var phase_turn   : int  = 0
 var _day_damage  : int  = 0
 var _day_speed   : int  = 0
 var _initialized : bool = false
+var _enemy                  = null   # cached so range-aware intent can read current_range
 
 
 # ── Reset — called by enemy.gd on each new spawn ─────────────────────────────
@@ -30,11 +31,13 @@ func reset_movement_state() -> void:
 	_initialized = false
 	_day_damage  = 0
 	_day_speed   = 0
+	_enemy       = null
 
 
 # ── EnemyData virtual methods ─────────────────────────────────────────────────
 
 func override_movement(enemy) -> bool:
+	_enemy = enemy
 	if not _initialized:
 		_day_damage  = enemy.data.damage
 		_day_speed   = enemy.data.move_speed
@@ -57,6 +60,10 @@ func override_movement(enemy) -> bool:
 ## Called by enemy.get_next_intent() so the IntentIndicator stays accurate.
 func get_current_intent() -> int:
 	if not is_night:
+		# Day: if it's within melee range (e.g. the player pulled it in) it will
+		# attack next turn, not advance.
+		if _enemy and _enemy.current_range <= _enemy.data.attack_range:
+			return MoveStep.MoveAction.ATTACK
 		return MoveStep.MoveAction.ADVANCE
 	if phase_turn >= night_turns - 1:
 		return MoveStep.MoveAction.ATTACK  # Charge is next
@@ -68,7 +75,10 @@ func get_current_intent() -> int:
 ## based on the ostrich's current range so the value updates as it retreats.
 func get_display_damage(enemy) -> int:
 	if is_night and phase_turn >= night_turns - 1:
-		var distance = enemy.current_range - 1
+		# Charge scales with starting range. Even at range 1 it lands for one
+		# step (charge_damage_per_range), so pulling it close shrinks the hit
+		# rather than cancelling it.
+		var distance = enemy.current_range
 		return distance * charge_damage_per_range
 	return enemy.get_attack_damage()
 
@@ -107,7 +117,7 @@ func _do_charge(enemy) -> void:
 	_spawn_charge_trail(enemy)
 
 	var old_range = enemy.current_range
-	var distance  = enemy.current_range - 1
+	var distance  = enemy.current_range   # matches get_display_damage; range 1 still deals one step
 
 	enemy.movement_speed = CHARGE_MOVE_SPEED
 	enemy.current_range = 1

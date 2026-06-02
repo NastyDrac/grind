@@ -4,14 +4,17 @@ class_name TriggeredCondition
 enum TriggerType {
 	ON_DEATH,
 	ON_ATTACK,
-	ON_ADVANCE
+	ON_ADVANCE,
+	ON_CARD_PLAYED,
+	ON_TAKE_DAMAGE,   ## Fires when the enemy is hit and survives.
 }
 
 enum TargetType {
 	ATTACK_TARGET,         ## The player (whoever the enemy attacked)
 	ALL_ENEMIES,           ## Every enemy currently on the field
 	ALL_OTHER_ENEMIES,     ## Every enemy except self
-	ALL_ENEMIES_AT_RANGE   ## Every enemy at the same range as self
+	ALL_ENEMIES_AT_RANGE,  ## Every enemy at the same range as self
+	SELF,                  ## Only this enemy (e.g. enrage-on-hit, self-heal)
 }
 
 @export_group("Trigger")
@@ -19,6 +22,8 @@ enum TargetType {
 
 @export_group("Target")
 @export var target_type : TargetType = TargetType.ATTACK_TARGET
+@export_group("Card Type")
+@export var card_type : CardData.TYPE
 
 @export_group("Effect")
 ## The condition applied to resolved targets when triggered.
@@ -52,7 +57,10 @@ func _connect_trigger() -> void:
 			Global.enemy_attacks_player.connect(_on_enemy_attacks)
 		TriggerType.ON_ADVANCE:
 			Global.enemy_advanced.connect(_on_enemy_advanced)
-			
+		TriggerType.ON_CARD_PLAYED:
+			Global.card_played.connect(_on_card_played)
+		TriggerType.ON_TAKE_DAMAGE:
+			Global.enemy_took_damage.connect(_on_enemy_took_damage)
 
 
 func _disconnect_trigger() -> void:
@@ -66,7 +74,12 @@ func _disconnect_trigger() -> void:
 		TriggerType.ON_ADVANCE:
 			if Global.enemy_advanced.is_connected(_on_enemy_advanced):
 				Global.enemy_advanced.disconnect(_on_enemy_advanced)
-			
+		TriggerType.ON_CARD_PLAYED:
+			if Global.card_played.is_connected(_on_card_played):
+				Global.card_played.disconnect(_on_card_played)
+		TriggerType.ON_TAKE_DAMAGE:
+			if Global.enemy_took_damage.is_connected(_on_enemy_took_damage):
+				Global.enemy_took_damage.disconnect(_on_enemy_took_damage)
 
 
 # ─────────────────────────────────────────────────────────────────────────────
@@ -92,6 +105,19 @@ func _on_enemy_advanced(enemy: Enemy, old_range : int, new_range: int) -> void:
 		
 	if fire_every_advance or new_range == trigger_range:
 		_fire()
+
+func _on_card_played(card_data : CardData) -> void:
+	if card_type == CardData.TYPE.Any:
+		_fire()
+	elif card_data.type == card_type:
+		_fire()
+
+
+func _on_enemy_took_damage(enemy: Enemy, _amount: int) -> void:
+	if enemy != entity:
+		return
+	_fire()
+
 # ─────────────────────────────────────────────────────────────────────────────
 #  FIRE
 # ─────────────────────────────────────────────────────────────────────────────
@@ -131,6 +157,10 @@ func _resolve_targets() -> Array:
 					func(e): return e.current_range == entity.current_range
 				)
 
+		TargetType.SELF:
+			if entity:
+				return [entity]
+
 	push_warning("TriggeredCondition: could not resolve targets for %s" % get_condition_name())
 	return []
 
@@ -147,6 +177,10 @@ func get_description_with_values() -> String:
 			trigger_text = "On attack"
 		TriggerType.ON_ADVANCE:
 			trigger_text = "On advance" if fire_every_advance else "At range %d" % trigger_range
+		TriggerType.ON_CARD_PLAYED:
+			trigger_text = "On card played"
+		TriggerType.ON_TAKE_DAMAGE:
+			trigger_text = "When hit and survives"
 
 	var target_text := _get_target_text()
 	var effect_text := triggered_effect.get_description_with_values()
@@ -160,4 +194,5 @@ func _get_target_text() -> String:
 		TargetType.ALL_ENEMIES: return "all enemies"
 		TargetType.ALL_OTHER_ENEMIES: return "all other enemies"
 		TargetType.ALL_ENEMIES_AT_RANGE: return "all enemies at the same range"
+		TargetType.SELF: return "itself"
 	return "the target"

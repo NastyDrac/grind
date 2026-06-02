@@ -7,6 +7,10 @@ var label : Label
 var attack_icon = preload("res://Art/Icons/BATTLEIconAlt.png")
 var move_icon = preload("res://Art/Icons/ArrowIcon.png")
 
+## Optional icon for non-damaging "attacks" (e.g. the Bugler's bugle). If left
+## unassigned, the indicator just shows a music note with no icon.
+@export var support_icon : Texture2D
+
 func _ready() -> void:
 	label = Label.new()
 	add_child(label)
@@ -20,9 +24,18 @@ func get_intent(character : Enemy, old : int, new : int):
 		return
 	match enemy.get_next_intent():
 		MoveStep.MoveAction.ATTACK, MoveStep.MoveAction.ATTACK_THEN_RETREAT, MoveStep.MoveAction.ATTACK_THEN_ADVANCE:
-			flip_h = false
-			texture = attack_icon
-			label.text = str(enemy.get_intent_damage())
+			var dmg : int = enemy.get_intent_damage()
+			if dmg > 0:
+				# A real attack — show the battle icon and the damage number.
+				flip_h = false
+				texture = attack_icon
+				label.text = str(dmg)
+			else:
+				# A non-damaging action (e.g. the Bugler bugling). Not an attack,
+				# so don't show "0" with the battle icon.
+				flip_h = false
+				texture = support_icon   # null is fine — just the note shows
+				label.text = "♪"
 		MoveStep.MoveAction.RETREAT:
 			flip_h = true
 			texture = move_icon

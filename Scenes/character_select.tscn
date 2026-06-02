@@ -1,10 +1,9 @@
-[gd_scene load_steps=15 format=3 uid="uid://su75sjnbkeke"]
+[gd_scene load_steps=14 format=3 uid="uid://su75sjnbkeke"]
 
 [ext_resource type="Script" uid="uid://b0slo2gkxcus2" path="res://Scripts/character_select_scene.gd" id="1_2b87j"]
 [ext_resource type="Script" uid="uid://dpayg0f6j5y2n" path="res://Scripts/character_data.gd" id="2_krxhl"]
 [ext_resource type="Resource" uid="uid://ce6l5lqjxvcs6" path="res://Characters/Engineer.tres" id="3_72d1u"]
 [ext_resource type="Resource" uid="uid://c2xwf8l4o67yn" path="res://Characters/regalur_guy.tres" id="4_d1kp4"]
-[ext_resource type="PackedScene" uid="uid://cssup3trfa1rg" path="res://Scenes/run_manager.tscn" id="5_brbi3"]
 [ext_resource type="Texture2D" uid="uid://uoxk5uid60p0" path="res://Art/Icons/goldIcon.png" id="6_vueyu"]
 [ext_resource type="Texture2D" uid="uid://ter6hyu0quuy" path="res://Art/swag.png" id="7_vueyu"]
 [ext_resource type="Texture2D" uid="uid://fwthpy3l0ykm" path="res://Art/guts.png" id="8_a4vvp"]
@@ -34,7 +33,6 @@ theme_override_constants/margin_right = 24
 theme_override_constants/margin_bottom = 20
 script = ExtResource("1_2b87j")
 characters = Array[ExtResource("2_krxhl")]([ExtResource("3_72d1u"), ExtResource("4_d1kp4")])
-run_manager_scene = ExtResource("5_brbi3")
 placeholder_label = NodePath("RootVBox/DetailPanel/PlaceHolderLabel")
 detail_content = NodePath("RootVBox/DetailPanel/DetailContent")
 detail_portrait = NodePath("RootVBox/DetailPanel/DetailContent/DetailPortrait")

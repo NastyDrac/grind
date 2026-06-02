@@ -1,0 +1,24 @@
+[gd_resource type="Resource" script_class="CardData" load_steps=7 format=3 uid="uid://5kdo1f5rx46pa"]
+
+[ext_resource type="Script" uid="uid://dhxff5egnsgrv" path="res://Scripts/action.gd" id="1_acti"]
+[ext_resource type="Script" uid="uid://0gsjrx47no8b" path="res://Scripts/card_data.gd" id="2_card"]
+[ext_resource type="Script" uid="uid://cgrxhw8vqenhu" path="res://Scripts/ValueCalculator.gd" id="3_vc"]
+[ext_resource type="Script" uid="uid://bc8y3uqk02xnl" path="res://Scripts/draw_action.gd" id="4_draw"]
+
+[sub_resource type="Resource" id="VC_1"]
+script = ExtResource("3_vc")
+formula = "2"
+metadata/_custom_type_script = "uid://cgrxhw8vqenhu"
+
+[sub_resource type="Resource" id="R_2"]
+script = ExtResource("4_draw")
+card_count_calculator = SubResource("VC_1")
+metadata/_custom_type_script = "uid://bc8y3uqk02xnl"
+
+[resource]
+script = ExtResource("2_card")
+card_name = "Second Wind"
+card_cost = 1
+type = 1
+actions = Array[ExtResource("1_acti")]([SubResource("R_2")])
+metadata/_custom_type_script = "uid://0gsjrx47no8b"

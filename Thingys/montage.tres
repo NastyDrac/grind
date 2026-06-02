@@ -1,0 +1,8 @@
+[gd_resource type="Resource" script_class="ThingyMontage" load_steps=2 format=3 uid="uid://bar2msv83fqy5"]
+
+[ext_resource type="Script" uid="uid://b6sdgjdg58ybq" path="res://Scripts/thingy_montage.gd" id="1_3a3xb"]
+
+[resource]
+script = ExtResource("1_3a3xb")
+condition_name = "Montage"
+metadata/_custom_type_script = "uid://b6sdgjdg58ybq"

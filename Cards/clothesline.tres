@@ -1,0 +1,27 @@
+[gd_resource type="Resource" script_class="CardData" load_steps=7 format=3 uid="uid://q67cd48zu0whb"]
+
+[ext_resource type="Script" uid="uid://dhxff5egnsgrv" path="res://Scripts/action.gd" id="1_acti"]
+[ext_resource type="Script" uid="uid://0gsjrx47no8b" path="res://Scripts/card_data.gd" id="2_card"]
+[ext_resource type="Script" uid="uid://cgrxhw8vqenhu" path="res://Scripts/ValueCalculator.gd" id="3_vc"]
+[ext_resource type="Script" uid="uid://clvjn77csx1a0" path="res://Scripts/AttackAction.gd" id="4_atta"]
+
+[sub_resource type="Resource" id="VC_1"]
+script = ExtResource("3_vc")
+formula = "guts"
+metadata/_custom_type_script = "uid://cgrxhw8vqenhu"
+
+[sub_resource type="Resource" id="R_2"]
+script = ExtResource("4_atta")
+damage_calculator = SubResource("VC_1")
+target_type = 2
+max_range = 1
+animation_type = 2
+metadata/_custom_type_script = "uid://clvjn77csx1a0"
+
+[resource]
+script = ExtResource("2_card")
+card_name = "Clothesline"
+card_cost = 2
+rarity = 1
+actions = Array[ExtResource("1_acti")]([SubResource("R_2")])
+metadata/_custom_type_script = "uid://0gsjrx47no8b"

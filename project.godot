@@ -19,6 +19,7 @@ config/icon="res://icon.svg"
 Global="*res://Scripts/Global.gd"
 Animations="*res://Scripts/animation_manager.gd"
 Transitions="*res://Scripts/transition_manager.gd"
+Game="*res://Scripts/game.gd"
 
 [display]
 

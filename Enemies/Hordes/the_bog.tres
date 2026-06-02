@@ -1,0 +1,25 @@
+[gd_resource type="Resource" script_class="Horde" load_steps=9 format=3 uid="uid://bth3b0gsw4mp"]
+
+[ext_resource type="Script" uid="uid://tnxg66jw03v3" path="res://Scripts/enemy_data.gd" id="1_ed"]
+[ext_resource type="Script" uid="uid://b6h8ntxfaauo5" path="res://Scripts/horde.gd" id="2_hd"]
+[ext_resource type="Resource" uid="uid://y3t2nkpl5ldc" path="res://Enemies/water_moccasin.tres" id="3_wm"]
+[ext_resource type="Resource" uid="uid://bullfr0gaaa1" path="res://Enemies/bullfrog.tres" id="4_bf"]
+[ext_resource type="Resource" uid="uid://du1l2khaw7wly" path="res://Enemies/snapping_turtle.tres" id="5_st"]
+[ext_resource type="Resource" uid="uid://bxjko7vp64qs5" path="res://Enemies/gator.tres" id="6_ga"]
+[ext_resource type="Script" uid="uid://dbrkkfbjmvvar" path="res://Scripts/defeat_x_enemies.gd" id="7_dx"]
+
+[sub_resource type="Resource" id="Resource_win"]
+script = ExtResource("7_dx")
+enemies_to_defeat = 11
+metadata/_custom_type_script = "uid://dbrkkfbjmvvar"
+
+[resource]
+script = ExtResource("2_hd")
+recipe_name = "The Bog"
+enemies = Array[ExtResource("1_ed")]([ExtResource("3_wm"), ExtResource("4_bf"), ExtResource("5_st"), ExtResource("6_ga")])
+min_column = 3
+max_column = 9
+rewards = Array[int]([0, 1])
+win_con = SubResource("Resource_win")
+starting_noise = 3.5
+metadata/_custom_type_script = "uid://b6h8ntxfaauo5"

@@ -1,0 +1,10 @@
+[gd_resource type="Resource" script_class="ThingyPlotArmor" load_steps=3 format=3 uid="uid://c2xrf1pv6gxsb"]
+
+[ext_resource type="Texture2D" uid="uid://b2rjhiy4rifig" path="res://icon.svg" id="1_3nsdn"]
+[ext_resource type="Script" uid="uid://b7kfa25prxl12" path="res://Scripts/plot_armor.gd" id="1_14k4v"]
+
+[resource]
+script = ExtResource("1_14k4v")
+condition_name = "Plot Armor"
+icon = ExtResource("1_3nsdn")
+metadata/_custom_type_script = "uid://b7kfa25prxl12"

@@ -1,0 +1,22 @@
+[gd_resource type="Resource" script_class="Horde" load_steps=8 format=3 uid="uid://bp0und5d0gs1"]
+
+[ext_resource type="Script" uid="uid://tnxg66jw03v3" path="res://Scripts/enemy_data.gd" id="1_ed"]
+[ext_resource type="Script" uid="uid://b6h8ntxfaauo5" path="res://Scripts/horde.gd" id="2_hd"]
+[ext_resource type="Resource" uid="uid://ch1hu4hu4aaa1" path="res://Enemies/chihuahua.tres" id="3_ch"]
+[ext_resource type="Resource" uid="uid://cwo3vxxer2eja" path="res://Enemies/greyhound.tres" id="4_gh"]
+[ext_resource type="Resource" uid="uid://v652o7snpp2q" path="res://Enemies/rottweiler.tres" id="5_ro"]
+[ext_resource type="Script" uid="uid://dbrkkfbjmvvar" path="res://Scripts/defeat_x_enemies.gd" id="6_dx"]
+
+[sub_resource type="Resource" id="Resource_win"]
+script = ExtResource("6_dx")
+metadata/_custom_type_script = "uid://dbrkkfbjmvvar"
+
+[resource]
+script = ExtResource("2_hd")
+recipe_name = "The Pound"
+enemies = Array[ExtResource("1_ed")]([ExtResource("3_ch"), ExtResource("4_gh"), ExtResource("5_ro")])
+min_column = 2
+max_column = 8
+rewards = Array[int]([0, 1])
+win_con = SubResource("Resource_win")
+metadata/_custom_type_script = "uid://b6h8ntxfaauo5"

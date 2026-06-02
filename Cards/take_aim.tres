@@ -1,0 +1,37 @@
+[gd_resource type="Resource" script_class="CardData" load_steps=10 format=3 uid="uid://05xdoibw0uzm5"]
+
+[ext_resource type="Script" uid="uid://dhxff5egnsgrv" path="res://Scripts/action.gd" id="1_acti"]
+[ext_resource type="Script" uid="uid://0gsjrx47no8b" path="res://Scripts/card_data.gd" id="2_card"]
+[ext_resource type="Script" uid="uid://cgrxhw8vqenhu" path="res://Scripts/ValueCalculator.gd" id="3_vc"]
+[ext_resource type="Script" uid="uid://y73360xhw2qs" path="res://Scripts/modify_stat_action.gd" id="4_mods"]
+[ext_resource type="Script" uid="uid://bc8y3uqk02xnl" path="res://Scripts/draw_action.gd" id="5_draw"]
+
+[sub_resource type="Resource" id="VC_1"]
+script = ExtResource("3_vc")
+formula = "3"
+metadata/_custom_type_script = "uid://cgrxhw8vqenhu"
+
+[sub_resource type="Resource" id="R_2"]
+script = ExtResource("4_mods")
+temp_modify = true
+modify_calculator = SubResource("VC_1")
+stat_to_modify = 3
+metadata/_custom_type_script = "uid://y73360xhw2qs"
+
+[sub_resource type="Resource" id="VC_3"]
+script = ExtResource("3_vc")
+formula = "1"
+metadata/_custom_type_script = "uid://cgrxhw8vqenhu"
+
+[sub_resource type="Resource" id="R_4"]
+script = ExtResource("5_draw")
+card_count_calculator = SubResource("VC_3")
+metadata/_custom_type_script = "uid://bc8y3uqk02xnl"
+
+[resource]
+script = ExtResource("2_card")
+card_name = "Take Aim"
+card_cost = 1
+type = 2
+actions = Array[ExtResource("1_acti")]([SubResource("R_2"), SubResource("R_4")])
+metadata/_custom_type_script = "uid://0gsjrx47no8b"

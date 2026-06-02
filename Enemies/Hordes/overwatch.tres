@@ -1,0 +1,21 @@
+[gd_resource type="Resource" script_class="Horde" load_steps=7 format=3 uid="uid://dpqku2dochr6o"]
+
+[ext_resource type="Script" uid="uid://tnxg66jw03v3" path="res://Scripts/enemy_data.gd" id="1_7deoq"]
+[ext_resource type="Script" uid="uid://b6h8ntxfaauo5" path="res://Scripts/horde.gd" id="2_jl24f"]
+[ext_resource type="Resource" uid="uid://rwhy6iobb6it" path="res://Enemies/goon.tres" id="2_nde2x"]
+[ext_resource type="Resource" uid="uid://dyg4uugsdlgf3" path="res://Enemies/lookout.tres" id="3_rdx78"]
+[ext_resource type="Script" uid="uid://dbrkkfbjmvvar" path="res://Scripts/defeat_x_enemies.gd" id="5_phqf5"]
+
+[sub_resource type="Resource" id="Resource_ar8it"]
+script = ExtResource("5_phqf5")
+metadata/_custom_type_script = "uid://dbrkkfbjmvvar"
+
+[resource]
+script = ExtResource("2_jl24f")
+recipe_name = "Overwatch"
+enemies = Array[ExtResource("1_7deoq")]([ExtResource("2_nde2x"), ExtResource("3_rdx78"), ExtResource("2_nde2x")])
+min_column = 3
+max_column = 9
+rewards = Array[int]([0, 1])
+win_con = SubResource("Resource_ar8it")
+metadata/_custom_type_script = "uid://b6h8ntxfaauo5"

@@ -14,8 +14,6 @@ metadata/_custom_type_script = "uid://rf04wb68htw8"
 
 [sub_resource type="Resource" id="Resource_ac_advance"]
 script = ExtResource("4_ac")
-predicate = 0
-action = 0
 metadata/_custom_type_script = "uid://rf04wb68htw8"
 
 [sub_resource type="Resource" id="Resource_ac_pattern"]

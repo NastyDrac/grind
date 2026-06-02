@@ -21,5 +21,6 @@ metadata/_custom_type_script = "uid://y73360xhw2qs"
 [resource]
 script = ExtResource("4_c2u84")
 card_name = "Ancestral Call"
+type = 2
 actions = Array[ExtResource("1_56b8h")]([SubResource("Resource_enwja")])
 metadata/_custom_type_script = "uid://0gsjrx47no8b"

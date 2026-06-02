@@ -1,0 +1,25 @@
+[gd_resource type="Resource" script_class="Horde" load_steps=9 format=3 uid="uid://bb1gt0pc1rc2"]
+
+[ext_resource type="Script" uid="uid://tnxg66jw03v3" path="res://Scripts/enemy_data.gd" id="1_ed"]
+[ext_resource type="Script" uid="uid://b6h8ntxfaauo5" path="res://Scripts/horde.gd" id="2_hd"]
+[ext_resource type="Resource" uid="uid://dd5ja7x4egq8y" path="res://Enemies/strongman.tres" id="3_sm"]
+[ext_resource type="Resource" uid="uid://cl0wnaaa1aaa1" path="res://Enemies/clown.tres" id="4_cl"]
+[ext_resource type="Resource" uid="uid://cuwxd1fxsxkud" path="res://Enemies/balloon_fiend.tres" id="5_bf"]
+[ext_resource type="Resource" uid="uid://b34r3l1t3aaa1" path="res://Enemies/bear.tres" id="6_be"]
+[ext_resource type="Script" uid="uid://dbrkkfbjmvvar" path="res://Scripts/defeat_x_enemies.gd" id="7_dx"]
+
+[sub_resource type="Resource" id="Resource_win"]
+script = ExtResource("7_dx")
+enemies_to_defeat = 12
+metadata/_custom_type_script = "uid://dbrkkfbjmvvar"
+
+[resource]
+script = ExtResource("2_hd")
+recipe_name = "Big Top"
+enemies = Array[ExtResource("1_ed")]([ExtResource("3_sm"), ExtResource("4_cl"), ExtResource("5_bf"), ExtResource("6_be")])
+min_column = 7
+max_column = 11
+rewards = Array[int]([0, 1])
+win_con = SubResource("Resource_win")
+starting_noise = 4.0
+metadata/_custom_type_script = "uid://b6h8ntxfaauo5"

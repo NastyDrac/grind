@@ -281,7 +281,7 @@ func _advance_one_enemy() -> void:
 
 	for enemy in all:
 		if is_instance_valid(enemy):
-			enemy.move_toward_player()
+			await enemy.move_toward_player()
 			await get_tree().create_timer(sequential_move_delay).timeout
 
 

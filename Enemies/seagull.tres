@@ -14,8 +14,6 @@ metadata/_custom_type_script = "uid://rf04wb68htw8"
 
 [sub_resource type="Resource" id="Resource_sg_advance"]
 script = ExtResource("4_sg")
-predicate = 0
-action = 0
 metadata/_custom_type_script = "uid://rf04wb68htw8"
 
 [sub_resource type="Resource" id="Resource_sg_pattern"]
@@ -33,5 +31,4 @@ damage = 2
 move_speed = 2
 attack_range = 3
 move_pattern = SubResource("Resource_sg_pattern")
-noise_cost = 1
 metadata/_custom_type_script = "uid://tnxg66jw03v3"

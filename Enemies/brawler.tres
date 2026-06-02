@@ -1,0 +1,35 @@
+[gd_resource type="Resource" script_class="EnemyData" load_steps=8 format=3 uid="uid://dn2i7s3fx05aw"]
+
+[ext_resource type="Script" uid="uid://b1ogi3xh5xakp" path="res://Scripts/condition.gd" id="1_u6sdb"]
+[ext_resource type="Script" uid="uid://bpr8cwurcrxy3" path="res://Scripts/triggered_condition.gd" id="2_bh2cu"]
+[ext_resource type="Script" uid="uid://tnxg66jw03v3" path="res://Scripts/enemy_data.gd" id="2_fkt03"]
+[ext_resource type="Script" uid="uid://d0hdj6yes681x" path="res://Scripts/damage_buff.gd" id="3_wdvpy"]
+[ext_resource type="Texture2D" uid="uid://b2rjhiy4rifig" path="res://icon.svg" id="5_jlfdq"]
+
+[sub_resource type="Resource" id="Resource_khncr"]
+script = ExtResource("3_wdvpy")
+condition_name = "Hype"
+stacks = 2
+show_stacks = true
+metadata/_custom_type_script = "uid://d0hdj6yes681x"
+
+[sub_resource type="Resource" id="Resource_mc5mc"]
+script = ExtResource("2_bh2cu")
+trigger_type = 4
+target_type = 4
+triggered_effect = SubResource("Resource_khncr")
+condition_name = "Angry"
+metadata/_custom_type_script = "uid://bpr8cwurcrxy3"
+
+[resource]
+script = ExtResource("2_fkt03")
+enemy_name = "Brawler"
+texture = ExtResource("5_jlfdq")
+min_health = 16
+max_health = 22
+damage = 2
+move_speed = 2
+attack_range = 2
+conditions = Array[ExtResource("1_u6sdb")]([SubResource("Resource_mc5mc")])
+noise_cost = 3
+metadata/_custom_type_script = "uid://tnxg66jw03v3"

@@ -1,0 +1,22 @@
+[gd_resource type="Resource" script_class="Horde" load_steps=8 format=3 uid="uid://bo1iqmf7mfdd0"]
+
+[ext_resource type="Script" uid="uid://tnxg66jw03v3" path="res://Scripts/enemy_data.gd" id="1_safdx"]
+[ext_resource type="Script" uid="uid://b6h8ntxfaauo5" path="res://Scripts/horde.gd" id="2_cc1n6"]
+[ext_resource type="Resource" uid="uid://dn2i7s3fx05aw" path="res://Enemies/brawler.tres" id="2_eaf2m"]
+[ext_resource type="Resource" uid="uid://rwhy6iobb6it" path="res://Enemies/goon.tres" id="3_k8jly"]
+[ext_resource type="Resource" uid="uid://blr5l5gd28mj" path="res://Enemies/juggernaut.tres" id="4_41li8"]
+[ext_resource type="Script" uid="uid://dbrkkfbjmvvar" path="res://Scripts/defeat_x_enemies.gd" id="6_wwc2t"]
+
+[sub_resource type="Resource" id="Resource_jdfs0"]
+script = ExtResource("6_wwc2t")
+metadata/_custom_type_script = "uid://dbrkkfbjmvvar"
+
+[resource]
+script = ExtResource("2_cc1n6")
+recipe_name = "Fightclub"
+enemies = Array[ExtResource("1_safdx")]([ExtResource("2_eaf2m"), ExtResource("3_k8jly"), ExtResource("4_41li8")])
+min_column = 7
+max_column = 11
+rewards = Array[int]([0, 1])
+win_con = SubResource("Resource_jdfs0")
+metadata/_custom_type_script = "uid://b6h8ntxfaauo5"

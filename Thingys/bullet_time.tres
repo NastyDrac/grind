@@ -1,0 +1,8 @@
+[gd_resource type="Resource" script_class="ThingyBulletTime" load_steps=2 format=3 uid="uid://cu07w36tcqxpg"]
+
+[ext_resource type="Script" uid="uid://dm77nllswyi11" path="res://Scripts/bullet_time.gd" id="1_bn6k5"]
+
+[resource]
+script = ExtResource("1_bn6k5")
+condition_name = "Bullet Time"
+metadata/_custom_type_script = "uid://dm77nllswyi11"

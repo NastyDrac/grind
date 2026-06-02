@@ -7,7 +7,6 @@
 
 [sub_resource type="Resource" id="Resource_ch1"]
 script = ExtResource("3_ch1")
-trigger_type = 0
 condition_name = "Yapping"
 stacks = 2
 icon = ExtResource("2_ch1")
@@ -21,7 +20,5 @@ min_health = 3
 max_health = 5
 damage = 2
 move_speed = 3
-attack_range = 1
 conditions = Array[ExtResource("1_ch1")]([SubResource("Resource_ch1")])
-noise_cost = 1
 metadata/_custom_type_script = "uid://tnxg66jw03v3"

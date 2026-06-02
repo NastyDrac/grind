@@ -76,7 +76,17 @@ func take_hit(who : Enemy, damage : int):
 		run_manager.ui_bar.set_health()
 
 	if health <= 0:
-		die()
+		var saved := false
+		for con in character_data.special_effects:
+			if con.has_method("try_save") and con.try_save(self):
+				saved = true
+				break
+		if not saved:
+			die()
+		else:
+			set_health_bar()
+			if run_manager and run_manager.ui_bar:
+				run_manager.ui_bar.set_health()
 
 func set_health_bar():
 	if health_bar and character_data and character_data.max_health:
@@ -97,7 +107,7 @@ func display_block():
 			block_display.visible = false
 
 func die():
-	print("Player has died!")
+	run_manager.on_player_death()
 
 func set_data(data : CharacterData):
 	character_data = data
@@ -197,11 +207,17 @@ func reset_for_new_wave() -> void:
 	# clearing any in-combat temporary buffs/debuffs.
 	sync_from_data()
 
-	# Re-apply persistent special effects for this wave.
+	# Thingies are PERSISTENT — they live in special_effects and are NEVER
+	# duplicated into `conditions` (that caused the double icon). Re-run their
+	# per-combat hookup on the SAME instances so counters/spent-flags carry
+	# across waves and both displays (sheet + HUD) read one object.
+	var rm = run_manager.range_manager if run_manager else null
 	if character_data.special_effects and character_data.special_effects.size() > 0:
-		for condition in character_data.special_effects:
-			var fresh = condition.duplicate(true)
-			fresh.apply_condition(self, fresh)
+		for fx in character_data.special_effects:
+			if fx.has_method("teardown"):
+				fx.teardown()
+			if fx.has_method("setup"):
+				fx.setup(self, rm)
 
 	if run_manager and run_manager.ui_bar:
 		run_manager.ui_bar.set_health()

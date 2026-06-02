@@ -1,0 +1,46 @@
+[gd_resource type="Resource" script_class="CardData" load_steps=12 format=3 uid="uid://c8da5zeay43z6"]
+
+[ext_resource type="Script" uid="uid://dhxff5egnsgrv" path="res://Scripts/action.gd" id="1_acti"]
+[ext_resource type="Script" uid="uid://0gsjrx47no8b" path="res://Scripts/card_data.gd" id="2_card"]
+[ext_resource type="Script" uid="uid://cgrxhw8vqenhu" path="res://Scripts/ValueCalculator.gd" id="3_vc"]
+[ext_resource type="Script" uid="uid://clvjn77csx1a0" path="res://Scripts/AttackAction.gd" id="4_atta"]
+[ext_resource type="Script" uid="uid://dqr8kxmoc0iom" path="res://Scripts/burning.gd" id="5_burn"]
+[ext_resource type="Script" uid="uid://dm2bmau6ctnm8" path="res://Scripts/apply_condition_action.gd" id="6_appl"]
+
+[sub_resource type="Resource" id="VC_1"]
+script = ExtResource("3_vc")
+formula = "mojo"
+metadata/_custom_type_script = "uid://cgrxhw8vqenhu"
+
+[sub_resource type="Resource" id="R_2"]
+script = ExtResource("4_atta")
+damage_calculator = SubResource("VC_1")
+target_type = 0
+max_range = 5
+animation_type = 1
+metadata/_custom_type_script = "uid://clvjn77csx1a0"
+
+[sub_resource type="Resource" id="R_3"]
+script = ExtResource("5_burn")
+metadata/_custom_type_script = "uid://dqr8kxmoc0iom"
+
+[sub_resource type="Resource" id="VC_4"]
+script = ExtResource("3_vc")
+formula = "2"
+metadata/_custom_type_script = "uid://cgrxhw8vqenhu"
+
+[sub_resource type="Resource" id="R_5"]
+script = ExtResource("6_appl")
+condition_resource = SubResource("R_3")
+stacks_calculator = SubResource("VC_4")
+target_type = 0
+max_range = 5
+animation_type = 1
+metadata/_custom_type_script = "uid://dm2bmau6ctnm8"
+
+[resource]
+script = ExtResource("2_card")
+card_name = "Slow Roast"
+card_cost = 1
+actions = Array[ExtResource("1_acti")]([SubResource("R_2"), SubResource("R_5")])
+metadata/_custom_type_script = "uid://0gsjrx47no8b"

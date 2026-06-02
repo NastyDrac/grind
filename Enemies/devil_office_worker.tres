@@ -1,0 +1,39 @@
+[gd_resource type="Resource" script_class="EnemyData" load_steps=11 format=3 uid="uid://cah0ikljw5jep"]
+
+[ext_resource type="Script" uid="uid://b1ogi3xh5xakp" path="res://Scripts/condition.gd" id="1_xm604"]
+[ext_resource type="Script" uid="uid://bpr8cwurcrxy3" path="res://Scripts/triggered_condition.gd" id="2_i4h36"]
+[ext_resource type="Script" uid="uid://tnxg66jw03v3" path="res://Scripts/enemy_data.gd" id="2_t8ft7"]
+[ext_resource type="Script" uid="uid://dhxff5egnsgrv" path="res://Scripts/action.gd" id="3_e11ib"]
+[ext_resource type="Script" uid="uid://0gsjrx47no8b" path="res://Scripts/card_data.gd" id="4_iork6"]
+[ext_resource type="Script" uid="uid://cvffdttrqlrm2" path="res://Scripts/add_card_condition.gd" id="5_ybli7"]
+[ext_resource type="Texture2D" uid="uid://m38bofij7iki" path="res://Art/Characters/DevilGuy.png" id="7_6oo0e"]
+
+[sub_resource type="Resource" id="Resource_35r2l"]
+script = ExtResource("4_iork6")
+card_name = "Red Tape"
+type = 3
+exhaust = true
+metadata/_custom_type_script = "uid://0gsjrx47no8b"
+
+[sub_resource type="Resource" id="Resource_nj26k"]
+script = ExtResource("5_ybli7")
+card = SubResource("Resource_35r2l")
+metadata/_custom_type_script = "uid://cvffdttrqlrm2"
+
+[sub_resource type="Resource" id="Resource_1bj0r"]
+script = ExtResource("2_i4h36")
+trigger_type = 1
+triggered_effect = SubResource("Resource_nj26k")
+condition_name = "Beaucratic"
+metadata/_custom_type_script = "uid://bpr8cwurcrxy3"
+
+[resource]
+script = ExtResource("2_t8ft7")
+enemy_name = "Demonic Accountant"
+texture = ExtResource("7_6oo0e")
+min_health = 16
+max_health = 23
+damage = 5
+conditions = Array[ExtResource("1_xm604")]([SubResource("Resource_1bj0r")])
+noise_cost = 2
+metadata/_custom_type_script = "uid://tnxg66jw03v3"

@@ -8,10 +8,4 @@
 script = ExtResource("1_crab")
 enemy_name = "The Crab"
 texture = ExtResource("3_crab")
-min_health = 10
-max_health = 14
-damage = 5
-move_speed = 1
-attack_range = 1
-noise_cost = 2
 metadata/_custom_type_script = "uid://tnxg66jw03v3"

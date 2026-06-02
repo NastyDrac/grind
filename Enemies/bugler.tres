@@ -7,7 +7,7 @@
 
 [sub_resource type="Resource" id="Resource_fem11"]
 script = ExtResource("3_1tamc")
-trigger_type = 2
+trigger_type = 1
 fire_every_advance = false
 trigger_range = 3
 condition_name = "Noisy"

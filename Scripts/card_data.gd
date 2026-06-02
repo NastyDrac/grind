@@ -3,6 +3,8 @@ class_name CardData
 
 @export var card_name: String = "Card"
 @export var card_cost: int = 1
+enum TYPE {Strike, Utility, Setup, Status, Any}
+@export var type : TYPE
 var card_description: String = ""
 @export var card_image: Texture2D
 enum RARITY {Common, Uncommon, Rare}

@@ -27,6 +27,7 @@ metadata/_custom_type_script = "uid://c3g4jmcp7xiqk"
 script = ExtResource("2_krlx5")
 card_name = "Come Here!"
 card_cost = 2
+type = 1
 rarity = 1
 actions = Array[ExtResource("1_xrape")]([SubResource("Resource_78q14")])
 metadata/_custom_type_script = "uid://0gsjrx47no8b"

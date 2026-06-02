@@ -23,6 +23,52 @@ func fire_projectile(from: Vector2, target: Node2D, on_hit: Callable) -> void:
 		on_hit.call()
 
 
+## Play an enemy's attack animation FROM the enemy TO the player, then return.
+## Mirrors the player-side flow but with the enemy as the source. Awaitable:
+## the enemy awaits this and emits enemy_attacks_player afterward, so damage
+## and ON_ATTACK triggers land on impact rather than instantly.
+func play_enemy_attack(source: Object, anim_type: Action.AnimationType) -> void:
+	var from := _node_sprite_position(source)
+	var to := _get_player_position()
+	var player_sprite := _get_player_sprite()
+
+	match anim_type:
+		Action.AnimationType.PROJECTILE:
+			await _play_projectile(from, to, player_sprite)
+		Action.AnimationType.MELEE_SLASH:
+			await _play_melee_slash(to, player_sprite)
+		Action.AnimationType.AOE_BURST:
+			await _play_aoe_burst(to, player_sprite)
+		_:
+			# NONE / BUFF have no enemy-attack visual — hold a short beat so the
+			# hit still reads as a discrete moment.
+			await get_tree().create_timer(0.1).timeout
+
+
+## Screen position of a node's Sprite2D child, falling back to the node itself.
+func _node_sprite_position(node: Object) -> Vector2:
+	if node is Node:
+		for child in (node as Node).get_children():
+			if child is Sprite2D or child is AnimatedSprite2D:
+				return (child as Node2D).global_position
+	if node is Node2D:
+		return (node as Node2D).global_position
+	return get_viewport().size * 0.5
+
+
+## The player's sprite node, used as the flash target on enemy hits.
+func _get_player_sprite() -> Node2D:
+	var player := get_tree().get_first_node_in_group("player")
+	if not player:
+		return null
+	for child in player.get_children():
+		if child is Sprite2D or child is AnimatedSprite2D:
+			return child as Node2D
+	if player is Node2D:
+		return player as Node2D
+	return null
+
+
 func _on_animation_requested(action: Action, target: Object, anim_type: Action.AnimationType) -> void:
 	var player_pos := _get_player_position()
 	var target_pos := _get_target_position(target)

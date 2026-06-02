@@ -1,0 +1,34 @@
+[gd_resource type="Resource" script_class="EnemyData" load_steps=9 format=3 uid="uid://b1ce613eo25tp"]
+
+[ext_resource type="Script" uid="uid://b1ogi3xh5xakp" path="res://Scripts/condition.gd" id="1_mplvl"]
+[ext_resource type="Script" uid="uid://tnxg66jw03v3" path="res://Scripts/enemy_data.gd" id="2_armft"]
+[ext_resource type="Script" uid="uid://b2o6hip7peiwb" path="res://Scripts/move_pattern.gd" id="2_cpw3x"]
+[ext_resource type="Script" uid="uid://rf04wb68htw8" path="res://Scripts/move_step.gd" id="3_f8gmx"]
+[ext_resource type="Texture2D" uid="uid://b2rjhiy4rifig" path="res://icon.svg" id="5_boull"]
+
+[sub_resource type="Resource" id="Resource_gr5m6"]
+script = ExtResource("3_f8gmx")
+predicate = 3
+action = 4
+metadata/_custom_type_script = "uid://rf04wb68htw8"
+
+[sub_resource type="Resource" id="Resource_bvt6l"]
+script = ExtResource("3_f8gmx")
+metadata/_custom_type_script = "uid://rf04wb68htw8"
+
+[sub_resource type="Resource" id="Resource_ka2i2"]
+script = ExtResource("2_cpw3x")
+steps = Array[ExtResource("3_f8gmx")]([SubResource("Resource_gr5m6"), SubResource("Resource_bvt6l")])
+metadata/_custom_type_script = "uid://b2o6hip7peiwb"
+
+[resource]
+script = ExtResource("2_armft")
+enemy_name = "Sniper"
+texture = ExtResource("5_boull")
+min_health = 6
+max_health = 9
+damage = 12
+attack_range = 5
+move_pattern = SubResource("Resource_ka2i2")
+noise_cost = 3
+metadata/_custom_type_script = "uid://tnxg66jw03v3"

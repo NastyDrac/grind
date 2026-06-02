@@ -1,0 +1,25 @@
+[gd_resource type="Resource" script_class="CardData" load_steps=7 format=3 uid="uid://v6l7loru175x0"]
+
+[ext_resource type="Script" uid="uid://dhxff5egnsgrv" path="res://Scripts/action.gd" id="1_acti"]
+[ext_resource type="Script" uid="uid://0gsjrx47no8b" path="res://Scripts/card_data.gd" id="2_card"]
+[ext_resource type="Script" uid="uid://cgrxhw8vqenhu" path="res://Scripts/ValueCalculator.gd" id="3_vc"]
+[ext_resource type="Script" uid="uid://px415e6h6tao" path="res://Scripts/block_action.gd" id="4_bloc"]
+
+[sub_resource type="Resource" id="VC_1"]
+script = ExtResource("3_vc")
+formula = "guts"
+metadata/_custom_type_script = "uid://cgrxhw8vqenhu"
+
+[sub_resource type="Resource" id="R_2"]
+script = ExtResource("4_bloc")
+block_calculator = SubResource("VC_1")
+target_type = 4
+metadata/_custom_type_script = "uid://px415e6h6tao"
+
+[resource]
+script = ExtResource("2_card")
+card_name = "Brace"
+card_cost = 1
+type = 1
+actions = Array[ExtResource("1_acti")]([SubResource("R_2")])
+metadata/_custom_type_script = "uid://0gsjrx47no8b"

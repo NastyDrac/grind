@@ -9,7 +9,7 @@ func execute(run_manager: RunManager, _parent: Node, done: Callable) -> void:
 	if card == null:
 		push_warning("EffectAddCard: no card assigned.")
 	else:
-		run_manager.deck.append(card)
+		run_manager.add_card_to_deck(card)
 	done.call()
 
 func get_description(run : RunManager) -> String:

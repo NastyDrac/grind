@@ -513,7 +513,14 @@ func _get_automatic_targets(action: Action) -> Array:
 	"""Get targets for actions that don't require player input"""
 	match action.target_type:
 		Action.TargetType.ALL_ENEMIES:
-			return run_manager.range_manager.get_all_enemies()
+			var enemies = run_manager.range_manager.get_all_enemies()
+			# Range-limited AoE only catches enemies who've gotten close.
+			# If nothing is in range, this returns empty — and the caller's
+			# fallback detonates it on the player instead. (Landmine.)
+			if action.max_range > 0:
+				enemies = enemies.filter(func(e):
+					return is_instance_valid(e) and e.get_current_range() <= action.max_range)
+			return enemies
 		Action.TargetType.SELF:
 			return [run_manager.player]
 	return []
@@ -1187,10 +1194,13 @@ func _trigger_volatile_cards():
 					for target in targets:
 						action.play_animation_and_execute(target)
 		
-		# Send to exhaust pile after triggering (volatile cards are consumed)
-		card.reparent(exhaust_pile)
-		if not exhaust_stack.has(card):
-			exhaust_stack.append(card)
+		# Consume the card after triggering. Honor its exhaust flag so the
+		# volatile path matches normal play: exhaust -> exhaust pile (gone for
+		# the rest of combat), otherwise -> discard (can come back around).
+		if card.data and card.data.exhaust:
+			await exhaust(card)
+		else:
+			await discard(card)
 	
 	if not volatile_cards.is_empty():
 		arrange_cards()

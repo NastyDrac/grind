@@ -1,0 +1,23 @@
+[gd_resource type="Resource" script_class="EnemyData" load_steps=6 format=3 uid="uid://bbt02yk48rjmq"]
+
+[ext_resource type="Script" uid="uid://b1ogi3xh5xakp" path="res://Scripts/condition.gd" id="1_0iymy"]
+[ext_resource type="Script" uid="uid://tnxg66jw03v3" path="res://Scripts/enemy_data.gd" id="2_7q5tt"]
+[ext_resource type="Script" uid="uid://bgw241a265wyo" path="res://Scripts/bloated.gd" id="2_spt0a"]
+[ext_resource type="Texture2D" uid="uid://b2rjhiy4rifig" path="res://icon.svg" id="4_mnsng"]
+
+[sub_resource type="Resource" id="Resource_trnji"]
+script = ExtResource("2_spt0a")
+condition_name = "Infected"
+stacks = 5
+metadata/_custom_type_script = "uid://bgw241a265wyo"
+
+[resource]
+script = ExtResource("2_7q5tt")
+enemy_name = "The Infeced"
+texture = ExtResource("4_mnsng")
+min_health = 16
+max_health = 22
+damage = 4
+conditions = Array[ExtResource("1_0iymy")]([SubResource("Resource_trnji")])
+noise_cost = 2
+metadata/_custom_type_script = "uid://tnxg66jw03v3"

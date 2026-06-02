@@ -8,8 +8,9 @@ class_name CharacterSelect
 ## Assign all playable CharacterData resources here in the Inspector.
 @export var characters : Array[CharacterData] = []
 
-## Path to your RunManager scene.
-@export var run_manager_scene : PackedScene
+# NOTE: run_manager_scene used to live here. Launching a run is now the job of
+# the Game coordinator (autoload), so this screen no longer knows about
+# RunManager at all -- it just asks Game to start a run with the chosen data.
 
 # ─────────────────────────────────────────────────────────────────────────────
 #  SCENE NODE REFERENCES
@@ -276,17 +277,14 @@ func _on_begin_run_pressed() -> void:
 	if not _selected_data:
 		return
 
-	if not run_manager_scene:
-		push_error("CharacterSelect: run_manager_scene is not assigned in the Inspector!")
-		return
-
+	# Initialise starting health from the character's max_health formula.
 	var preview := _make_preview_character(_selected_data)
 	_selected_data.current_health = _selected_data.max_health.calculate(preview) if _selected_data.max_health else 100
 	preview.queue_free()
 
-	var run_manager : RunManager = run_manager_scene.instantiate()
-	run_manager.character = _selected_data
-	get_tree().root.add_child(run_manager)
+	# Hand off to the coordinator. It owns run lifecycle from here; this screen
+	# frees itself now that its job is done.
+	Game.start_run(_selected_data)
 	queue_free()
 
 # ─────────────────────────────────────────────────────────────────────────────

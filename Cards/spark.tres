@@ -1,0 +1,32 @@
+[gd_resource type="Resource" script_class="CardData" load_steps=9 format=3 uid="uid://0fp2ulwu4t8o2"]
+
+[ext_resource type="Script" uid="uid://dhxff5egnsgrv" path="res://Scripts/action.gd" id="1_acti"]
+[ext_resource type="Script" uid="uid://0gsjrx47no8b" path="res://Scripts/card_data.gd" id="2_card"]
+[ext_resource type="Script" uid="uid://cgrxhw8vqenhu" path="res://Scripts/ValueCalculator.gd" id="3_vc"]
+[ext_resource type="Script" uid="uid://dqr8kxmoc0iom" path="res://Scripts/burning.gd" id="4_burn"]
+[ext_resource type="Script" uid="uid://dm2bmau6ctnm8" path="res://Scripts/apply_condition_action.gd" id="5_appl"]
+
+[sub_resource type="Resource" id="R_1"]
+script = ExtResource("4_burn")
+metadata/_custom_type_script = "uid://dqr8kxmoc0iom"
+
+[sub_resource type="Resource" id="VC_2"]
+script = ExtResource("3_vc")
+formula = "mojo/4"
+metadata/_custom_type_script = "uid://cgrxhw8vqenhu"
+
+[sub_resource type="Resource" id="R_3"]
+script = ExtResource("5_appl")
+condition_resource = SubResource("R_1")
+stacks_calculator = SubResource("VC_2")
+target_type = 0
+max_range = 5
+animation_type = 1
+metadata/_custom_type_script = "uid://dm2bmau6ctnm8"
+
+[resource]
+script = ExtResource("2_card")
+card_name = "Spark"
+card_cost = 1
+actions = Array[ExtResource("1_acti")]([SubResource("R_3")])
+metadata/_custom_type_script = "uid://0gsjrx47no8b"

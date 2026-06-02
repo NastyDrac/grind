@@ -1,0 +1,35 @@
+[gd_resource type="Resource" script_class="EnemyData" load_steps=10 format=3 uid="uid://dyg4uugsdlgf3"]
+
+[ext_resource type="Script" uid="uid://b1ogi3xh5xakp" path="res://Scripts/condition.gd" id="1_e4qs3"]
+[ext_resource type="Script" uid="uid://do7yj12cpcfq4" path="res://Scripts/trumpeteer.gd" id="2_5f5gq"]
+[ext_resource type="Script" uid="uid://tnxg66jw03v3" path="res://Scripts/enemy_data.gd" id="2_w5fhw"]
+[ext_resource type="Script" uid="uid://b2o6hip7peiwb" path="res://Scripts/move_pattern.gd" id="3_5w4w8"]
+[ext_resource type="Script" uid="uid://rf04wb68htw8" path="res://Scripts/move_step.gd" id="4_bxj2k"]
+[ext_resource type="Texture2D" uid="uid://b2rjhiy4rifig" path="res://icon.svg" id="6_v2wkv"]
+
+[sub_resource type="Resource" id="Resource_nsiv2"]
+script = ExtResource("2_5f5gq")
+trigger_type = 2
+metadata/_custom_type_script = "uid://do7yj12cpcfq4"
+
+[sub_resource type="Resource" id="Resource_03xqc"]
+script = ExtResource("4_bxj2k")
+metadata/_custom_type_script = "uid://rf04wb68htw8"
+
+[sub_resource type="Resource" id="Resource_6h0mt"]
+script = ExtResource("3_5w4w8")
+steps = Array[ExtResource("4_bxj2k")]([SubResource("Resource_03xqc")])
+metadata/_custom_type_script = "uid://b2o6hip7peiwb"
+
+[resource]
+script = ExtResource("2_w5fhw")
+enemy_name = "The Lookout"
+texture = ExtResource("6_v2wkv")
+min_health = 8
+max_health = 12
+damage = 2
+attack_range = 3
+conditions = Array[ExtResource("1_e4qs3")]([SubResource("Resource_nsiv2")])
+move_pattern = SubResource("Resource_6h0mt")
+noise_cost = 2
+metadata/_custom_type_script = "uid://tnxg66jw03v3"

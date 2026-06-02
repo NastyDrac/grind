@@ -7,6 +7,7 @@ const TOOLTIP_SCENE = preload("res://Scenes/tooltip.tscn")
 var tooltip_instance: Control = null
 var stacks_label: Label = null
 
+var _last_stacks: int = -2147483648   # force first update
 
 
 func _ready():
@@ -17,6 +18,7 @@ func _ready():
 	mouse_entered.connect(_on_mouse_entered)
 	mouse_exited.connect(_on_mouse_exited)
 	_setup_stacks_label()
+	update_display()
 
 func _setup_stacks_label():
 	stacks_label = Label.new()
@@ -33,7 +35,21 @@ func _setup_stacks_label():
 
 func set_condition(con: Condition):
 	condition = con
+	_last_stacks = -2147483648
 	update_display()
+
+## Poll the condition's stacks every frame so the number is always visible and
+## always current — no hover, no container rebuild needed. One condition object
+## can drive several icons (character sheet + combat HUD) this way.
+func _process(_delta: float) -> void:
+	if condition and condition.show_stacks:
+		if condition.stacks != _last_stacks:
+			_last_stacks = condition.stacks
+			if stacks_label:
+				stacks_label.text = str(condition.stacks)
+				stacks_label.visible = true
+	elif stacks_label and stacks_label.visible:
+		stacks_label.visible = false
 
 func update_display():
 	if condition and condition.icon:
@@ -97,13 +113,13 @@ func _populate_tooltip():
 	if not desc_node:
 		push_warning("ConditionIcon: could not find condition_description node in tooltip scene")
 		return
-	
+
 	var description_text = condition.get_description_with_values()
 
 	if condition.stacks > 0:
 		description_text = "[b]Stacks:[/b] %d\n%s" % [condition.stacks, description_text]
 	desc_node.text = description_text
-	
+
 
 func _position_tooltip():
 	if not tooltip_instance:

@@ -1,61 +1,90 @@
 extends Node2D
 class_name RunManager
 
-########
+## Emitted when this run ends (win or loss), right before RunManager frees
+## itself. The session coordinator (Game autoload) listens to decide what
+## comes next. RunManager itself never knows about title screens, character
+## select, settings, etc. -- it handles exactly one run and then disappears.
+signal run_finished(won: bool)
+
+# ──────────────────────────────────────────────────────────────────────────
+#  INSPECTOR CONFIG  (grouped for tidiness; groups are purely cosmetic)
+# ──────────────────────────────────────────────────────────────────────────
+
+@export_group("Run Setup")
+## The player's starting deck. Deep-copied at run start.
+@export var deck : Array[CardData]
+
+@export_group("Acts")
+## One HordePool per act (index 0 = Act 1, etc.). Each pool defines that act's
+## normal fights (recipes) AND its possible bosses (boss_recipes).
+@export var act_recipe_pools : Array[HordePool] = []
+## Event pool, shared across all acts.
+@export var available_events : Array[EventData] = []
+
+@export_group("Scenes")
+@export var map_generator_scene : PackedScene
+@export var character_sheet_scene : PackedScene
+@export var defeat_screen_scene : PackedScene
+@export var victory_screen_scene : PackedScene
+
+# ──────────────────────────────────────────────────────────────────────────
+#  RUNTIME STATE  (not inspector-assigned)
+# ──────────────────────────────────────────────────────────────────────────
+
 var run_seed : int
 var rng : RandomNumberGenerator
+
+## The run's character. Set at runtime by Game.start_run and deep-copied in
+## begin_run -- NOT assigned in the Inspector, so it's a plain var, not @export.
+var character : CharacterData
 
 var card_handler : CardHandler
 var player : Character
 var draft_amount : int = 3
-@export var deck : Array[CardData]
 
 var range_manager : RangeManager
 var ui_bar : UIBar
-@export var character : CharacterData
-
-@export var character_sheet_scene : PackedScene
 var current_character_sheet : PopupPanel = null
 
-## Which act the player is currently on (0-indexed internally, displayed as 1-indexed).
+## Which act the player is on (0-indexed internally, displayed as 1-indexed).
 var current_act : int = 0
 
-## Tracks horde recipe_names fought so far this act so they aren't repeated.
-## Reset at run start and whenever a new act begins.
+## Tracks horde recipe_names / event paths used this act so they aren't repeated.
 var _used_horde_names : Array[String] = []
 var _used_event_names : Array[String] = []
-## One HordePool per act (index 0 = Act 1, index 1 = Act 2, etc.).
-## If the player reaches an act beyond this array, falls back to horde.
-@export var act_recipe_pools : Array[HordePool] = []
 
-## Fallback enemy list used when no pool is defined for the current act.
-@export var horde : Array[EnemyData] = []
+## Runtime fallback enemy list, set by event combats (event.gd) to inject a
+## specific fight; consumed by _pick_horde_for_combat. Not inspector-assigned,
+## so it's a plain var rather than an export.
+var horde : Array[EnemyData] = []
 
-## The Horde resource that was selected for the current (or most recent) combat.
-## Populated by _pick_horde_for_combat(); used by the RewardScene.
+## The Horde selected for the current/most recent combat. Used by RewardScene.
 var current_horde : Horde = null
 
-var current_win_condition: WinCondition = null
+## The boss chosen for the CURRENT act, decided once at map generation with the
+## seeded RNG so it's fixed and knowable the moment the map exists. Read by
+## begin_boss_combat; nothing re-rolls it.
+var current_boss : Horde = null
 
-@export var available_events: Array[EventData] = []
-var current_event_scene: EventScene = null
+var current_win_condition : WinCondition = null
+var current_event_scene : EventScene = null
 
-var current_draft_screen: DraftScreen = null
-var current_reward_scene: RewardScene = null
-var current_shop: Shop = null
-var current_gym      : Gym      = null
+var current_draft_screen : DraftScreen = null
+var current_reward_scene : RewardScene = null
+var current_shop : Shop = null
+var current_gym : Gym = null
 var current_hospital : Hospital = null
 var current_services : Services = null
 
-# -- Map -----------------------------------------------------------------------
-## Assign the MapGenerator scene in the inspector.
-@export var map_generator_scene : PackedScene
 var map_generator : MapGenerator = null
 ## The node the player most recently selected -- resolved after combat/event ends.
 var _pending_map_node : MapNode = null
 
+var current_end_screen : Node = null
+
 enum GameState { MAP, EVENT, COMBAT }
-var current_state: GameState = GameState.MAP
+var current_state : GameState = GameState.MAP
 
 # -- Thingy dedup --------------------------------------------------------------
 ## resource_path values of every ThingyCondition the player has acquired this run.
@@ -71,6 +100,16 @@ func begin_run(seed : int = -1):
 	else:
 		run_seed = seed
 	rng.seed = run_seed
+
+	# Work on a disposable DEEP COPY of the character so permanent changes this
+	# run (stat boosts from gym/Montage, gold spent, thingies bought into
+	# special_effects) never bleed back into the saved CharacterData asset.
+	# Without this, the cached .tres is mutated and persists across runs.
+	if character:
+		character = character.duplicate(true)
+	else:
+		push_error("RunManager: begin_run called but character is null!")
+
 	current_act = 0
 	_used_horde_names.clear()
 	_used_event_names.clear()
@@ -86,6 +125,13 @@ func begin_run(seed : int = -1):
 	create_ui()
 	create_player()
 	player.toggle_visible(false)
+
+	# Wire up run-level listeners for any starting passives the character owns
+	# (e.g. a Training Montage given as a build-defining starter). Mid-run
+	# pickups are activated in add_thingy_condition instead.
+	for fx in character.special_effects:
+		if fx.has_method("activate"):
+			fx.activate(self)
 
 func _ready() -> void:
 	begin_run()
@@ -104,6 +150,7 @@ func _show_map() -> void:
 			map_generator = map_generator_scene.instantiate()
 			add_child(map_generator)
 			map_generator.node_chosen.connect(_on_map_node_chosen)
+			_choose_act_boss()
 			map_generator.build(rng)
 		else:
 			push_error("RunManager: map_generator_scene is not assigned in the inspector!")
@@ -184,12 +231,6 @@ func _on_event_completed():
 #  COMBAT
 # ------------------------------------------------------------------------------
 
-## One Horde per act for boss fights. Index 0 = Act 1, index 1 = Act 2, etc.
-## The first enemy in the horde with is_elite = true is the boss — spawned
-## immediately. All other enemies go into the noise pool and spawn as the
-## player plays cards, just like a normal combat.
-@export var act_boss_hordes : Array[Horde] = []
-
 func begin_combat():
 	current_state = GameState.COMBAT
 	begin_wave()
@@ -197,12 +238,11 @@ func begin_combat():
 func begin_boss_combat():
 	current_state = GameState.COMBAT
 
-	var boss_horde : Horde = null
-	if current_act < act_boss_hordes.size():
-		boss_horde = act_boss_hordes[current_act]
+	# Use the boss chosen at map generation (see _choose_act_boss).
+	var boss_horde : Horde = current_boss
 
 	if boss_horde == null:
-		push_error("RunManager: no boss horde for act %d in act_boss_hordes!" % (current_act + 1))
+		push_error("RunManager: no boss chosen for act %d (boss_recipes empty?)" % (current_act + 1))
 		return
 
 	current_horde = boss_horde
@@ -326,7 +366,7 @@ func _pick_horde_for_combat() -> Array[EnemyData]:
 func create_card_handler():
 	card_handler = load("res://Scenes/card_handler.tscn").instantiate()
 	$CanvasLayer.add_child(card_handler)
-	
+
 	card_handler.run_manager = self
 	card_handler.initialize()
 
@@ -396,8 +436,16 @@ func on_combat_won():
 	await current_reward_scene.reward_scene_completed
 
 	await Transitions.transition(func(): _show_map())
+
+	# Boss defeated: either advance to the next act, or — if this was the
+	# final act — the whole run is won.
 	if was_boss:
-		_start_new_act()
+		# Act count is defined by the size of act_recipe_pools -- a single source
+		# of truth, nothing separate to keep in sync. Last act's boss = victory.
+		if current_act + 1 >= act_recipe_pools.size():
+			on_run_won()
+		else:
+			_start_new_act()
 
 ## Increments the act counter and generates a brand-new map for the next act.
 func _start_new_act() -> void:
@@ -405,17 +453,95 @@ func _start_new_act() -> void:
 	_used_horde_names.clear()
 	_used_event_names.clear()
 	print("RunManager: beginning Act %d" % (current_act + 1))
+	_choose_act_boss()
 	if map_generator:
 		await Transitions.transition(func(): map_generator.build(rng))
 	else:
 		push_error("RunManager: _start_new_act called but map_generator is null")
 
+## Picks this act's boss from its HordePool.boss_recipes using the seeded RNG,
+## and stores it in current_boss. Called once whenever an act's map is built, so
+## the boss is fixed and knowable from map generation onward.
+func _choose_act_boss() -> void:
+	current_boss = null
+	if current_act < act_recipe_pools.size():
+		var pool : HordePool = act_recipe_pools[current_act]
+		if pool:
+			current_boss = pool.pick_boss(rng)
+	if current_boss == null:
+		push_error("RunManager: no boss available for act %d -- is boss_recipes empty on its HordePool?" % (current_act + 1))
+	else:
+		print("RunManager: act %d boss will be '%s'" % [current_act + 1, current_boss.recipe_name])
+
+# ------------------------------------------------------------------------------
+#  RUN TERMINAL STATES  (victory / defeat)
+# ------------------------------------------------------------------------------
+
+## Called from character.die() when the player's health hits 0.
 func on_player_death():
 	if current_win_condition:
 		current_win_condition.cleanup()
 		current_win_condition = null
 
 	print("Game Over!")
+	get_tree().paused = true
+	_show_end_screen(defeat_screen_scene, "Defeat", false)
+
+## Called from on_combat_won() when the final act's boss is defeated.
+func on_run_won():
+	print("Run complete -- victory!")
+	get_tree().paused = true
+	_show_end_screen(victory_screen_scene, "Victory", true)
+
+## Instantiates an end-screen overlay under the CanvasLayer. The screen runs
+## while the tree is paused (PROCESS_MODE_ALWAYS) and should emit
+## `restart_requested` when its button is pressed. The `won` flag is forwarded
+## to end_run so the coordinator learns the outcome.
+func _show_end_screen(scene: PackedScene, label: String, won: bool) -> void:
+	if scene == null:
+		push_warning("RunManager: %s screen scene not assigned in the inspector." % label)
+		return
+
+	if current_end_screen:
+		current_end_screen.queue_free()
+		current_end_screen = null
+
+	current_end_screen = scene.instantiate()
+	current_end_screen.process_mode = Node.PROCESS_MODE_ALWAYS
+	$CanvasLayer.add_child(current_end_screen)
+
+	if current_end_screen.has_signal("restart_requested"):
+		current_end_screen.restart_requested.connect(end_run.bind(won))
+	if "run_manager" in current_end_screen:
+		current_end_screen.run_manager = self
+
+## Ends this run. RunManager's only job here is to announce the result and
+## remove itself; deciding what happens next belongs to the coordinator
+## listening on run_finished. Safe to call from a paused end screen.
+## Deactivates run-level thingy listeners first so they don't leak across runs.
+func end_run(won: bool) -> void:
+	get_tree().paused = false
+	if character:
+		for fx in character.special_effects:
+			if fx.has_method("deactivate"):
+				fx.deactivate()
+	run_finished.emit(won)
+	queue_free()
+
+# ------------------------------------------------------------------------------
+#  CARDS — deck additions
+# ------------------------------------------------------------------------------
+
+## The single path for adding a card to the run deck. Routes every source
+## (shop purchase, reward draft, pickup effects) through here so that
+## deck-add listeners (e.g. the Training Montage thingy) fire reliably.
+## Appends a fresh deep copy so each deck slot is an independent object.
+func add_card_to_deck(card_data : CardData) -> void:
+	if card_data == null:
+		return
+	var copy : CardData = card_data.duplicate(true)
+	deck.append(copy)
+	Global.card_added_to_deck.emit(copy)
 
 # ------------------------------------------------------------------------------
 #  THINGY CONDITIONS
@@ -428,14 +554,19 @@ func on_player_death():
 ## across waves. reset_for_new_wave re-applies it as a fresh duplicate at the
 ## start of every subsequent combat, calling setup() automatically.
 ##
-## If a combat wave is already in progress, a working copy is applied to the
-## player immediately so it takes effect without waiting for the next wave.
+## on_pickup() fires once here for one-time acquisition effects (stat grants,
+## deck changes). activate() fires here too, to wire up any run-level listeners
+## (the same call begin_run makes for starting passives).
 func add_thingy_condition(condition: ThingyCondition) -> void:
 	# Track the resource path so get_unique_thingy_condition() can exclude it.
 	if condition.resource_path != "" and condition.resource_path not in _owned_thingy_paths:
 		_owned_thingy_paths.append(condition.resource_path)
 
 	character.special_effects.append(condition)
+
+	# One-time acquisition effect, then wire up run-level listeners.
+	condition.on_pickup(self)
+	condition.activate(self)
 
 	if current_state == GameState.COMBAT and player:
 		var fresh := condition.duplicate(true) as ThingyCondition
@@ -534,7 +665,7 @@ func create_reward_scene() -> void:
 	current_reward_scene.current_horde = current_horde
 	get_tree().root.add_child(current_reward_scene)
 	current_reward_scene.set_anchors_preset(Control.PRESET_FULL_RECT)
-	
+
 
 func close_reward_scene() -> void:
 	if current_reward_scene:
@@ -630,7 +761,7 @@ func _on_service_chosen(service: String) -> void:
 			_resolve_pending_node()
 
 # ------------------------------------------------------------------------------
-#  CARDS
+#  CARDS — random card lookup
 # ------------------------------------------------------------------------------
 
 func get_random_card_data(excluded_paths: Array[String] = []) -> CardData:
@@ -666,10 +797,12 @@ func get_random_card_data(excluded_paths: Array[String] = []) -> CardData:
 
 ## Scans res://Thingys/ for .tres files and returns one at random.
 ## ThingyConditions are Resources, not scenes -- save them as .tres assets.
+## An empty / missing folder is an expected dev state, so it warns rather than
+## errors; every caller already handles a null return gracefully.
 func get_random_thingy_condition(excluded_paths: Array[String] = []) -> ThingyCondition:
 	var dir := DirAccess.open("res://Thingys/")
 	if dir == null:
-		push_error("RunManager: could not open Thingys directory")
+		push_warning("RunManager: res://Thingys/ not found yet — no thingies to offer.")
 		return null
 
 	var paths : Array = []
@@ -684,7 +817,7 @@ func get_random_thingy_condition(excluded_paths: Array[String] = []) -> ThingyCo
 	dir.list_dir_end()
 
 	if paths.is_empty():
-		push_error("RunManager: no ThingyCondition resources found in res://Thingys/")
+		push_warning("RunManager: no ThingyCondition resources in res://Thingys/ (or all excluded).")
 		return null
 
 	return load(paths[randi() % paths.size()])

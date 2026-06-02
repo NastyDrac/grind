@@ -7,7 +7,6 @@
 
 [sub_resource type="Resource" id="Resource_pel"]
 script = ExtResource("3_pel")
-trigger_type = 0
 condition_name = "Squawk"
 stacks = 3
 icon = ExtResource("2_pel")
@@ -20,7 +19,6 @@ texture = ExtResource("2_pel")
 min_health = 12
 max_health = 16
 damage = 4
-move_speed = 1
 attack_range = 2
 conditions = Array[ExtResource("1_pel")]([SubResource("Resource_pel")])
 noise_cost = 3

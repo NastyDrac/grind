@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="EnemyData" load_steps=4 format=3 uid="uid://dis8begl0b7uy"]
+
+[ext_resource type="Script" uid="uid://b1ogi3xh5xakp" path="res://Scripts/condition.gd" id="1_ucymk"]
+[ext_resource type="Script" uid="uid://tnxg66jw03v3" path="res://Scripts/enemy_data.gd" id="2_12gq3"]
+[ext_resource type="Texture2D" uid="uid://b2rjhiy4rifig" path="res://icon.svg" id="3_12gq3"]
+
+[resource]
+script = ExtResource("2_12gq3")
+enemy_name = "K9 Unit"
+texture = ExtResource("3_12gq3")
+min_health = 7
+damage = 6
+move_speed = 4
+noise_cost = 2
+metadata/_custom_type_script = "uid://tnxg66jw03v3"

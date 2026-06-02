@@ -1,0 +1,32 @@
+[gd_resource type="Resource" script_class="EnemyData" load_steps=8 format=3 uid="uid://ds6ljaxim38cc"]
+
+[ext_resource type="Script" uid="uid://b1ogi3xh5xakp" path="res://Scripts/condition.gd" id="1_vuryo"]
+[ext_resource type="Script" uid="uid://tnxg66jw03v3" path="res://Scripts/enemy_data.gd" id="2_a5ju5"]
+[ext_resource type="Script" uid="uid://bpr8cwurcrxy3" path="res://Scripts/triggered_condition.gd" id="2_st4n4"]
+[ext_resource type="Script" uid="uid://dqr8kxmoc0iom" path="res://Scripts/burning.gd" id="3_87w5v"]
+[ext_resource type="Texture2D" uid="uid://b2rjhiy4rifig" path="res://icon.svg" id="5_5f5cc"]
+
+[sub_resource type="Resource" id="Resource_q2prx"]
+script = ExtResource("3_87w5v")
+condition_name = "Burning"
+stacks = 4
+metadata/_custom_type_script = "uid://dqr8kxmoc0iom"
+
+[sub_resource type="Resource" id="Resource_qcfly"]
+script = ExtResource("2_st4n4")
+trigger_type = 1
+triggered_effect = SubResource("Resource_q2prx")
+condition_name = "Fire Starter"
+metadata/_custom_type_script = "uid://bpr8cwurcrxy3"
+
+[resource]
+script = ExtResource("2_a5ju5")
+enemy_name = "The Arsonist"
+texture = ExtResource("5_5f5cc")
+min_health = 12
+max_health = 17
+damage = 2
+attack_range = 3
+conditions = Array[ExtResource("1_vuryo")]([SubResource("Resource_qcfly")])
+noise_cost = 3
+metadata/_custom_type_script = "uid://tnxg66jw03v3"

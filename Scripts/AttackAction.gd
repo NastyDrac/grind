@@ -24,8 +24,19 @@ func execute(target) -> void:
 		return
 
 	var damage = damage_calculator.calculate(player)
-	target.take_damgage(damage)
-	Global.player_attacks.emit(player, target, damage)
+
+	if target.has_method("take_damgage"):
+		# Normal case: hitting an enemy.
+		target.take_damgage(damage)
+		Global.player_attacks.emit(player, target, damage)
+	elif target.has_method("take_hit"):
+		# Self-detonation (e.g. Landmine cooking off with no enemy in range):
+		# damage the player. take_hit() applies block and plot-armor saves,
+		# so the blast is absorbed/survived like any other hit. `who` is unused
+		# inside take_hit(), so null is safe here.
+		target.take_hit(null, damage)
+	else:
+		push_error("AttackAction.execute: target %s can't take damage" % target)
 
 
 # ============================================================================

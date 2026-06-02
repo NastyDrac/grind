@@ -35,8 +35,8 @@ func _apply_heal_amount(amount: int) -> void:
 
 	var actually_healed = entity.current_health - old_hp
 	if actually_healed <= 0:
-		return  # Already full — skip animation.
+		return
 	Animations.play_heal(entity)
-	remove_condition(self)
+	remove_condition(entity)  
 func get_description_with_values() -> String:
 	return "Heal by %d." % stacks

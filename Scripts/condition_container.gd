@@ -5,21 +5,36 @@ class_name ConditionContainer
 
 const COLUMNS: int = 5
 
-var _previous_conditions: Array = []
+var _previous_list: Array = []
 
 func _ready():
 	columns = COLUMNS
 	update_conditions()
 
-func _process(delta: float) -> void:
-	if _conditions_changed():
+func _process(_delta: float) -> void:
+	# Rebuild only when the SET of displayed conditions changes (added/removed).
+	# Number changes are handled live by each ConditionIcon, so they don't
+	# require a rebuild here.
+	if _membership_changed():
 		update_conditions()
+
+## The full list to display:
+##   Character -> persistent thingies (special_effects) + temporary combat conditions
+##   Enemy     -> its conditions
+func _get_display_list() -> Array:
+	var list: Array = []
+	if entity is Character:
+		if entity.character_data and entity.character_data.special_effects:
+			list.append_array(entity.character_data.special_effects)
+		list.append_array(entity.conditions)
+	elif entity is Enemy:
+		list.append_array(entity.conditions)
+	return list
 
 func create_icon(con: Condition):
 	var icon = ConditionIcon.new()
 	icon.set_condition(con)
 	add_child(icon)
-	icon.ready.connect(icon.update_display.bind(), CONNECT_ONE_SHOT)
 
 func update_conditions():
 	if not entity:
@@ -28,36 +43,24 @@ func update_conditions():
 	for child in get_children():
 		child.queue_free()
 
-	var conditions: Array[Condition] = []
-	if entity is Character or entity is Enemy:
-		conditions = entity.conditions
+	var list := _get_display_list()
+	for con in list:
+		if con is Condition:
+			create_icon(con)
 
-	for con in conditions:
-		create_icon(con)
+	_previous_list = list.duplicate()
 
-	_previous_conditions = conditions.duplicate()
-
-func _conditions_changed() -> bool:
+func _membership_changed() -> bool:
 	if not entity:
 		return false
 
-	var current_conditions: Array = []
-	if entity is Character or entity is Enemy:
-		current_conditions = entity.conditions
+	var current := _get_display_list()
 
-	if current_conditions.size() != _previous_conditions.size():
+	if current.size() != _previous_list.size():
 		return true
 
-	for i in range(current_conditions.size()):
-		if i >= _previous_conditions.size():
-			return true
-
-		var current = current_conditions[i]
-		var previous = _previous_conditions[i]
-
-		if current.get_script() != previous.get_script():
-			return true
-		if current.stacks != previous.stacks:
+	for i in range(current.size()):
+		if current[i] != _previous_list[i]:
 			return true
 
 	return false

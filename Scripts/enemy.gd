@@ -6,6 +6,7 @@ var _movement_data : EnemyData  # original un-duplicated reference for virtual d
 var current_health : int
 var max_health : int
 var current_range : int = 5
+const MIN_RANGE := 1   # range 0 is the player's slot — enemies never enter it
 
 var range_manager : RangeManager
 var target_position : Vector2
@@ -19,9 +20,9 @@ var _hover_tween : Tween = null
 var _is_hovered : bool = false
 var _enemy_tooltip : Control = null
 
-#signal enemy_attack_player(enemy : Enemy, damage : int)
-#signal enemy_moved(enemy : Enemy, old_range : int, new_range : int)
-#signal enemy_player_moved(enemy : Enemy, old_range : int, new_range : int)
+# Enemy movement/attack signals live on Global (enemy_advanced,
+# enemy_attacks_player, enemy_player_moved) so every listener uses one source.
+
 
 @onready var sprite := $Sprite2D
 
@@ -103,11 +104,11 @@ func move_toward_player():
 	if data.move_pattern:
 		var step = data.move_pattern.get_active_step(self)
 		if step:
-			_execute_action(step.action)
+			await _execute_action(step.action)
 			return
 	# Default behavior — no pattern assigned, or no step matched.
 	if current_range <= data.attack_range:
-		attack_player()
+		await attack_player()
 		return
 	_do_advance()
 
@@ -143,16 +144,16 @@ func _execute_action(action: MoveStep.MoveAction) -> void:
 			pass  # Intentionally do nothing.
 		MoveStep.MoveAction.ATTACK:
 			if current_range <= data.attack_range:
-				attack_player()
+				await attack_player()
 			else:
 				_do_advance()
 		MoveStep.MoveAction.ATTACK_THEN_RETREAT:
 			if current_range <= data.attack_range:
-				attack_player()
+				await attack_player()
 			_do_retreat()
 		MoveStep.MoveAction.ATTACK_THEN_ADVANCE:
 			if current_range <= data.attack_range:
-				attack_player()
+				await attack_player()
 			_do_advance()
 
 
@@ -173,7 +174,25 @@ func get_next_intent() -> MoveStep.MoveAction:
 
 
 func attack_player():
-	Global.enemy_attacks_player.emit(self, get_attack_damage())
+	# Play the strike from this enemy to the player, then emit on impact so
+	# damage and ON_ATTACK triggers land when the hit visually connects.
+	var damage := get_attack_damage()
+	# A 0-damage "attack" (e.g. the bugler's buff) shouldn't throw a punch —
+	# skip the visual but still emit so ON_ATTACK triggers/effects fire.
+	if damage > 0:
+		var anim := _get_attack_animation()
+		if Animations and Animations.has_method("play_enemy_attack"):
+			await Animations.play_enemy_attack(self, anim)
+	Global.enemy_attacks_player.emit(self, damage)
+
+
+## Which animation this enemy uses to attack. Melee when it strikes from
+## adjacent range, otherwise a projectile. (Add a field on EnemyData later if
+## you want per-enemy overrides.)
+func _get_attack_animation() -> Action.AnimationType:
+	if data and data.attack_range <= 1:
+		return Action.AnimationType.MELEE_SLASH
+	return Action.AnimationType.PROJECTILE
 
 func get_intent_damage() -> int:
 	# Allows custom movement data to report a different damage value for the
@@ -194,14 +213,17 @@ func get_attack_damage() -> int:
 ## Always use this for push effects — it emits enemy_moved so the range manager
 ## stays in sync, and enemy_player_moved so Newton's Cradle (player-only) fires.
 func push(amount: int) -> void:
-	if amount <= 0:
+	if amount == 0:
 		return
+	var ceiling := range_manager.current_max_range if (range_manager and range_manager.current_max_range > 0) else 9999
 	var old_range := current_range
-	current_range += amount
+	current_range = clampi(current_range + amount, MIN_RANGE, ceiling)
+	if old_range == current_range:
+		return   # fully clamped — no actual move, so emit nothing
 	if range_manager:
 		target_position = range_manager.get_position_for_enemy(self)
 	Global.enemy_advanced.emit(self, old_range, current_range)
-	#enemy_player_moved.emit(self, old_range, current_range)
+	Global.enemy_player_moved.emit(self, old_range, current_range)
 
 func get_current_range() -> int:
 	return current_range
