@@ -3,6 +3,11 @@ class_name Horde
 
 @export var recipe_name : String = "Unnamed Horde"
 @export var enemies : Array[EnemyData] = []
+
+## Per-enemy spawn entries with optional noise-cost overrides for THIS horde.
+## When non-empty, this replaces `enemies` as the spawn source — letting the
+## same enemy type cost different noise in different fights.
+@export var enemy_entries : Array[HordeEnemy] = []
 @export_range(1, 100) var weight : int = 1
 
 ## First map column this horde can appear on (0 = first column).
@@ -28,3 +33,24 @@ func is_valid_for_column(col: int) -> bool:
 	if max_column >= 0 and col > max_column:
 		return false
 	return true
+
+## Builds this fight's spawn pool. Uses enemy_entries when defined, otherwise the
+## legacy `enemies` list. Noise costs are NOT on the enemies — see get_noise_costs.
+func get_spawn_pool() -> Array[EnemyData]:
+	var pool : Array[EnemyData] = []
+	if not enemy_entries.is_empty():
+		for entry in enemy_entries:
+			if entry and entry.enemy:
+				pool.append(entry.enemy)
+		return pool
+	pool.append_array(enemies)
+	return pool
+
+## Maps each enemy in this horde to its noise cost. Enemies from the legacy
+## `enemies` list (no entry) are omitted, so range_manager treats them as cost 1.
+func get_noise_costs() -> Dictionary:
+	var costs : Dictionary = {}
+	for entry in enemy_entries:
+		if entry and entry.enemy:
+			costs[entry.enemy] = entry.noise_cost
+	return costs

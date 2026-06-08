@@ -8,6 +8,7 @@
 
 [sub_resource type="Resource" id="Resource_mux3l"]
 script = ExtResource("2_7iy2a")
+is_keyword = true
 metadata/_custom_type_script = "uid://dqr8kxmoc0iom"
 
 [sub_resource type="Resource" id="Resource_xeotf"]

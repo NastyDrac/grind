@@ -15,6 +15,9 @@ var selectable : bool = false
 var is_targeted : bool = false
 var conditions : Array[Condition] = []
 var run_manager 
+## True once this enemy has died. Guards against double-death re-entrancy
+## (e.g. thorns damaging a corpse, which would otherwise re-emit enemy_dies).
+var _is_dead : bool = false
 
 var _hover_tween : Tween = null
 var _is_hovered : bool = false
@@ -73,6 +76,8 @@ func set_data(enemy_data: EnemyData, spawn_range : int = 5):
 			condition.apply_condition(self, condition)
 
 func take_damgage(amount : int):
+	if _is_dead:
+		return
 	current_health -= amount
 	for con : Condition in conditions:
 		if con.has_method("on_take_damage"):
@@ -83,6 +88,9 @@ func take_damgage(amount : int):
 		die()
 
 func die():
+	if _is_dead:
+		return
+	_is_dead = true
 	Global.enemy_dies.emit(self)
 	remove_all_conditions()
 	_hide_enemy_tooltip()

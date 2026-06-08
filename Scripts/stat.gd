@@ -3,7 +3,7 @@ class_name Stat
 
 signal stat_modified(stat_type: STAT, new_value: int)
 
-enum STAT {SWAG, MARBLES, GUTS, BANG, HUSTLE, MOJO}
+enum STAT {SWAG, MARBLES, GUTS, HEAT, HUSTLE, MOJO}
 @export var stat_type : STAT
 @export var value_calc : ValueCalculator
 var value : int
@@ -15,6 +15,18 @@ func modify_stat(amount : int):
 	var modified_amount = amount * modify_value
 	value += modified_amount
 	stat_modified.emit(stat_type, value)
+
+## Short label for this stat's growth/loss rate (modify_value). Returns "" for a
+## normal 1.0 rate so the UI stays clean. e.g. "(1.5x)", "(0.5x)", "(0x)".
+func get_rate_label() -> String:
+	if is_equal_approx(modify_value, 1.0):
+		return ""
+	if is_zero_approx(modify_value):
+		return "(0x)"
+	var num := "%.2f" % modify_value
+	if "." in num:
+		num = num.rstrip("0").rstrip(".")
+	return "(%sx)" % num
 
 func get_value() -> int:
 	# Only run the ValueCalculator on the very first call.

@@ -21,5 +21,4 @@ texture = ExtResource("3_glf47")
 min_health = 7
 damage = 2
 conditions = Array[ExtResource("1_ifmhn")]([SubResource("Resource_yuhu1")])
-noise_cost = 2
 metadata/_custom_type_script = "uid://tnxg66jw03v3"

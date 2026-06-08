@@ -83,6 +83,26 @@ func get_description_with_values(character) -> String:
 	return ""
 
 
+## Text shown in the CARD BODY: clean, computed values, no formula breakdown.
+## Defaults to the legacy description so un-converted actions keep working.
+func get_card_text(character) -> String:
+	return get_description_with_values(character)
+
+
+## Plain-text breakdown shown in the card's HOVER TOOLTIP: the formula behind a
+## value, keyword-condition explanations, etc. Empty by default.
+func get_tooltip_text(character) -> String:
+	return ""
+
+
+## A "<value> <label> = <formula>" tooltip line, or "" when the value is a plain
+## literal (nothing to explain).
+func _formula_breakdown(label: String, value: int, formula: String) -> String:
+	if formula.is_valid_int():
+		return ""
+	return "%d %s = %s" % [value, label, _format_formula_display(formula)]
+
+
 # ============================================================================
 # HELPERS
 # ============================================================================

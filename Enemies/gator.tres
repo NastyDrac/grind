@@ -30,6 +30,5 @@ max_health = 45
 damage = 10
 move_speed = 2
 move_pattern = SubResource("Resource_gat_pattern")
-noise_cost = 8
 is_elite = true
 metadata/_custom_type_script = "uid://tnxg66jw03v3"

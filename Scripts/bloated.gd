@@ -1,6 +1,10 @@
 extends Condition
 class_name Bloated
 
+## Guards the death explosion so it triggers exactly once, even if the damage it
+## deals causes further enemy_dies emissions.
+var _exploded : bool = false
+
 func apply_condition(who, condition: Condition):
 	entity = who
 	
@@ -25,12 +29,19 @@ func _get_existing_bloated(who) -> Bloated:  # FIXED: Removed type hint to work 
 	return null
 
 func on_enemy_dies(dying_enemy: Enemy):
-	if dying_enemy == entity:
+	if dying_enemy != entity:
+		return
+	if _exploded:
+		return
+	_exploded = true
 
-		if dying_enemy.current_range == 1:
-			Global.enemy_attacks_player.emit(dying_enemy, stacks)
-		
+	# Disconnect BEFORE dealing any damage so the resulting hit can't re-enter
+	# this handler and loop.
+	if Global.enemy_dies.is_connected(on_enemy_dies):
 		Global.enemy_dies.disconnect(on_enemy_dies)
+
+	if dying_enemy.current_range == 1:
+		Global.enemy_attacks_player.emit(dying_enemy, stacks)
 
 func get_description_with_values() -> String:
 	return "If at range 1, on death, deal %s damage." % stacks

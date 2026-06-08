@@ -67,5 +67,7 @@ func _deploy(at_range: int) -> void:
 # UI DESCRIPTION
 # ─────────────────────────────────────────────
 
-func get_description_with_values(_character) -> String:
-	return "Deploy a turret at the targeted enemy's range.\nEach time step, the turret deals %d damage to a random enemy there.\nStacks with additional turrets." % damage.calculate(player)
+func get_description_with_values(character = null) -> String:
+	var who = character if character else player
+	var dmg : int = damage.calculate(who) if (damage and who) else 0
+	return "Deploy a turret.\nThe turret deals %d damage to a random enemy there." % dmg

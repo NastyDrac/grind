@@ -22,6 +22,5 @@ max_health = 42
 damage = 9
 move_speed = 2
 conditions = Array[ExtResource("1_bear")]([SubResource("Resource_bear")])
-noise_cost = 8
 is_elite = true
 metadata/_custom_type_script = "uid://tnxg66jw03v3"

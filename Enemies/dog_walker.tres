@@ -22,6 +22,5 @@ max_health = 35
 damage = 5
 attack_range = 2
 conditions = Array[ExtResource("1_dw")]([SubResource("Resource_dw")])
-noise_cost = 8
 is_elite = true
 metadata/_custom_type_script = "uid://tnxg66jw03v3"

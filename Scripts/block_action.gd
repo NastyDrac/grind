@@ -20,3 +20,15 @@ func get_description_with_values(character: Variant) -> String:
 	var formula_display = _format_formula_display(block_calculator.formula)
 	
 	return "Gain §%d§ (%s) Block" % [block_amount, formula_display]
+
+
+func get_card_text(character) -> String:
+	if not character or not block_calculator:
+		return "Block"
+	return "Gain §%d§ Block" % block_calculator.calculate(character)
+
+
+func get_tooltip_text(character) -> String:
+	if not character or not block_calculator:
+		return ""
+	return _formula_breakdown("block", block_calculator.calculate(character), block_calculator.formula)

@@ -1,4 +1,4 @@
-[gd_resource type="Resource" script_class="CharacterData" load_steps=23 format=3 uid="uid://c2xwf8l4o67yn"]
+[gd_resource type="Resource" script_class="CharacterData" load_steps=24 format=3 uid="uid://c2xwf8l4o67yn"]
 
 [ext_resource type="Script" uid="uid://dpayg0f6j5y2n" path="res://Scripts/character_data.gd" id="1_5j4wt"]
 [ext_resource type="Script" uid="uid://b2h1ochum01o" path="res://Scripts/stat.gd" id="1_8ety0"]
@@ -7,6 +7,7 @@
 [ext_resource type="Resource" uid="uid://dj6ttthval7yo" path="res://items/gold.tres" id="4_dvkhi"]
 [ext_resource type="Script" uid="uid://b1ogi3xh5xakp" path="res://Scripts/condition.gd" id="4_rw86x"]
 [ext_resource type="Script" uid="uid://dfo48c3dx2d7" path="res://Scripts/item_dropper.gd" id="5_p2jjl"]
+[ext_resource type="Script" uid="uid://0gsjrx47no8b" path="res://Scripts/card_data.gd" id="7_rw86x"]
 
 [sub_resource type="Resource" id="Resource_sjutl"]
 script = ExtResource("2_8k2ij")
@@ -54,7 +55,7 @@ metadata/_custom_type_script = "uid://cgrxhw8vqenhu"
 
 [sub_resource type="Resource" id="Resource_ml0kd"]
 script = ExtResource("1_8ety0")
-stat_type = 2
+stat_type = 3
 value_calc = SubResource("Resource_3ax6e")
 metadata/_custom_type_script = "uid://b2h1ochum01o"
 
@@ -65,7 +66,7 @@ metadata/_custom_type_script = "uid://cgrxhw8vqenhu"
 
 [sub_resource type="Resource" id="Resource_o2qd2"]
 script = ExtResource("1_8ety0")
-stat_type = 3
+stat_type = 2
 value_calc = SubResource("Resource_ill6o")
 metadata/_custom_type_script = "uid://b2h1ochum01o"
 
@@ -93,7 +94,7 @@ metadata/_custom_type_script = "uid://b2h1ochum01o"
 
 [resource]
 script = ExtResource("1_5j4wt")
-character_name = "Regalur Guy"
+character_name = "The Knight"
 character_image = ExtResource("1_rw86x")
 max_health = SubResource("Resource_sjutl")
 stats = Array[ExtResource("1_8ety0")]([SubResource("Resource_8ety0"), SubResource("Resource_82thg"), SubResource("Resource_ml0kd"), SubResource("Resource_o2qd2"), SubResource("Resource_8k2ij"), SubResource("Resource_dvkhi")])

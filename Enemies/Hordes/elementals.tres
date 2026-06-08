@@ -1,4 +1,4 @@
-[gd_resource type="Resource" script_class="Horde" load_steps=8 format=3 uid="uid://ccuum4068tu4w"]
+[gd_resource type="Resource" script_class="Horde" load_steps=12 format=3 uid="uid://ccuum4068tu4w"]
 
 [ext_resource type="Script" uid="uid://tnxg66jw03v3" path="res://Scripts/enemy_data.gd" id="1_v8par"]
 [ext_resource type="Script" uid="uid://b6h8ntxfaauo5" path="res://Scripts/horde.gd" id="2_m3fpm"]
@@ -6,6 +6,22 @@
 [ext_resource type="Resource" uid="uid://2omyroag2mcs" path="res://Enemies/ice_giant.tres" id="3_cxbfi"]
 [ext_resource type="Resource" uid="uid://cjfdeb3dnv3g0" path="res://Enemies/slime.tres" id="4_xnyjx"]
 [ext_resource type="Script" uid="uid://dbrkkfbjmvvar" path="res://Scripts/defeat_x_enemies.gd" id="6_l61kk"]
+[ext_resource type="Script" uid="uid://bl2ttj5d643xd" path="res://Scripts/horde_enemy.gd" id="hde_script"]
+
+[sub_resource type="Resource" id="HE_1"]
+script = ExtResource("hde_script")
+enemy = ExtResource("2_r65fv")
+noise_cost = 5
+
+[sub_resource type="Resource" id="HE_2"]
+script = ExtResource("hde_script")
+enemy = ExtResource("3_cxbfi")
+noise_cost = 3
+
+[sub_resource type="Resource" id="HE_3"]
+script = ExtResource("hde_script")
+enemy = ExtResource("4_xnyjx")
+noise_cost = 2
 
 [sub_resource type="Resource" id="Resource_hqhms"]
 script = ExtResource("6_l61kk")
@@ -14,7 +30,7 @@ metadata/_custom_type_script = "uid://dbrkkfbjmvvar"
 [resource]
 script = ExtResource("2_m3fpm")
 recipe_name = "Elementals"
-enemies = Array[ExtResource("1_v8par")]([ExtResource("2_r65fv"), ExtResource("3_cxbfi"), ExtResource("4_xnyjx")])
+enemy_entries = Array[ExtResource("hde_script")]([SubResource("HE_1"), SubResource("HE_2"), SubResource("HE_3")])
 min_column = 3
 max_column = 9
 rewards = Array[int]([0, 1])

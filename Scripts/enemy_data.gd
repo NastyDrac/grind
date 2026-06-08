@@ -13,10 +13,6 @@ class_name EnemyData
 ## Optional movement pattern. If unset, the enemy uses default advance-or-attack behavior.
 @export var move_pattern: MovePattern
 
-# How much this enemy costs to spawn from the noise meter.
-# Cheap enemies (goblins etc.) = 1-2, elites = 4-6, bosses = 8+
-@export var noise_cost: int = 1
-
 # Mark this enemy as an Elite. An Elite can only spawn once per combat.
 # When it spawns the win condition switches to DefeatSingleEnemy targeting it,
 # the progress bar is hidden, and a new announcement fires.

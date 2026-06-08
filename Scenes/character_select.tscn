@@ -9,7 +9,7 @@
 [ext_resource type="Texture2D" uid="uid://fwthpy3l0ykm" path="res://Art/guts.png" id="8_a4vvp"]
 [ext_resource type="Texture2D" uid="uid://du7xgq856vejv" path="res://Art/marbles.png" id="9_se7r8"]
 [ext_resource type="Texture2D" uid="uid://co3msqu18ho2x" path="res://Art/hustle.png" id="10_ma4qd"]
-[ext_resource type="Texture2D" uid="uid://dy6yulqjedv40" path="res://Art/bang.png" id="11_nq02w"]
+[ext_resource type="Texture2D" uid="uid://dy6yulqjedv40" path="res://Art/heat.png" id="11_nq02w"]
 [ext_resource type="Texture2D" uid="uid://btnp5m57fhynw" path="res://Art/mojo.png" id="12_jxsgu"]
 [ext_resource type="Shader" uid="uid://c21r8x54i1uxi" path="res://Text/text_effect.gdshader" id="13_a4vvp"]
 
@@ -21,7 +21,7 @@ shader_parameter/shimmer_strength = 0.55
 shader_parameter/shimmer_pause = 2.5
 shader_parameter/shimmer_color = Color(5.679429e-06, 0.6195035, 0.7515141, 1)
 
-[node name="character_select" type="MarginContainer" node_paths=PackedStringArray("placeholder_label", "detail_content", "detail_portrait", "detail_name", "detail_hp_bar", "detail_hp_label", "detail_hp_formula", "detail_effects", "begin_button", "card_list", "stat_label_swag", "stat_label_guts", "stat_label_marbles", "stat_label_hustle", "stat_label_bang", "stat_label_mojo", "gold_label")]
+[node name="character_select" type="MarginContainer" node_paths=PackedStringArray("placeholder_label", "detail_content", "detail_portrait", "detail_name", "detail_hp_bar", "detail_hp_label", "detail_hp_formula", "detail_effects", "begin_button", "card_list", "stat_label_swag", "stat_label_guts", "stat_label_marbles", "stat_label_hustle", "stat_label_heat", "stat_label_mojo", "gold_label")]
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
@@ -32,7 +32,7 @@ theme_override_constants/margin_top = 20
 theme_override_constants/margin_right = 24
 theme_override_constants/margin_bottom = 20
 script = ExtResource("1_2b87j")
-characters = Array[ExtResource("2_krxhl")]([ExtResource("3_72d1u"), ExtResource("4_d1kp4")])
+characters = Array[ExtResource("2_krxhl")]([ExtResource("4_d1kp4"), ExtResource("3_72d1u")])
 placeholder_label = NodePath("RootVBox/DetailPanel/PlaceHolderLabel")
 detail_content = NodePath("RootVBox/DetailPanel/DetailContent")
 detail_portrait = NodePath("RootVBox/DetailPanel/DetailContent/DetailPortrait")
@@ -47,7 +47,7 @@ stat_label_swag = NodePath("RootVBox/DetailPanel/DetailContent/RightPanel/StatsG
 stat_label_guts = NodePath("RootVBox/DetailPanel/DetailContent/RightPanel/StatsGrid/GutsRow/GutsLabel")
 stat_label_marbles = NodePath("RootVBox/DetailPanel/DetailContent/RightPanel/StatsGrid/MarblesRow/MarblesLabel")
 stat_label_hustle = NodePath("RootVBox/DetailPanel/DetailContent/RightPanel/StatsGrid/HustleRow/HustleLabel")
-stat_label_bang = NodePath("RootVBox/DetailPanel/DetailContent/RightPanel/StatsGrid/BangRow/BangLabel")
+stat_label_heat = NodePath("RootVBox/DetailPanel/DetailContent/RightPanel/StatsGrid/HeatRow/HeatLabel")
 stat_label_mojo = NodePath("RootVBox/DetailPanel/DetailContent/RightPanel/StatsGrid/MojoRow/MojoLabel")
 gold_label = NodePath("RootVBox/DetailPanel/DetailContent/RightPanel/HPSection/HBoxContainer/goldlabel")
 
@@ -239,24 +239,24 @@ layout_mode = 2
 theme_override_font_sizes/font_size = 14
 text = "-"
 
-[node name="BangRow" type="HBoxContainer" parent="RootVBox/DetailPanel/DetailContent/RightPanel/StatsGrid"]
+[node name="HeatRow" type="HBoxContainer" parent="RootVBox/DetailPanel/DetailContent/RightPanel/StatsGrid"]
 layout_mode = 2
 theme_override_constants/separation = 5
 
-[node name="BangIcon" type="TextureRect" parent="RootVBox/DetailPanel/DetailContent/RightPanel/StatsGrid/BangRow"]
+[node name="HeatIcon" type="TextureRect" parent="RootVBox/DetailPanel/DetailContent/RightPanel/StatsGrid/HeatRow"]
 custom_minimum_size = Vector2(16, 16)
 layout_mode = 2
 texture = ExtResource("11_nq02w")
 expand_mode = 2
 
-[node name="BangNameLabel" type="Label" parent="RootVBox/DetailPanel/DetailContent/RightPanel/StatsGrid/BangRow"]
+[node name="HeatNameLabel" type="Label" parent="RootVBox/DetailPanel/DetailContent/RightPanel/StatsGrid/HeatRow"]
 custom_minimum_size = Vector2(52, 0)
 layout_mode = 2
 theme_override_colors/font_color = Color(1, 0.6, 0.1, 1)
 theme_override_font_sizes/font_size = 13
-text = "Bang:"
+text = "Heat:"
 
-[node name="BangLabel" type="Label" parent="RootVBox/DetailPanel/DetailContent/RightPanel/StatsGrid/BangRow"]
+[node name="HeatLabel" type="Label" parent="RootVBox/DetailPanel/DetailContent/RightPanel/StatsGrid/HeatRow"]
 layout_mode = 2
 theme_override_font_sizes/font_size = 14
 text = "-"

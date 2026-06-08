@@ -1,4 +1,4 @@
-[gd_resource type="Resource" script_class="Horde" load_steps=8 format=3 uid="uid://degm6kbh5cx3h"]
+[gd_resource type="Resource" script_class="Horde" load_steps=12 format=3 uid="uid://degm6kbh5cx3h"]
 
 [ext_resource type="Script" uid="uid://tnxg66jw03v3" path="res://Scripts/enemy_data.gd" id="1_8nhju"]
 [ext_resource type="Script" uid="uid://b6h8ntxfaauo5" path="res://Scripts/horde.gd" id="2_flk38"]
@@ -6,6 +6,22 @@
 [ext_resource type="Resource" uid="uid://rwhy6iobb6it" path="res://Enemies/goon.tres" id="3_qydlk"]
 [ext_resource type="Resource" uid="uid://cayjeqeyt177k" path="res://Enemies/handler.tres" id="4_rvmed"]
 [ext_resource type="Script" uid="uid://dbrkkfbjmvvar" path="res://Scripts/defeat_x_enemies.gd" id="6_0eb30"]
+[ext_resource type="Script" uid="uid://bl2ttj5d643xd" path="res://Scripts/horde_enemy.gd" id="hde_script"]
+
+[sub_resource type="Resource" id="HE_1"]
+script = ExtResource("hde_script")
+enemy = ExtResource("2_k3h35")
+noise_cost = 2
+
+[sub_resource type="Resource" id="HE_2"]
+script = ExtResource("hde_script")
+enemy = ExtResource("3_qydlk")
+noise_cost = 2
+
+[sub_resource type="Resource" id="HE_3"]
+script = ExtResource("hde_script")
+enemy = ExtResource("4_rvmed")
+noise_cost = 4
 
 [sub_resource type="Resource" id="Resource_qquoa"]
 script = ExtResource("6_0eb30")
@@ -14,7 +30,7 @@ metadata/_custom_type_script = "uid://dbrkkfbjmvvar"
 [resource]
 script = ExtResource("2_flk38")
 recipe_name = "Crowd Control"
-enemies = Array[ExtResource("1_8nhju")]([ExtResource("2_k3h35"), ExtResource("3_qydlk"), ExtResource("4_rvmed")])
+enemy_entries = Array[ExtResource("hde_script")]([SubResource("HE_1"), SubResource("HE_2"), SubResource("HE_3")])
 min_column = 2
 max_column = 8
 rewards = Array[int]([0, 1])

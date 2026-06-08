@@ -1,7 +1,8 @@
-[gd_scene load_steps=6 format=3 uid="uid://vun5mwhqc014"]
+[gd_scene load_steps=7 format=3 uid="uid://vun5mwhqc014"]
 
 [ext_resource type="Script" uid="uid://qb2kyhu1kbb1" path="res://Scripts/card_handler.gd" id="1_rom71"]
 [ext_resource type="Texture2D" uid="uid://fcnd5bjeuu1" path="res://Art/Icons/ButtonBG.png" id="2_sdc1o"]
+[ext_resource type="Texture2D" uid="uid://dv4ydeb0iwc0n" path="res://Art/Icons/HourglassIcon.png" id="3_r6eh0"]
 
 [sub_resource type="Curve" id="Curve_rom71"]
 _data = [Vector2(0, 0), 0.0, 1.0, 0, 1, Vector2(1, 1), 1.0, 0.0, 1, 0]
@@ -77,13 +78,16 @@ icon_alignment = 1
 
 [node name="PassTimeButton" type="Button" parent="."]
 offset_left = 40.0
-offset_top = 531.0
-offset_right = 125.0
-offset_bottom = 562.0
+offset_top = 451.0
+offset_right = 148.0
+offset_bottom = 565.8
 theme_override_colors/icon_pressed_color = Color(0.29219002, 0.29219005, 0.29219002, 1)
 theme_override_constants/icon_max_width = 100
-text = "End Turn"
-icon = ExtResource("2_sdc1o")
 flat = true
 text_overrun_behavior = 2
 icon_alignment = 1
+
+[node name="HourglassIcon" type="Sprite2D" parent="."]
+position = Vector2(93.000046, 510)
+scale = Vector2(0.24, 0.24)
+texture = ExtResource("3_r6eh0")

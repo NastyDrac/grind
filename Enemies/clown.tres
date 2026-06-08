@@ -21,5 +21,4 @@ max_health = 10
 damage = 2
 move_speed = 2
 conditions = Array[ExtResource("1_cl")]([SubResource("Resource_cl")])
-noise_cost = 2
 metadata/_custom_type_script = "uid://tnxg66jw03v3"

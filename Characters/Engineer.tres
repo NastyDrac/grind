@@ -1,4 +1,4 @@
-[gd_resource type="Resource" script_class="CharacterData" load_steps=30 format=3 uid="uid://ce6l5lqjxvcs6"]
+[gd_resource type="Resource" script_class="CharacterData" load_steps=31 format=3 uid="uid://ce6l5lqjxvcs6"]
 
 [ext_resource type="Texture2D" uid="uid://bdwqxwxli60bi" path="res://Art/engineer.png" id="1_486th"]
 [ext_resource type="Script" uid="uid://dpayg0f6j5y2n" path="res://Scripts/character_data.gd" id="1_t1uqq"]
@@ -11,6 +11,7 @@
 [ext_resource type="Script" uid="uid://dfo48c3dx2d7" path="res://Scripts/item_dropper.gd" id="7_qa6lw"]
 [ext_resource type="Script" uid="uid://bbikocjwp04x5" path="res://Scripts/scrap_collector.gd" id="8_486th"]
 [ext_resource type="Texture2D" uid="uid://btoj6g7v0x2vq" path="res://Art/Icons/ScrapCollectorIcon.png" id="9_qa6lw"]
+[ext_resource type="Script" uid="uid://0gsjrx47no8b" path="res://Scripts/card_data.gd" id="11_qa6lw"]
 
 [sub_resource type="Resource" id="Resource_livrn"]
 script = ExtResource("4_486th")

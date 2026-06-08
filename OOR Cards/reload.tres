@@ -1,4 +1,4 @@
-[gd_resource type="Resource" script_class="CardData" load_steps=10 format=3 uid="uid://pwz1ca10epioz"]
+[gd_resource type="Resource" script_class="CardData" load_steps=10 format=3 uid="uid://hejx2dy4v0nx"]
 
 [ext_resource type="Script" uid="uid://dhxff5egnsgrv" path="res://Scripts/action.gd" id="1_acti"]
 [ext_resource type="Script" uid="uid://0gsjrx47no8b" path="res://Scripts/card_data.gd" id="2_card"]
@@ -23,7 +23,6 @@ metadata/_custom_type_script = "uid://cgrxhw8vqenhu"
 
 [sub_resource type="Resource" id="R_4"]
 script = ExtResource("5_mods")
-temp_modify = true
 modify_calculator = SubResource("VC_3")
 stat_to_modify = 3
 metadata/_custom_type_script = "uid://y73360xhw2qs"

@@ -20,7 +20,7 @@ metadata/_custom_type_script = "uid://clvjn77csx1a0"
 
 [resource]
 script = ExtResource("4_pw3xh")
-card_name = "Landmine"
+card_name = "Grenade"
 type = 1
 rarity = 1
 actions = Array[ExtResource("1_jpisu")]([SubResource("R_2")])

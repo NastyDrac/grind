@@ -28,5 +28,4 @@ max_health = 17
 damage = 2
 attack_range = 3
 conditions = Array[ExtResource("1_vuryo")]([SubResource("Resource_qcfly")])
-noise_cost = 3
 metadata/_custom_type_script = "uid://tnxg66jw03v3"

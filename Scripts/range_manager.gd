@@ -28,7 +28,7 @@ class_name RangeManager
 @export var entry_offscreen_margin: float = 200.0
 
 # Visual style for range divider lines
-@export var range_line_color: Color = Color(1, 1, 1, 0.15)
+@export var range_line_color: Color = Color(0.111, 0.111, 0.111, 1.0)
 @export var range_line_width: float = 2.0
 
 @export_category("UI")
@@ -78,12 +78,17 @@ var enemies_by_range: Dictionary = {}
 @export var immediate_cost_ratio: float = 0.5
 
 var noise_meter: float = 0.0
+# Per-fight noise cost per EnemyData, set from the horde (Horde.get_noise_costs).
+var noise_cost_map: Dictionary = {}
 var _last_noise_display: int = -1
 var items_by_range : Dictionary = {}
 var run_manager : RunManager
 
 var enemy_hovered : Enemy
 var targeting : bool = false
+## The range the player is currently aiming at (mouse over an enemy during
+## targeting). -1 when not aiming. Held through execution so `here` resolves.
+var targeted_range : int = -1
 var targets : Array[Enemy] = []
 var number_of_targets : int = 0
 var current_target_type : Action.TargetType
@@ -162,6 +167,8 @@ func _on_viewport_size_changed() -> void:
 func _process(_delta: float) -> void:
 	queue_redraw()
 	_update_ui()
+	if targeting and is_instance_valid(enemy_hovered):
+		targeted_range = enemy_hovered.get_current_range()
 
 # =========================
 # RANGE DIVIDER LINES
@@ -302,9 +309,9 @@ func _get_enemy_column(enemy: Enemy) -> int:
 
 func _drain_meter_into_spawns():
 	var enemy_data := _pick_deterministic_enemy()
-	while enemy_data != null and noise_meter >= enemy_data.noise_cost:
+	while enemy_data != null and noise_meter >= _cost_of(enemy_data):
 		spawn_enemy(enemy_data, 5)
-		noise_meter -= enemy_data.noise_cost
+		noise_meter -= _cost_of(enemy_data)
 		noise_meter = maxf(noise_meter, 0.0)
 		enemy_data = _pick_deterministic_enemy()
 
@@ -321,20 +328,27 @@ func _pick_deterministic_enemy() -> EnemyData:
 	for e: EnemyData in enemy_pool:
 		if e.is_elite and elite_spawned:
 			continue
-		if e.noise_cost <= noise_meter and e.noise_cost > best_cost:
+		var c := _cost_of(e)
+		if c <= noise_meter and c > best_cost:
 			best = e
-			best_cost = e.noise_cost
+			best_cost = c
 
 	for tier in tiered_enemy_pools:
 		var pool: Array = tiered_enemy_pools[tier]
 		for e: EnemyData in pool:
 			if e.is_elite and elite_spawned:
 				continue
-			if e.noise_cost <= noise_meter and e.noise_cost > best_cost:
+			var c := _cost_of(e)
+			if c <= noise_meter and c > best_cost:
 				best = e
-				best_cost = e.noise_cost
+				best_cost = c
 
 	return best  # null when meter is too low to afford anything
+
+## Noise cost for an enemy in the CURRENT fight. Costs live on the horde entry
+## (see Horde.get_noise_costs), not on EnemyData. Unmapped enemies cost 1.
+func _cost_of(ed: EnemyData) -> int:
+	return int(noise_cost_map.get(ed, 1))
 
 func _cheapest_available_noise_cost() -> float:
 	# Returns the lowest noise_cost across all enemies that can still spawn.
@@ -343,12 +357,12 @@ func _cheapest_available_noise_cost() -> float:
 	for e: EnemyData in enemy_pool:
 		if e.is_elite and elite_spawned:
 			continue
-		cheapest = minf(cheapest, e.noise_cost)
+		cheapest = minf(cheapest, _cost_of(e))
 	for tier in tiered_enemy_pools:
 		for e: EnemyData in tiered_enemy_pools[tier]:
 			if e.is_elite and elite_spawned:
 				continue
-			cheapest = minf(cheapest, e.noise_cost)
+			cheapest = minf(cheapest, _cost_of(e))
 	return cheapest if cheapest < INF else INF
 
 func spawn_enemy(enemy_data: EnemyData, spawn_range: int = 5) -> Enemy:
@@ -692,6 +706,7 @@ func _count_selectable_enemies() -> int:
 
 func start_targeting(target_type: Action.TargetType, max_range: int, num_targets: int):
 	targeting = true
+	targeted_range = -1
 	current_target_type = target_type
 	current_max_range = max_range
 	number_of_targets = num_targets
@@ -720,6 +735,7 @@ func _make_all_ranges_selectable():
 			enemy.make_selectable()
 
 func cancel_targeting():
+	targeted_range = -1
 	targeting = false
 	number_of_targets = 0
 

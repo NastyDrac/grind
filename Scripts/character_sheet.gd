@@ -16,7 +16,7 @@ var character_instance : Character
 @onready var guts_label = $CenterContainer/VBoxContainer/HBoxContainer/VBoxContainer/VBoxContainer2/guts_label
 @onready var marbles_label = $CenterContainer/VBoxContainer/HBoxContainer/VBoxContainer/VBoxContainer3/guts_label
 @onready var hustle_label = $CenterContainer/VBoxContainer/HBoxContainer/VBoxContainer/VBoxContainer4/hustle_label
-@onready var bang_label = $CenterContainer/VBoxContainer/HBoxContainer/VBoxContainer/VBoxContainer5/bang_label
+@onready var heat_label = $CenterContainer/VBoxContainer/HBoxContainer/VBoxContainer/VBoxContainer5/heat_label
 @onready var mojo_label = $CenterContainer/VBoxContainer/HBoxContainer/VBoxContainer/VBoxContainer6/mojo_label
 @onready var effects_label = $CenterContainer/VBoxContainer/VBoxContainer/Label2
 
@@ -98,20 +98,23 @@ func _update_base_stats():
 		return
 	
 	for stat in character_data.stats:
-		var base_value = stat.value
+		var txt := str(stat.value)
+		var rate := stat.get_rate_label()
+		if rate != "":
+			txt += " " + rate
 		match stat.stat_type:
 			Stat.STAT.SWAG:
-				swag_label.text = str(base_value)
+				swag_label.text = txt
 			Stat.STAT.GUTS:
-				guts_label.text = str(base_value)
+				guts_label.text = txt
 			Stat.STAT.MARBLES:
-				marbles_label.text = str(base_value)
+				marbles_label.text = txt
 			Stat.STAT.HUSTLE:
-				hustle_label.text = str(base_value)
-			Stat.STAT.BANG:
-				bang_label.text = str(base_value)
+				hustle_label.text = txt
+			Stat.STAT.HEAT:
+				heat_label.text = txt
 			Stat.STAT.MOJO:
-				mojo_label.text = str(base_value)
+				mojo_label.text = txt
 
 func _update_combat_stats():
 	if not character_instance or not character_instance.stats:
@@ -124,6 +127,10 @@ func _update_combat_stats():
 		if "base_value" in stat and stat.value != stat.base_value:
 			display_text = "%d (%d)" % [current_value, stat.base_value]
 		
+		var rate := stat.get_rate_label()
+		if rate != "":
+			display_text += " " + rate
+		
 		match stat.stat_type:
 			Stat.STAT.SWAG:
 				swag_label.text = display_text
@@ -133,8 +140,8 @@ func _update_combat_stats():
 				marbles_label.text = display_text
 			Stat.STAT.HUSTLE:
 				hustle_label.text = display_text
-			Stat.STAT.BANG:
-				bang_label.text = display_text
+			Stat.STAT.HEAT:
+				heat_label.text = display_text
 			Stat.STAT.MOJO:
 				mojo_label.text = display_text
 

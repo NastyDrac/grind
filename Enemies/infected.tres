@@ -19,5 +19,4 @@ min_health = 16
 max_health = 22
 damage = 4
 conditions = Array[ExtResource("1_0iymy")]([SubResource("Resource_trnji")])
-noise_cost = 2
 metadata/_custom_type_script = "uid://tnxg66jw03v3"

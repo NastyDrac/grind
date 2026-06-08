@@ -1,4 +1,4 @@
-[gd_resource type="Resource" script_class="Horde" load_steps=8 format=3 uid="uid://bf41ryr1ng22"]
+[gd_resource type="Resource" script_class="Horde" load_steps=12 format=3 uid="uid://bf41ryr1ng22"]
 
 [ext_resource type="Script" uid="uid://tnxg66jw03v3" path="res://Scripts/enemy_data.gd" id="1_ed"]
 [ext_resource type="Script" uid="uid://b6h8ntxfaauo5" path="res://Scripts/horde.gd" id="2_hd"]
@@ -6,6 +6,20 @@
 [ext_resource type="Resource" uid="uid://cjfdeb3dnv3g0" path="res://Enemies/slime.tres" id="4_sl"]
 [ext_resource type="Resource" uid="uid://bfr5bliq5oiih" path="res://Enemies/hob_goblin.tres" id="5_hg"]
 [ext_resource type="Script" uid="uid://dbrkkfbjmvvar" path="res://Scripts/defeat_x_enemies.gd" id="6_dx"]
+[ext_resource type="Script" uid="uid://bl2ttj5d643xd" path="res://Scripts/horde_enemy.gd" id="hde_script"]
+
+[sub_resource type="Resource" id="HE_1"]
+script = ExtResource("hde_script")
+enemy = ExtResource("3_fa")
+
+[sub_resource type="Resource" id="HE_2"]
+script = ExtResource("hde_script")
+enemy = ExtResource("4_sl")
+noise_cost = 2
+
+[sub_resource type="Resource" id="HE_3"]
+script = ExtResource("hde_script")
+enemy = ExtResource("5_hg")
 
 [sub_resource type="Resource" id="Resource_win"]
 script = ExtResource("6_dx")
@@ -14,7 +28,7 @@ metadata/_custom_type_script = "uid://dbrkkfbjmvvar"
 [resource]
 script = ExtResource("2_hd")
 recipe_name = "Fairy Ring"
-enemies = Array[ExtResource("1_ed")]([ExtResource("3_fa"), ExtResource("4_sl"), ExtResource("5_hg")])
+enemy_entries = Array[ExtResource("hde_script")]([SubResource("HE_1"), SubResource("HE_2"), SubResource("HE_3")])
 min_column = 3
 max_column = 9
 rewards = Array[int]([0, 1])

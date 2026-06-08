@@ -46,11 +46,30 @@ func _get_stat_name(stat_type: Stat.STAT) -> String:
 			return "Marbles"
 		Stat.STAT.GUTS:
 			return "Guts"
-		Stat.STAT.BANG:
-			return "Bang"
+		Stat.STAT.HEAT:
+			return "Heat"
 		Stat.STAT.HUSTLE:
 			return "Hustle"
 		Stat.STAT.MOJO:
 			return "Mojo"
 		_:
 			return "Unknown"
+
+
+func get_card_text(character) -> String:
+	if not character or not modify_calculator:
+		return "Modify"
+	var mod_value : int = modify_calculator.calculate(character)
+	var stat_name : String = _get_stat_name(stat_to_modify)
+	var sign : String = "+" if mod_value >= 0 else ""
+	return "Modify %s: §%s%d§" % [stat_name, sign, mod_value]
+
+
+func get_tooltip_text(character) -> String:
+	if not character or not modify_calculator:
+		return ""
+	if modify_calculator.formula.is_valid_int():
+		return ""
+	var mod_value : int = modify_calculator.calculate(character)
+	var sign : String = "+" if mod_value >= 0 else ""
+	return "%s%d %s = %s" % [sign, mod_value, _get_stat_name(stat_to_modify), _format_formula_display(modify_calculator.formula)]

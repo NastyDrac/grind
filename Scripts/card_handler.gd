@@ -284,6 +284,7 @@ func apply_card_transform(card: Card, pos: Vector2, rot: float, z: int, scale: V
 func hover_card(card : Card):
 	# Only block hovering during enemy targeting, not card targeting
 	if is_targeting:
+		_hide_card_tooltip()
 		return
 	
 	# During card targeting, don't allow hovering the played card
@@ -299,6 +300,7 @@ func hover_card(card : Card):
 			var card_to_reset = hovered_card
 			hovered_card = null
 			reset_card(card_to_reset)
+		_hide_card_tooltip()
 		return
 	
 	if hovered_card and hovered_card != card:
@@ -308,6 +310,101 @@ func hover_card(card : Card):
 	
 	if card_position.has(card):
 		card.z_index = 100
+
+	_show_card_tooltip(card)
+
+# ─── Positioned card tooltip (off to the side, not over the card) ─────────────
+
+var _tip_layer : CanvasLayer = null
+var _tip_panel : PanelContainer = null
+var _tip_label : RichTextLabel = null
+var _tip_last_text : String = ""
+
+const TIP_WIDTH : float = 240.0
+const TIP_MARGIN : float = 12.0
+
+func _ensure_card_tooltip() -> void:
+	if _tip_layer and is_instance_valid(_tip_layer):
+		return
+	_tip_layer = CanvasLayer.new()
+	_tip_layer.layer = 200   # above the cards
+	add_child(_tip_layer)
+
+	_tip_panel = PanelContainer.new()
+	_tip_panel.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_tip_panel.custom_minimum_size = Vector2(TIP_WIDTH, 0)
+	_tip_panel.visible = false
+	_tip_layer.add_child(_tip_panel)
+
+	var pad := MarginContainer.new()
+	pad.add_theme_constant_override("margin_left", 10)
+	pad.add_theme_constant_override("margin_right", 10)
+	pad.add_theme_constant_override("margin_top", 8)
+	pad.add_theme_constant_override("margin_bottom", 8)
+	_tip_panel.add_child(pad)
+
+	_tip_label = RichTextLabel.new()
+	_tip_label.bbcode_enabled = false       # tooltip text is plain
+	_tip_label.fit_content = true
+	_tip_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	_tip_label.custom_minimum_size = Vector2(TIP_WIDTH - 20, 0)
+	_tip_label.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	pad.add_child(_tip_label)
+
+func _show_card_tooltip(card) -> void:
+	if card == null or not card.has_method("get_card_tooltip_text"):
+		_hide_card_tooltip()
+		return
+	var text : String = card.get_card_tooltip_text()
+	if text.strip_edges() == "":
+		_hide_card_tooltip()
+		return
+
+	_ensure_card_tooltip()
+	_tip_label.text = text
+	_tip_last_text = text
+	_tip_panel.visible = true
+	_position_card_tooltip(card)
+
+func _position_card_tooltip(card) -> void:
+	_tip_panel.reset_size()   # recompute to content before measuring
+	var size : Vector2 = _tip_panel.size
+	var rect : Rect2 = card.get_global_rect()
+	var vp : Vector2 = card.get_viewport_rect().size
+
+	# Prefer the right of the card; flip to the left near the screen edge.
+	var x : float
+	if rect.position.x + rect.size.x + TIP_MARGIN + size.x <= vp.x:
+		x = rect.position.x + rect.size.x + TIP_MARGIN
+	else:
+		x = rect.position.x - size.x - TIP_MARGIN
+
+	# Align near the card's top, clamped on-screen.
+	var y : float = clamp(rect.position.y, TIP_MARGIN, max(TIP_MARGIN, vp.y - size.y - TIP_MARGIN))
+	_tip_panel.position = Vector2(x, y)
+
+func _hide_card_tooltip() -> void:
+	if _tip_panel and is_instance_valid(_tip_panel):
+		_tip_panel.visible = false
+
+## Re-evaluate the visible hover tooltip every frame so values that aren't driven
+## by player stats (block, enemies, here) stay current. Only acts while the
+## tooltip is already visible — i.e. when hovering a card in hand, never during
+## targeting (the tooltip is hidden then). Re-renders only on an actual change.
+func _refresh_card_tooltip_if_changed() -> void:
+	if not (_tip_panel and is_instance_valid(_tip_panel) and _tip_panel.visible):
+		return
+	if hovered_card == null or not hovered_card.has_method("get_card_tooltip_text"):
+		return
+	var text : String = hovered_card.get_card_tooltip_text()
+	if text == _tip_last_text:
+		return
+	_tip_last_text = text
+	if text.strip_edges() == "":
+		_hide_card_tooltip()
+		return
+	_tip_label.text = text
+	_position_card_tooltip(hovered_card)
 
 func reset_card(card: Card):
 	if card_position.has(card):
@@ -325,26 +422,37 @@ func _process(delta: float) -> void:
 	# Always handle card selection (for both playing cards AND selecting cards to discard)
 	_handle_card_selection()
 
+	# Keep the visible hover tooltip's numbers live (block / enemies / here can
+	# change while a card stays hovered). Only runs while the tooltip is visible,
+	# which is hover-only — never during targeting.
+	_refresh_card_tooltip_if_changed()
+
 func _update_card_animations(delta: float):
 	if hovered_card:
 		_animate_hovered_card(delta)
 	
 	_animate_non_hovered_cards(delta)
 
+## The elevated, fully-readable resting spot a hovered card animates to. Mirrors
+## the bottom-of-viewport math so a frozen (being-targeted) card sits in the same
+## readable place instead of dropping back down toward the hand.
+func _hover_rest_position(card: Card) -> Vector2:
+	if not card_position.has(card):
+		return card.position
+	var target_scale   := base_scale * hover_scale
+	var viewport_height := get_viewport().get_visible_rect().size.y
+	var pivot_y         := 150.0  # pivot_offset.y from card.tscn (half of 300px height)
+	var target_global_y := viewport_height - pivot_y * (1.0 + target_scale.y)
+	var target_local_y  = hand.to_local(Vector2(0.0, target_global_y)).y
+	var base_pos        : Vector2 = card_position[card]["position"]
+	return Vector2(base_pos.x, target_local_y)
+
 func _animate_hovered_card(delta: float):
 	if not card_position.has(hovered_card):
 		return
 
-	var target_scale   := base_scale * hover_scale
-	var viewport_height = get_viewport().get_visible_rect().size.y
-	var pivot_y         = 150.0  # pivot_offset.y from card.tscn (half of 300px height)
-	# Bottom of card = position.y + pivot_y + pivot_y * scale.y
-	# Solve for position.y to put bottom at viewport_height:
-	var target_global_y = viewport_height - pivot_y * (1.0 + target_scale.y)
-	var target_local_y  = hand.to_local(Vector2(0.0, target_global_y)).y
-
-	var base_pos   = card_position[hovered_card]["position"]
-	var target_pos = Vector2(base_pos.x, target_local_y)
+	var target_scale := base_scale * hover_scale
+	var target_pos   := _hover_rest_position(hovered_card)
 
 	var speed = hover_transition_speed * delta
 	hovered_card.position         = hovered_card.position.lerp(target_pos, speed)
@@ -408,8 +516,9 @@ func play_card(card: Card):
 	var stored_position = Vector2.ZERO
 	var stored_scale = base_scale * hover_scale
 	if card_position.has(card):
-		var base_pos = card_position[card]["position"]
-		stored_position = base_pos + Vector2(0, hover_y_offset)
+		# Freeze at the same elevated, readable spot the card occupies while
+		# hovered — not just above the hand — so it stays visible during targeting.
+		stored_position = _hover_rest_position(card)
 	else:
 		stored_position = card.position
 		stored_scale = card.scale
@@ -1240,4 +1349,9 @@ func _show_pile_viewer(title_text: String, card_data: Array[CardData]) -> void:
 	viewer.setup(title_text, card_data, DeckViewer.Mode.DISPLAY)
 	viewer.closed.connect(func(): pile_viewer = null)
 func _on_pass_time_button_pressed():
+	var hourglass : Sprite2D = $HourglassIcon
+	var tween := create_tween()
+	tween.tween_property(hourglass, "rotation_degrees", 180, .2)
 	pass_time()
+	await tween.finished
+	hourglass.rotation_degrees = 0

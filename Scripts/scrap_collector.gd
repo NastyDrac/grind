@@ -38,6 +38,28 @@ func apply_condition(who, condition: Condition) -> void:
 
 
 # ─────────────────────────────────────────────
+# COMBAT LIFECYCLE  (called per-wave by Character.reset_for_new_wave on the
+# persistent special_effects instance). This is how the collector is wired now;
+# the old apply_condition path isn't used for starting passives. Scrap count
+# carries across waves because the same instance is reused.
+# ─────────────────────────────────────────────
+
+func setup(who, _rm = null) -> void:
+	entity = who
+	show_stacks = true
+	if not Global.item_picked_up.is_connected(_on_item_picked_up):
+		Global.item_picked_up.connect(_on_item_picked_up)
+	if not Global.time_passed.is_connected(_on_time_passed):
+		Global.time_passed.connect(_on_time_passed)
+
+func teardown() -> void:
+	if Global.item_picked_up.is_connected(_on_item_picked_up):
+		Global.item_picked_up.disconnect(_on_item_picked_up)
+	if Global.time_passed.is_connected(_on_time_passed):
+		Global.time_passed.disconnect(_on_time_passed)
+
+
+# ─────────────────────────────────────────────
 # SCRAP COLLECTION — just count, never craft here
 # ─────────────────────────────────────────────
 

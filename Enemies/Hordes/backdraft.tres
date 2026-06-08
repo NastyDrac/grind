@@ -1,4 +1,4 @@
-[gd_resource type="Resource" script_class="Horde" load_steps=8 format=3 uid="uid://bbcg8osrsxsor"]
+[gd_resource type="Resource" script_class="Horde" load_steps=12 format=3 uid="uid://bbcg8osrsxsor"]
 
 [ext_resource type="Script" uid="uid://tnxg66jw03v3" path="res://Scripts/enemy_data.gd" id="1_765uv"]
 [ext_resource type="Resource" uid="uid://ds6ljaxim38cc" path="res://Enemies/arsonist.tres" id="2_3b3fb"]
@@ -6,6 +6,22 @@
 [ext_resource type="Resource" uid="uid://rwhy6iobb6it" path="res://Enemies/goon.tres" id="3_kacq8"]
 [ext_resource type="Resource" uid="uid://bbt02yk48rjmq" path="res://Enemies/infected.tres" id="4_87bxn"]
 [ext_resource type="Script" uid="uid://dbrkkfbjmvvar" path="res://Scripts/defeat_x_enemies.gd" id="6_dun0q"]
+[ext_resource type="Script" uid="uid://bl2ttj5d643xd" path="res://Scripts/horde_enemy.gd" id="hde_script"]
+
+[sub_resource type="Resource" id="HE_1"]
+script = ExtResource("hde_script")
+enemy = ExtResource("2_3b3fb")
+noise_cost = 3
+
+[sub_resource type="Resource" id="HE_2"]
+script = ExtResource("hde_script")
+enemy = ExtResource("3_kacq8")
+noise_cost = 2
+
+[sub_resource type="Resource" id="HE_3"]
+script = ExtResource("hde_script")
+enemy = ExtResource("4_87bxn")
+noise_cost = 2
 
 [sub_resource type="Resource" id="Resource_tnqs8"]
 script = ExtResource("6_dun0q")
@@ -14,7 +30,7 @@ metadata/_custom_type_script = "uid://dbrkkfbjmvvar"
 [resource]
 script = ExtResource("2_5f702")
 recipe_name = "Backdraft"
-enemies = Array[ExtResource("1_765uv")]([ExtResource("2_3b3fb"), ExtResource("3_kacq8"), ExtResource("4_87bxn")])
+enemy_entries = Array[ExtResource("hde_script")]([SubResource("HE_1"), SubResource("HE_2"), SubResource("HE_3")])
 rewards = Array[int]([0, 1])
 win_con = SubResource("Resource_tnqs8")
 metadata/_custom_type_script = "uid://b6h8ntxfaauo5"

@@ -37,12 +37,12 @@ class_name CharacterSelect
 
 @export_category("Stat Labels")
 ## One Label per stat for the detail panel readouts.
-## Order: Swag, Guts, Marbles, Hustle, Bang, Mojo.
+## Order: Swag, Guts, Marbles, Hustle, Heat, Mojo.
 @export var stat_label_swag    : Label
 @export var stat_label_guts    : Label
 @export var stat_label_marbles : Label
 @export var stat_label_hustle  : Label
-@export var stat_label_bang    : Label
+@export var stat_label_heat    : Label
 @export var stat_label_mojo    : Label
 @export var gold_label         : Label
 
@@ -56,7 +56,7 @@ const STAT_META : Array = [
 	[ Stat.STAT.GUTS,    "Guts",    "res://Art/guts.png",    Color(0.95, 0.35, 0.35) ],
 	[ Stat.STAT.MARBLES, "Marbles", "res://Art/marbles.png", Color(0.30, 0.75, 1.00) ],
 	[ Stat.STAT.HUSTLE,  "Hustle",  "res://Art/hustle.png",  Color(0.40, 0.90, 0.40) ],
-	[ Stat.STAT.BANG,    "Bang",    "res://Art/bang.png",    Color(1.00, 0.60, 0.10) ],
+	[ Stat.STAT.HEAT,    "Heat",    "res://Art/heat.png",    Color(1.00, 0.60, 0.10) ],
 	[ Stat.STAT.MOJO,    "Mojo",    "res://Art/mojo.png",    Color(0.75, 0.35, 1.00) ],
 ]
 
@@ -92,13 +92,23 @@ func _ready() -> void:
 #  STAT ROWS  — map enum values to the exported Label nodes
 # ─────────────────────────────────────────────────────────────────────────────
 
+## Growth/loss-rate label for a stat on this character, or "" if normal.
+func _get_stat_rate_label(char_data, stat_type) -> String:
+	if not char_data or not char_data.stats:
+		return ""
+	for s in char_data.stats:
+		if s.stat_type == stat_type:
+			return s.get_rate_label()
+	return ""
+
+
 func _build_stat_rows() -> void:
 	var labels := [
 		stat_label_swag,
 		stat_label_guts,
 		stat_label_marbles,
 		stat_label_hustle,
-		stat_label_bang,
+		stat_label_heat,
 		stat_label_mojo,
 	]
 	for i in STAT_META.size():
@@ -248,7 +258,11 @@ func _refresh_detail_panel(char_data: CharacterData) -> void:
 		var stat_type : int = meta[0]
 		var val : int = _get_stat_value_from_character(preview, stat_type)
 		if _detail_stat_rows.has(stat_type):
-			_detail_stat_rows[stat_type].text = str(val)
+			var txt := str(val)
+			var rate := _get_stat_rate_label(char_data, stat_type)
+			if rate != "":
+				txt += " " + rate
+			_detail_stat_rows[stat_type].text = txt
 
 	preview.queue_free()
 

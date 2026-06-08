@@ -31,5 +31,4 @@ damage = 2
 attack_range = 3
 conditions = Array[ExtResource("1_e4qs3")]([SubResource("Resource_nsiv2")])
 move_pattern = SubResource("Resource_6h0mt")
-noise_cost = 2
 metadata/_custom_type_script = "uid://tnxg66jw03v3"

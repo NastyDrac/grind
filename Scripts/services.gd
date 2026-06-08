@@ -1,6 +1,15 @@
 extends CanvasLayer
 class_name Services
 
+# ─── Configuration (set per-scene in the inspector) ────────────────────────────
+enum ServiceType { HOSPITAL, WORKSHOP, GYM, SHOP }
+
+## Which service types this node is allowed to offer.
+@export var available_services : Array[ServiceType] = [ServiceType.HOSPITAL, ServiceType.WORKSHOP]
+## How many services to present. If fewer than the pool size, a random distinct
+## subset is shown each visit; if equal or greater, the whole pool is shown.
+@export var num_offers : int = 2
+
 # ─── Layout ───────────────────────────────────────────────────────────────────
 const UIBAR_HEIGHT : float = 50.0
 const MARGIN       : float = 40.0
@@ -14,31 +23,23 @@ var choice_container : HBoxContainer
 
 signal service_chosen(service: String)
 
-# ─── Service definitions ──────────────────────────────────────────────────────
-# [id, title, icon_char, color, description]
-var SERVICES_LIST : Array = [
-	[
-		"hospital",
-		"Hospital",
-		"➕",
-		Color(0.20, 0.85, 0.50),
-		"Restore lost health.\nThe doc has a few\noptions for ya."
-	],
-	[
-		"gym",
-		"Gym",
-		"💪",
-		Color(0.95, 0.60, 0.15),
-		"Train hard, get\npermanent stat\nboosts. Pick one.",
-	],
-	[
-		"shop",
-		"Shop",
-		"🛒",
-		Color(0.95, 0.85, 0.20),
-		"Browse cards and\nthingies. Spend\nyour hard-earned gold.",
-	],
-]
+# ─── Service presentation ─────────────────────────────────────────────────────
+# Returns [id, title, icon_char, color, description] for a service type.
+func _service_meta(type: ServiceType) -> Array:
+	match type:
+		ServiceType.HOSPITAL:
+			return ["hospital", "Hospital", "➕", Color(0.20, 0.85, 0.50),
+				"Restore lost health.\nThe doc has a few\noptions for ya."]
+		ServiceType.WORKSHOP:
+			return ["workshop", "Workshop", "🔧", Color(0.45, 0.65, 0.95),
+				"Retune a card to\nscale off a different\nstat. Make it yours."]
+		ServiceType.GYM:
+			return ["gym", "Gym", "💪", Color(0.95, 0.60, 0.15),
+				"Train hard, get\npermanent stat\nboosts. Pick one."]
+		ServiceType.SHOP:
+			return ["shop", "Shop", "🛒", Color(0.95, 0.85, 0.20),
+				"Browse cards and\nthingies. Spend\nyour hard-earned gold."]
+	return ["unknown", "???", "?", Color.WHITE, ""]
 
 # ─── Build the UI ─────────────────────────────────────────────────────────────
 
@@ -126,11 +127,31 @@ func _populate_choices() -> void:
 
 	var player_full : bool = _is_player_full()
 
-	for svc in SERVICES_LIST:
-		var already_full : bool = svc[0] == "hospital" and player_full
+	for type in _select_offers():
+		var meta := _service_meta(type)
+		var already_full : bool = meta[0] == "hospital" and player_full
 		choice_container.add_child(
-			_build_service_card(svc[0], svc[1], svc[2], svc[3], svc[4], already_full)
+			_build_service_card(meta[0], meta[1], meta[2], meta[3], meta[4], already_full)
 		)
+
+## Picks which service types to show this visit: a distinct subset of
+## available_services, sized to num_offers (random when the pool is larger).
+func _select_offers() -> Array:
+	var pool : Array = []
+	for t in available_services:
+		if t not in pool:
+			pool.append(t)
+
+	if pool.is_empty():
+		push_warning("Services: available_services is empty — nothing to offer.")
+		return []
+
+	var count : int = clampi(num_offers, 1, pool.size())
+	if count >= pool.size():
+		return pool
+
+	pool.shuffle()
+	return pool.slice(0, count)
 
 func _build_service_card(
 		id          : String,

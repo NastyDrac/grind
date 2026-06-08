@@ -28,7 +28,7 @@ func _stat_display_name(stat_type: Stat.STAT) -> String:
 		Stat.STAT.SWAG:    return "Swag"
 		Stat.STAT.MARBLES: return "Marbles"
 		Stat.STAT.GUTS:    return "Guts"
-		Stat.STAT.BANG:    return "Bang"
+		Stat.STAT.HEAT:    return "Heat"
 		Stat.STAT.HUSTLE:  return "Hustle"
 		Stat.STAT.MOJO:    return "Mojo"
 		_: return "???"
@@ -38,7 +38,7 @@ func _stat_color(stat_type: Stat.STAT) -> Color:
 		Stat.STAT.SWAG:    return Color(0.95, 0.85, 0.20)   # gold
 		Stat.STAT.MARBLES: return Color(0.30, 0.75, 1.00)   # sky blue
 		Stat.STAT.GUTS:    return Color(0.95, 0.35, 0.35)   # red
-		Stat.STAT.BANG:    return Color(1.00, 0.60, 0.10)   # orange
+		Stat.STAT.HEAT:    return Color(1.00, 0.60, 0.10)   # orange
 		Stat.STAT.HUSTLE:  return Color(0.40, 0.90, 0.40)   # green
 		Stat.STAT.MOJO:    return Color(0.75, 0.35, 1.00)   # purple
 		_: return Color.WHITE
@@ -48,7 +48,7 @@ func _stat_icon_path(stat_type: Stat.STAT) -> String:
 		Stat.STAT.SWAG:    return "res://Art/swag.png"
 		Stat.STAT.MARBLES: return "res://Art/marbles.png"
 		Stat.STAT.GUTS:    return "res://Art/guts.png"
-		Stat.STAT.BANG:    return "res://Art/bang.png"
+		Stat.STAT.HEAT:    return "res://Art/heat.png"
 		Stat.STAT.HUSTLE:  return "res://Art/hustle.png"
 		Stat.STAT.MOJO:    return "res://Art/mojo.png"
 		_: return ""
@@ -58,7 +58,7 @@ func _stat_flavour(stat_type: Stat.STAT) -> String:
 		Stat.STAT.SWAG:    return "Work the mirror. Confidence is a muscle."
 		Stat.STAT.MARBLES: return "Chess drills until your brain hurts."
 		Stat.STAT.GUTS:    return "Ice baths and the will to keep going."
-		Stat.STAT.BANG:    return "Heavy bag work. Pure, uncut power."
+		Stat.STAT.HEAT:    return "Run it hot. Let the whole room burn."
 		Stat.STAT.HUSTLE:  return "Sprint intervals. No days off."
 		Stat.STAT.MOJO:    return "Vibe calibration. Trust the energy."
 		_: return ""

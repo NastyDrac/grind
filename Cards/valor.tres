@@ -1,0 +1,28 @@
+[gd_resource type="Resource" script_class="CardData" load_steps=7 format=3 uid="uid://ckn1ghtvalor0"]
+
+[ext_resource type="Script" uid="uid://dhxff5egnsgrv" path="res://Scripts/action.gd" id="1_action"]
+[ext_resource type="Script" uid="uid://0gsjrx47no8b" path="res://Scripts/card_data.gd" id="2_carddata"]
+[ext_resource type="Script" uid="uid://y73360xhw2qs" path="res://Scripts/modify_stat_action.gd" id="3_modify"]
+[ext_resource type="Script" uid="uid://cgrxhw8vqenhu" path="res://Scripts/ValueCalculator.gd" id="4_calc"]
+
+[sub_resource type="Resource" id="Calc_0_mod"]
+script = ExtResource("4_calc")
+formula = "3"
+metadata/_custom_type_script = "uid://cgrxhw8vqenhu"
+
+[sub_resource type="Resource" id="Act_0"]
+script = ExtResource("3_modify")
+modify_calculator = SubResource("Calc_0_mod")
+stat_to_modify = 2
+target_type = 4
+animation_type = 4
+metadata/_custom_type_script = "uid://y73360xhw2qs"
+
+[resource]
+script = ExtResource("2_carddata")
+card_name = "Valor"
+type = 2
+rarity = 1
+actions = Array[ExtResource("1_action")]([SubResource("Act_0")])
+exhaust = true
+metadata/_custom_type_script = "uid://0gsjrx47no8b"

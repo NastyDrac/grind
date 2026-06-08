@@ -1,0 +1,39 @@
+[gd_resource type="Resource" script_class="CardData" load_steps=10 format=3 uid="uid://ckn1ghtvang01"]
+
+[ext_resource type="Script" uid="uid://dhxff5egnsgrv" path="res://Scripts/action.gd" id="1_action"]
+[ext_resource type="Script" uid="uid://0gsjrx47no8b" path="res://Scripts/card_data.gd" id="2_carddata"]
+[ext_resource type="Script" uid="uid://cgrxhw8vqenhu" path="res://Scripts/ValueCalculator.gd" id="3_calc"]
+[ext_resource type="Script" uid="uid://clvjn77csx1a0" path="res://Scripts/AttackAction.gd" id="4_attack"]
+[ext_resource type="Script" uid="uid://px415e6h6tao" path="res://Scripts/block_action.gd" id="5_block"]
+
+[sub_resource type="Resource" id="Calc_0_d"]
+script = ExtResource("3_calc")
+formula = "guts"
+metadata/_custom_type_script = "uid://cgrxhw8vqenhu"
+
+[sub_resource type="Resource" id="Act_0"]
+script = ExtResource("4_attack")
+damage_calculator = SubResource("Calc_0_d")
+max_range = 1
+animation_type = 2
+metadata/_custom_type_script = "uid://clvjn77csx1a0"
+
+[sub_resource type="Resource" id="Calc_1_b"]
+script = ExtResource("3_calc")
+formula = "enemies*2"
+metadata/_custom_type_script = "uid://cgrxhw8vqenhu"
+
+[sub_resource type="Resource" id="Act_1"]
+script = ExtResource("5_block")
+block_calculator = SubResource("Calc_1_b")
+target_type = 4
+animation_type = 0
+metadata/_custom_type_script = "uid://px415e6h6tao"
+
+[resource]
+script = ExtResource("2_carddata")
+card_name = "Vanguard"
+card_cost = 1
+rarity = 1
+actions = Array[ExtResource("1_action")]([SubResource("Act_0"), SubResource("Act_1")])
+metadata/_custom_type_script = "uid://0gsjrx47no8b"

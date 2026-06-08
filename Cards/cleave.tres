@@ -1,0 +1,27 @@
+[gd_resource type="Resource" script_class="CardData" load_steps=7 format=3 uid="uid://ckn1ghtcleave"]
+
+[ext_resource type="Script" uid="uid://dhxff5egnsgrv" path="res://Scripts/action.gd" id="1_action"]
+[ext_resource type="Script" uid="uid://0gsjrx47no8b" path="res://Scripts/card_data.gd" id="2_carddata"]
+[ext_resource type="Script" uid="uid://clvjn77csx1a0" path="res://Scripts/AttackAction.gd" id="3_attack"]
+[ext_resource type="Script" uid="uid://cgrxhw8vqenhu" path="res://Scripts/ValueCalculator.gd" id="4_calc"]
+
+[sub_resource type="Resource" id="Calc_0_dmg"]
+script = ExtResource("4_calc")
+formula = "guts+swag"
+metadata/_custom_type_script = "uid://cgrxhw8vqenhu"
+
+[sub_resource type="Resource" id="Act_0"]
+script = ExtResource("3_attack")
+damage_calculator = SubResource("Calc_0_dmg")
+target_type = 2
+max_range = 1
+animation_type = 3
+metadata/_custom_type_script = "uid://clvjn77csx1a0"
+
+[resource]
+script = ExtResource("2_carddata")
+card_name = "Cleave"
+card_cost = 2
+rarity = 1
+actions = Array[ExtResource("1_action")]([SubResource("Act_0")])
+metadata/_custom_type_script = "uid://0gsjrx47no8b"

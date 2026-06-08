@@ -7,6 +7,11 @@ class_name AttackAction
 # Number of enemies to hit (only used for X_ENEMIES_UP_TO_RANGE)
 @export var enemy_count_calculator: ValueCalculator
 
+## When true, the player's block is set to 0 after this attack resolves. Pairs
+## with a damage formula of "block" (Shield Slam): block is permanent, so
+## spending it IS the card's cost.
+@export var consume_block: bool = false
+
 
 func get_action_type() -> String:
 	return "Attack"
@@ -37,6 +42,11 @@ func execute(target) -> void:
 		target.take_hit(null, damage)
 	else:
 		push_error("AttackAction.execute: target %s can't take damage" % target)
+
+	if consume_block and player:
+		player.block = 0
+		if player.has_method("display_block"):
+			player.display_block()
 
 
 # ============================================================================
@@ -104,6 +114,68 @@ func get_description_with_values(character: Character) -> String:
 		desc += " - Range: §%d§" % max_range
 
 	return desc
+
+
+# ============================================================================
+# CARD BODY / TOOLTIP SPLIT
+# ============================================================================
+
+## Text shown in the CARD BODY: the computed result only, no formula breakdown.
+## The formula moves to the hover tooltip (get_tooltip_text) so the card stays
+## readable while the math is still available on hover.
+func get_card_text(character) -> String:
+	if not character or not damage_calculator:
+		return "Attack"
+
+	var damage = damage_calculator.calculate(character)
+
+	var desc = ""
+
+	match target_type:
+		TargetType.SINGLE_ENEMY:
+			desc = "Deal §%d§ damage" % damage
+
+		TargetType.ALL_ENEMIES:
+			desc = "Deal §%d§ damage to all enemies" % damage
+
+		TargetType.ALL_ENEMIES_AT_RANGE:
+			desc = "Deal §%d§ damage to all at range" % damage
+
+		TargetType.X_ENEMIES_UP_TO_RANGE:
+			if enemy_count_calculator:
+				var count = enemy_count_calculator.calculate(character)
+				desc = "Deal §%d§ damage to §%d§ enemies" % [damage, count]
+			else:
+				desc = "Deal §%d§ damage to multiple enemies" % damage
+
+		TargetType.SELF:
+			desc = "Deal §%d§ damage to self" % damage
+
+	if max_range > 0:
+		desc += " - Range: §%d§" % max_range
+
+	return desc
+
+
+## Plain-text breakdown shown in the card's HOVER TOOLTIP: the formula behind
+## each computed value. Returns "" for plain-literal values (nothing to explain),
+## so a flat-damage attack contributes no tooltip line.
+func get_tooltip_text(character) -> String:
+	if not character or not damage_calculator:
+		return ""
+
+	var lines : Array[String] = []
+
+	var dmg_line = _formula_breakdown("damage", damage_calculator.calculate(character), damage_calculator.formula)
+	if dmg_line != "":
+		lines.append(dmg_line)
+
+	if target_type == TargetType.X_ENEMIES_UP_TO_RANGE and enemy_count_calculator:
+		var cnt_line = _formula_breakdown("enemies", enemy_count_calculator.calculate(character), enemy_count_calculator.formula)
+		if cnt_line != "":
+			lines.append(cnt_line)
+
+	return "\n".join(lines)
 
 
 # ============================================================================

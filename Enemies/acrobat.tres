@@ -31,5 +31,4 @@ damage = 5
 move_speed = 2
 attack_range = 2
 move_pattern = SubResource("Resource_ac_pattern")
-noise_cost = 2
 metadata/_custom_type_script = "uid://tnxg66jw03v3"

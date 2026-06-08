@@ -76,6 +76,7 @@ var current_shop : Shop = null
 var current_gym : Gym = null
 var current_hospital : Hospital = null
 var current_services : Services = null
+var current_workshop : Workshop = null
 
 var map_generator : MapGenerator = null
 ## The node the player most recently selected -- resolved after combat/event ends.
@@ -107,6 +108,11 @@ func begin_run(seed : int = -1):
 	# Without this, the cached .tres is mutated and persists across runs.
 	if character:
 		character = character.duplicate(true)
+		# Use the character's signature starting deck if it defines one; otherwise
+		# fall back to RunManager's @export deck (shared/legacy default). The
+		# deep-duplication loop below makes the cards run-local either way.
+		if not character.starting_deck.is_empty():
+			deck = character.starting_deck.duplicate()
 	else:
 		push_error("RunManager: begin_run called but character is null!")
 
@@ -250,7 +256,7 @@ func begin_boss_combat():
 	# Split the horde into the boss (first elite) and the minion noise pool.
 	var boss_data   : EnemyData          = null
 	var minion_pool : Array[EnemyData]   = []
-	for ed in boss_horde.enemies:
+	for ed in boss_horde.get_spawn_pool():
 		if ed.is_elite and boss_data == null:
 			boss_data = ed       # first elite is the boss
 		else:
@@ -264,6 +270,7 @@ func begin_boss_combat():
 	range_manager = load("res://Scenes/range_manager.tscn").instantiate()
 	range_manager.run_manager = self
 	range_manager.enemy_pool.append_array(minion_pool)
+	range_manager.noise_cost_map = boss_horde.get_noise_costs()
 	range_manager.starting_noise = boss_horde.starting_noise
 	add_child(range_manager)
 
@@ -331,6 +338,7 @@ func create_range_manager():
 	# with everything in place. The deferred drain in _ready() then handles
 	# the first wave of spawns through the noise system.
 	range_manager.enemy_pool.append_array(_pick_horde_for_combat())
+	range_manager.noise_cost_map = current_horde.get_noise_costs() if current_horde else {}
 	range_manager.starting_noise = current_horde.starting_noise if current_horde else 0.0
 	add_child(range_manager)
 
@@ -345,12 +353,14 @@ func _pick_horde_for_combat() -> Array[EnemyData]:
 		var pool : HordePool = act_recipe_pools[current_act]
 		if pool:
 			var recipe := pool.pick_random(rng, col, _used_horde_names)
-			if recipe and not recipe.enemies.is_empty():
-				print("RunManager: act %d col %d using horde '%s'" % [current_act + 1, col, recipe.recipe_name])
-				if recipe.recipe_name not in _used_horde_names:
-					_used_horde_names.append(recipe.recipe_name)
-				current_horde = recipe
-				return recipe.enemies
+			if recipe:
+				var pool_enemies := recipe.get_spawn_pool()
+				if not pool_enemies.is_empty():
+					print("RunManager: act %d col %d using horde '%s'" % [current_act + 1, col, recipe.recipe_name])
+					if recipe.recipe_name not in _used_horde_names:
+						_used_horde_names.append(recipe.recipe_name)
+					current_horde = recipe
+					return pool_enemies
 
 	# Fallback: no matching pool recipe -- clear current_horde since there's
 	# no Horde resource to pull rewards from.
@@ -737,21 +747,33 @@ func close_hospital() -> void:
 func create_services() -> void:
 	if current_services:
 		current_services.queue_free()
-	current_services = Services.new()
+	current_services = load("res://Scenes/services.tscn").instantiate()
 	add_child(current_services)
 	current_services.service_chosen.connect(_on_service_chosen)
 	current_services.display_services(self)
 
-func close_services() -> void:
+## Frees the chooser without resolving the map node.
+func _free_services() -> void:
 	if current_services:
 		current_services.queue_free()
 		current_services = null
 
+## Called when the player leaves Services without picking anything.
+## Declining is a valid choice (e.g. full HP, nothing to retune), so the node
+## resolves and the run continues.
+func close_services() -> void:
+	_free_services()
+	_resolve_pending_node()
+
 func _on_service_chosen(service: String) -> void:
-	close_services()
+	# Free the chooser but DON'T resolve yet — the sub-screen we open will
+	# resolve the node when it closes.
+	_free_services()
 	match service:
 		"hospital":
 			create_hospital()
+		"workshop":
+			create_workshop()
 		"gym":
 			create_gym()
 		"shop":
@@ -759,6 +781,24 @@ func _on_service_chosen(service: String) -> void:
 		_:
 			push_warning("RunManager: unknown service '%s'" % service)
 			_resolve_pending_node()
+
+# ------------------------------------------------------------------------------
+#  WORKSHOP  (card re-stat bench — screen not built yet)
+# ------------------------------------------------------------------------------
+
+func create_workshop() -> void:
+	if current_workshop:
+		current_workshop.queue_free()
+	current_workshop = Workshop.new()
+	add_child(current_workshop)
+	current_workshop.workshop_closed.connect(close_workshop)
+	current_workshop.display_workshop(self)
+
+func close_workshop() -> void:
+	if current_workshop:
+		current_workshop.queue_free()
+		current_workshop = null
+	_resolve_pending_node()
 
 # ------------------------------------------------------------------------------
 #  CARDS — random card lookup

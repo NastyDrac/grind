@@ -55,19 +55,19 @@ func refresh_description():
 	
 	for i in range(action_count):
 		var action : Action = data.actions[i]
-		desc += action.get_description_with_values(player)
+		desc += action.get_card_text(player)
 		if i < action_count - 1:
 			desc += "\n"
 	
 	var regex = RegEx.new()
-	regex.compile("§(\\d+)§")
+	regex.compile("§([+\\-]?\\d+)§")
 	desc = regex.sub(desc, "[color=green]$1[/color]", true)
 	
 	desc = desc.replace("swag", "[img=16x16]res://Art/swag.png[/img]")
 	desc = desc.replace("marbles", "[img=16x16]res://Art/marbles.png[/img]")
 	desc = desc.replace("guts", "[img=16x16]res://Art/guts.png[/img]")
 	desc = desc.replace("hustle", "[img=16x16]res://Art/hustle.png[/img]")
-	desc = desc.replace("bang", "[img=16x16]res://Art/bang.png[/img]")
+	desc = desc.replace("heat", "[img=16x16]res://Art/heat.png[/img]")
 	desc = desc.replace("mojo", "[img=16x16]res://Art/mojo.png[/img]")
 	
 	# Keyword tags
@@ -92,8 +92,8 @@ func _show_description_without_player():
 	for i in range(action_count):
 		var action : Action = data.actions[i]
 		
-		if action.has_method("get_description_with_values"):
-			var action_desc = action.get_description_with_values(null)
+		if action.has_method("get_card_text"):
+			var action_desc = action.get_card_text(null)
 			if action_desc and action_desc != "":
 				desc += action_desc
 		elif action.has_method("get_base_description"):
@@ -109,14 +109,14 @@ func _show_description_without_player():
 		desc = "[i]Preview mode - full details available in combat[/i]"
 	
 	var regex = RegEx.new()
-	regex.compile("§(\\d+)§")
+	regex.compile("§([+\\-]?\\d+)§")
 	desc = regex.sub(desc, "[color=green]$1[/color]", true)
 	
 	desc = desc.replace("swag", "[img=36x36]res://Art/swag.png[/img]")
 	desc = desc.replace("marbles", "[img=36x36]res://Art/marbles.png[/img]")
 	desc = desc.replace("guts", "[img=36x36]res://Art/guts.png[/img]")
 	desc = desc.replace("hustle", "[img=36x36]res://Art/hustle.png[/img]")
-	desc = desc.replace("bang", "[img=36x36]res://Art/bang.png[/img]")
+	desc = desc.replace("heat", "[img=36x36]res://Art/heat.png[/img]")
 	desc = desc.replace("mojo", "[img=36x36]res://Art/mojo.png[/img]")
 	
 	# Keyword tags
@@ -156,10 +156,97 @@ func _on_add_pressed():
 
 func _on_mouse_entered() -> void:
 	hovered = true
+	_show_tooltip()
 
 func _on_mouse_exited() -> void:
 	hovered = false
+	_hide_tooltip()
+
+func _exit_tree() -> void:
+	_hide_tooltip()
 
 func _process(delta: float) -> void:
 	if hovered and Input.is_action_just_pressed("left click"):
 		card_selected.emit(data)
+
+
+# ── Hover tooltip (formula breakdown + keyword condition explanations) ──────────
+# DraftableCards aren't managed by card_handler, so they carry their own minimal
+# tooltip. Reuses the shared high-layer "TooltipLayer".
+var _tooltip_instance : Control = null
+
+func get_card_tooltip_text() -> String:
+	if not data:
+		return ""
+	var player = get_tree().get_first_node_in_group("player")
+	if not player:
+		return ""
+	var lines : Array[String] = []
+	for action in data.actions:
+		if action == null:
+			continue
+		if action.has_method("get_tooltip_text"):
+			var t : String = action.get_tooltip_text(player)
+			if t != "":
+				lines.append(t)
+	return "\n".join(lines)
+
+func _show_tooltip() -> void:
+	if _tooltip_instance:
+		return
+	var text := get_card_tooltip_text()
+	if text == "":
+		return
+
+	var layer := get_tree().root.get_node_or_null("TooltipLayer")
+	if not layer:
+		layer = CanvasLayer.new()
+		layer.name = "TooltipLayer"
+		get_tree().root.add_child(layer)
+	# Force above modal CanvasLayers (e.g. the deck viewer sits at layer 100).
+	layer.layer = 1000
+
+	var panel := PanelContainer.new()
+	panel.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	var margin := MarginContainer.new()
+	margin.add_theme_constant_override("margin_left", 8)
+	margin.add_theme_constant_override("margin_right", 8)
+	margin.add_theme_constant_override("margin_top", 6)
+	margin.add_theme_constant_override("margin_bottom", 6)
+	panel.add_child(margin)
+	var lbl := Label.new()
+	lbl.text = text
+	lbl.add_theme_font_size_override("font_size", 13)
+	margin.add_child(lbl)
+
+	layer.add_child(panel)
+	_tooltip_instance = panel
+	panel.visible = false
+	_position_tooltip()
+
+func _hide_tooltip() -> void:
+	if _tooltip_instance:
+		_tooltip_instance.queue_free()
+		_tooltip_instance = null
+
+func _position_tooltip() -> void:
+	if not _tooltip_instance:
+		return
+	# Let layout settle so size is known before placing.
+	await get_tree().process_frame
+	await get_tree().process_frame
+	if not _tooltip_instance:
+		return
+	var mouse_pos := get_viewport().get_mouse_position()
+	var size := _tooltip_instance.size
+	var view := get_viewport_rect().size
+	var m := 10.0
+	var pos := mouse_pos + Vector2(m, m)
+	if pos.x + size.x > view.x - m:
+		pos.x = mouse_pos.x - size.x - m
+	if pos.y + size.y > view.y - m:
+		pos.y = mouse_pos.y - size.y - m
+	pos.x = clampf(pos.x, m, view.x - size.x - m)
+	pos.y = clampf(pos.y, m, view.y - size.y - m)
+	_tooltip_instance.global_position = pos
+	_tooltip_instance.visible = true

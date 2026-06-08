@@ -1,4 +1,4 @@
-[gd_resource type="Resource" script_class="Horde" load_steps=8 format=3 uid="uid://ug6s8dtvl3q3"]
+[gd_resource type="Resource" script_class="Horde" load_steps=12 format=3 uid="uid://ug6s8dtvl3q3"]
 
 [ext_resource type="Script" uid="uid://tnxg66jw03v3" path="res://Scripts/enemy_data.gd" id="1_vbgjs"]
 [ext_resource type="Script" uid="uid://b6h8ntxfaauo5" path="res://Scripts/horde.gd" id="2_itlcq"]
@@ -6,6 +6,20 @@
 [ext_resource type="Resource" uid="uid://bfr5bliq5oiih" path="res://Enemies/hob_goblin.tres" id="3_1jdwj"]
 [ext_resource type="Resource" uid="uid://w16ibmun3dtb" path="res://Enemies/war_monger.tres" id="4_ajneb"]
 [ext_resource type="Script" uid="uid://dbrkkfbjmvvar" path="res://Scripts/defeat_x_enemies.gd" id="6_ld0t5"]
+[ext_resource type="Script" uid="uid://bl2ttj5d643xd" path="res://Scripts/horde_enemy.gd" id="hde_script"]
+
+[sub_resource type="Resource" id="HE_1"]
+script = ExtResource("hde_script")
+enemy = ExtResource("2_kestc")
+
+[sub_resource type="Resource" id="HE_2"]
+script = ExtResource("hde_script")
+enemy = ExtResource("3_1jdwj")
+
+[sub_resource type="Resource" id="HE_3"]
+script = ExtResource("hde_script")
+enemy = ExtResource("4_ajneb")
+noise_cost = 6
 
 [sub_resource type="Resource" id="Resource_cs8wu"]
 script = ExtResource("6_ld0t5")
@@ -14,7 +28,7 @@ metadata/_custom_type_script = "uid://dbrkkfbjmvvar"
 [resource]
 script = ExtResource("2_itlcq")
 recipe_name = "Wildlings"
-enemies = Array[ExtResource("1_vbgjs")]([ExtResource("2_kestc"), ExtResource("3_1jdwj"), ExtResource("4_ajneb")])
+enemy_entries = Array[ExtResource("hde_script")]([SubResource("HE_1"), SubResource("HE_2"), SubResource("HE_3")])
 min_column = 7
 max_column = 14
 rewards = Array[int]([0, 1])

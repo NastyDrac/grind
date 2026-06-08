@@ -29,8 +29,8 @@ func get_description(run : RunManager) -> String:
 			desc += " Marbles"
 		Stat.STAT.GUTS:
 			desc += " Guts"
-		Stat.STAT.BANG:
-			desc += " Bang"
+		Stat.STAT.HEAT:
+			desc += " Heat"
 		Stat.STAT.HUSTLE:
 			desc += " Hustle"
 		Stat.STAT.MOJO:

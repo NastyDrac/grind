@@ -37,4 +37,4 @@ func trigger_condition():
 		entity = null
 
 func get_description_with_values() -> String:
-	return "Burning: take %d damage each turn, losing %d stack per turn until it runs out." % [stacks, decrement]
+	return "Take damage equal to stacks each turn, losing %d stack per turn until it runs out." % decrement

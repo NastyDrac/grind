@@ -15,6 +15,9 @@ enum RARITY {Common, Uncommon, Rare}
 @export var fickle : bool
 ## Card automatically executes its actions when left in hand as time passes.
 @export var volatile : bool
+## Set true once the Workshop retunes this card. Blocks a second retune and
+## drives the "modified" glow. Exported so it survives card duplication.
+@export var modified : bool = false
 
 func get_description_with_values(character_data: Character) -> String:
 	var desc = card_description

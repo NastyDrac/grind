@@ -55,6 +55,14 @@ func position_character():
 		health_bar.global_position = Vector2(left_x - health_bar_width / 2, center_y + 100)
 
 func take_hit(who : Enemy, damage : int):
+	# Retaliate / thorns: any condition that wants to strike back gets the
+	# attacker passed to it. Fires whenever we're attacked, even if block
+	# absorbs the blow — that's what makes it synergise with a defensive deck.
+	if who and is_instance_valid(who):
+		for con in conditions:
+			if con.has_method("react_to_attacker"):
+				con.react_to_attacker(who)
+
 	for con : Condition in character_data.special_effects:
 		if con.has_method("modify_damage"):
 			damage = con.modify_damage(damage)

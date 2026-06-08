@@ -11,6 +11,11 @@ class_name Condition
 ## When true, the condition icon will display the current stacks value as a number.
 @export var show_stacks: bool = false
 
+## True for named "keyword" conditions (e.g. Burning): the card shows the keyword
+## and the tooltip explains it. False for one-off/bespoke effects whose full
+## description text is shown inline in the card body (thingy-style effects).
+@export var is_keyword : bool = false
+
 var entity 
 
 func apply_condition(who, condition : Condition) -> void:
@@ -29,6 +34,8 @@ func remove_condition(who) -> void:
 ## Override in subclasses to include dynamic values (e.g. calculated damage).
 ## Falls back to the exported description field if not overridden.
 func get_description_with_values() -> String:
+	if description != "":
+		return description
 	return "Description must be set in condition"
 
 

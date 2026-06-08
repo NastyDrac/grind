@@ -15,6 +15,18 @@ func apply_condition(who, condition: Condition) -> void:
 	if not Global.enemy_dies.is_connected(new_dropper._on_enemy_death):
 		Global.enemy_dies.connect(new_dropper._on_enemy_death)
 
+# Per-combat lifecycle (called by Character.reset_for_new_wave on the persistent
+# special_effects instance). This is how the dropper is actually wired up now —
+# the old apply_condition path isn't used for starting passives.
+func setup(who, _rm = null) -> void:
+	entity = who
+	if not Global.enemy_dies.is_connected(_on_enemy_death):
+		Global.enemy_dies.connect(_on_enemy_death)
+
+func teardown() -> void:
+	if Global.enemy_dies.is_connected(_on_enemy_death):
+		Global.enemy_dies.disconnect(_on_enemy_death)
+
 
 func drop_item(enemy_range: int, enemy_position: Vector2):
 	var run_manager = entity.run_manager

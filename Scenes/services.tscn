@@ -1,0 +1,6 @@
+[gd_scene load_steps=2 format=3 uid="uid://blcr4r83lt00i"]
+
+[ext_resource type="Script" uid="uid://bo1nkvc0iaumx" path="res://Scripts/services.gd" id="1_svc"]
+
+[node name="Services" type="CanvasLayer"]
+script = ExtResource("1_svc")
