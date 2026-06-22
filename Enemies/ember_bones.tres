@@ -10,6 +10,6 @@ enemy_name = "Ember Bones"
 texture = ExtResource("3_xgo48")
 min_health = 14
 max_health = 19
-damage = 6
+damage = 7
 noise_cost = 5
 metadata/_custom_type_script = "uid://tnxg66jw03v3"

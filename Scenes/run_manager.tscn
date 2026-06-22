@@ -1,4 +1,4 @@
-[gd_scene load_steps=48 format=3 uid="uid://cssup3trfa1rg"]
+[gd_scene load_steps=54 format=3 uid="uid://cssup3trfa1rg"]
 
 [ext_resource type="Script" uid="uid://nami4xhnpwrm" path="res://Scripts/run_manager.gd" id="1_u1n32"]
 [ext_resource type="Script" uid="uid://0gsjrx47no8b" path="res://Scripts/card_data.gd" id="2_0y178"]
@@ -34,10 +34,16 @@
 [ext_resource type="PackedScene" uid="uid://dn40540p4q1ve" path="res://Scenes/map_generator.tscn" id="25_j41x3"]
 [ext_resource type="Resource" uid="uid://bbcg8osrsxsor" path="res://Enemies/Hordes/backdraft.tres" id="25_oj18y"]
 [ext_resource type="PackedScene" uid="uid://6exjsyxobg5i" path="res://Scenes/victory_scene.tscn" id="26_0fl43"]
+[ext_resource type="Resource" uid="uid://btheaud1tb0ss" path="res://Enemies/Hordes/BOSS_the_audit.tres" id="26_ickfq"]
 [ext_resource type="Resource" uid="uid://degm6kbh5cx3h" path="res://Enemies/Hordes/crowd_control.tres" id="26_o08x3"]
 [ext_resource type="Resource" uid="uid://bo1iqmf7mfdd0" path="res://Enemies/Hordes/fightclub.tres" id="27_ickfq"]
 [ext_resource type="Resource" uid="uid://dpqku2dochr6o" path="res://Enemies/Hordes/overwatch.tres" id="28_hieuu"]
 [ext_resource type="Resource" uid="uid://c4ssmelbab2s0" path="res://Enemies/Hordes/Riot.tres" id="29_yxr82"]
+[ext_resource type="Resource" uid="uid://0a4r1sfyqvum" path="res://events/tavern.tres" id="36_hieuu"]
+[ext_resource type="Resource" uid="uid://dbones3evt01" path="res://events/the_bonesetter.tres" id="36_l7t3q"]
+[ext_resource type="Resource" uid="uid://dcardsharp01" path="res://events/the_card_sharp.tres" id="37_6nprv"]
+[ext_resource type="Resource" uid="uid://dfence4evt01" path="res://events/the_fence.tres" id="38_guhpx"]
+[ext_resource type="Resource" uid="uid://bxe53wy1mu7mm" path="res://events/three_finger_lou.tres" id="41_guhpx"]
 
 [sub_resource type="Resource" id="Resource_4342n"]
 script = ExtResource("12_awuji")
@@ -89,13 +95,14 @@ metadata/_custom_type_script = "uid://6vpnqyvhbord"
 [sub_resource type="Resource" id="Resource_7yfce"]
 script = ExtResource("16_1tppy")
 recipes = Array[ExtResource("12_4342n")]([ExtResource("25_oj18y"), ExtResource("26_o08x3"), ExtResource("27_ickfq"), ExtResource("28_hieuu"), ExtResource("29_yxr82")])
+boss_recipes = Array[ExtResource("12_4342n")]([ExtResource("26_ickfq")])
 metadata/_custom_type_script = "uid://6vpnqyvhbord"
 
 [node name="RunManager" type="Node2D"]
 script = ExtResource("1_u1n32")
 deck = Array[ExtResource("2_0y178")]([SubResource("Resource_0ycsu"), SubResource("Resource_0ycsu"), SubResource("Resource_0ycsu"), SubResource("Resource_0ycsu"), SubResource("Resource_0ycsu"), SubResource("Resource_lv2e2"), SubResource("Resource_lv2e2"), SubResource("Resource_lv2e2"), SubResource("Resource_lv2e2"), SubResource("Resource_lv2e2")])
 act_recipe_pools = Array[ExtResource("16_1tppy")]([SubResource("Resource_38h1b"), SubResource("Resource_7yfce")])
-available_events = Array[ExtResource("10_obnx0")]([ExtResource("11_rqa6y"), ExtResource("19_h8e1q"), ExtResource("23_4342n")])
+available_events = Array[ExtResource("10_obnx0")]([ExtResource("19_h8e1q"), ExtResource("11_rqa6y"), ExtResource("36_hieuu"), ExtResource("36_l7t3q"), ExtResource("37_6nprv"), ExtResource("38_guhpx"), ExtResource("23_4342n"), ExtResource("41_guhpx")])
 map_generator_scene = ExtResource("25_j41x3")
 character_sheet_scene = ExtResource("12_4nan2")
 defeat_screen_scene = ExtResource("25_egn0v")

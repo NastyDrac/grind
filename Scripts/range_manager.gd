@@ -559,6 +559,12 @@ func get_position_for_enemy(enemy: Enemy) -> Vector2:
 	var range_num = enemy.get_current_range()
 	var base_x   = _get_x_for_range(range_num)
 
+	# Defensive: if this enemy's range somehow has no bucket (e.g. queried for an
+	# uninitialized range before re-bucketing), treat it as alone there instead
+	# of crashing on a missing dictionary key.
+	if not enemies_by_range.has(range_num):
+		return Vector2(base_x, (y_min + y_max) * 0.5)
+
 	# Filter out any freed instances before doing layout math
 	var enemies_at_range: Array = enemies_by_range[range_num].filter(
 		func(e): return is_instance_valid(e)

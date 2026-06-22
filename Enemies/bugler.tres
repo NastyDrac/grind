@@ -21,7 +21,6 @@ enemy_name = "Bugler"
 texture = ExtResource("2_44d2j")
 min_health = 3
 max_health = 6
-damage = 0
 attack_range = 3
 conditions = Array[ExtResource("1_277ci")]([SubResource("Resource_fem11")])
 metadata/_custom_type_script = "uid://tnxg66jw03v3"

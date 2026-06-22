@@ -21,7 +21,6 @@ metadata/_custom_type_script = "uid://clvjn77csx1a0"
 [resource]
 script = ExtResource("2_carddata")
 card_name = "Shield Slam"
-card_cost = 1
 rarity = 1
 actions = Array[ExtResource("1_action")]([SubResource("Act_attack")])
 metadata/_custom_type_script = "uid://0gsjrx47no8b"

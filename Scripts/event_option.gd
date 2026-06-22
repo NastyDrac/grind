@@ -14,7 +14,7 @@ class_name EventOption
 
 @export_group("Combat")
 @export var triggers_combat: bool = false
-@export var combat_horde: Array[EnemyData] = []
+@export var combat_horde: Horde
 @export var combat_difficulty_modifier: float = 1.0
 @export var win_con: WinCondition
 
@@ -26,8 +26,19 @@ class_name EventOption
 @export var required_card: CardData = null
 
 
+## Total gold this option costs: the legacy gold_cost field plus any positive
+## EffectCostGold amounts in its effects. Used by the affordability gate so a
+## cost defined purely as an effect still locks the option when you can't pay.
+func required_gold() -> int:
+	var total := gold_cost
+	for e in effects:
+		if e is EffectCostGold and e.amount > 0:
+			total += e.amount
+	return total
+
+
 func can_select(player_gold: int, player_deck: Array[CardData]) -> bool:
-	if gold_cost > player_gold:
+	if required_gold() > player_gold:
 		return false
 	if required_card != null and not player_deck.has(required_card):
 		return false
@@ -35,8 +46,9 @@ func can_select(player_gold: int, player_deck: Array[CardData]) -> bool:
 
 
 func get_unavailable_reason(player_gold: int, player_deck: Array[CardData]) -> String:
-	if gold_cost > player_gold:
-		return "Not enough gold (%d required)" % gold_cost
+	var need := required_gold()
+	if need > player_gold:
+		return "Not enough gold (%d required)" % need
 	if required_card != null and not player_deck.has(required_card):
 		return "Requires card: %s" % required_card.card_name
 	return ""

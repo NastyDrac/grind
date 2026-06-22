@@ -1,0 +1,90 @@
+[gd_resource type="Resource" script_class="CharacterData" load_steps=22 format=3 uid="uid://cdrftchar001"]
+
+[ext_resource type="Script" uid="uid://dpayg0f6j5y2n" path="res://Scripts/character_data.gd" id="1_chardata"]
+[ext_resource type="Texture2D" uid="uid://b2rjhiy4rifig" path="res://icon.svg" id="1_yl1gw"]
+[ext_resource type="Script" uid="uid://cgrxhw8vqenhu" path="res://Scripts/ValueCalculator.gd" id="2_calc"]
+[ext_resource type="Script" uid="uid://b2h1ochum01o" path="res://Scripts/stat.gd" id="3_stat"]
+[ext_resource type="Script" uid="uid://b1ogi3xh5xakp" path="res://Scripts/condition.gd" id="4_cond"]
+[ext_resource type="Script" uid="uid://0gsjrx47no8b" path="res://Scripts/card_data.gd" id="5_carddata"]
+[ext_resource type="Script" uid="uid://b1sfbwje7kd7c" path="res://Scripts/momentum.gd" id="6_momentum"]
+
+[sub_resource type="Resource" id="Calc_hp"]
+script = ExtResource("2_calc")
+formula = "10 + marbles"
+metadata/_custom_type_script = "uid://cgrxhw8vqenhu"
+
+[sub_resource type="Resource" id="Cond_momentum"]
+script = ExtResource("6_momentum")
+condition_name = "Momentum"
+
+[sub_resource type="Resource" id="Resource_yl1gw"]
+script = ExtResource("2_calc")
+formula = "5"
+metadata/_custom_type_script = "uid://cgrxhw8vqenhu"
+
+[sub_resource type="Resource" id="Resource_nr57k"]
+script = ExtResource("3_stat")
+value_calc = SubResource("Resource_yl1gw")
+metadata/_custom_type_script = "uid://b2h1ochum01o"
+
+[sub_resource type="Resource" id="Resource_optbw"]
+script = ExtResource("2_calc")
+formula = "5"
+metadata/_custom_type_script = "uid://cgrxhw8vqenhu"
+
+[sub_resource type="Resource" id="Resource_e41p8"]
+script = ExtResource("3_stat")
+stat_type = 1
+value_calc = SubResource("Resource_optbw")
+metadata/_custom_type_script = "uid://b2h1ochum01o"
+
+[sub_resource type="Resource" id="Resource_phmh3"]
+script = ExtResource("2_calc")
+formula = "2"
+metadata/_custom_type_script = "uid://cgrxhw8vqenhu"
+
+[sub_resource type="Resource" id="Resource_wmdxb"]
+script = ExtResource("3_stat")
+stat_type = 2
+value_calc = SubResource("Resource_phmh3")
+metadata/_custom_type_script = "uid://b2h1ochum01o"
+
+[sub_resource type="Resource" id="Resource_v01b8"]
+script = ExtResource("2_calc")
+formula = "5"
+metadata/_custom_type_script = "uid://cgrxhw8vqenhu"
+
+[sub_resource type="Resource" id="Resource_w6cdo"]
+script = ExtResource("3_stat")
+stat_type = 3
+value_calc = SubResource("Resource_v01b8")
+metadata/_custom_type_script = "uid://b2h1ochum01o"
+
+[sub_resource type="Resource" id="Calc_hustle"]
+script = ExtResource("2_calc")
+formula = "5"
+metadata/_custom_type_script = "uid://cgrxhw8vqenhu"
+
+[sub_resource type="Resource" id="Stat_hustle"]
+script = ExtResource("3_stat")
+stat_type = 4
+value_calc = SubResource("Calc_hustle")
+
+[sub_resource type="Resource" id="Calc_mojo"]
+script = ExtResource("2_calc")
+formula = "1"
+metadata/_custom_type_script = "uid://cgrxhw8vqenhu"
+
+[sub_resource type="Resource" id="Stat_mojo"]
+script = ExtResource("3_stat")
+stat_type = 5
+value_calc = SubResource("Calc_mojo")
+
+[resource]
+script = ExtResource("1_chardata")
+character_name = "The Drifter"
+character_image = ExtResource("1_yl1gw")
+max_health = SubResource("Calc_hp")
+stats = Array[ExtResource("3_stat")]([SubResource("Resource_nr57k"), SubResource("Resource_e41p8"), SubResource("Resource_wmdxb"), SubResource("Resource_w6cdo"), SubResource("Stat_hustle"), SubResource("Stat_mojo")])
+gold = 100
+special_effects = Array[ExtResource("4_cond")]([SubResource("Cond_momentum")])

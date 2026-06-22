@@ -25,6 +25,10 @@ enum Mode {
 
 var current_mode : Mode = Mode.DISPLAY_ONLY
 
+## Title tint for cards retuned by the Workshop (data.modified). Keep in sync with
+## the same constant in card.gd so a card reads identically everywhere.
+const TITLE_COLOR_MODIFIED : Color = Color(1.0, 0.84, 0.30)   # warm gold
+
 func set_data(card_data : CardData):
 	data = card_data
 	if is_node_ready():
@@ -32,6 +36,7 @@ func set_data(card_data : CardData):
 
 func _setup_card():
 	title.text = data.card_name
+	_apply_title_style()
 	cost.text = str(data.card_cost)
 	if description is RichTextLabel:
 		description.bbcode_enabled = true
@@ -39,6 +44,18 @@ func _setup_card():
 	refresh_description()
 
 	_connect_to_player_stats()
+
+
+## Tints the title gold when the card was retuned by the Workshop (data.modified),
+## and restores the scene's default color otherwise. Title-only — does not affect
+## the description or the hover tooltip.
+func _apply_title_style() -> void:
+	if not title or not data:
+		return
+	if data.modified:
+		title.add_theme_color_override("default_color", TITLE_COLOR_MODIFIED)
+	else:
+		title.remove_theme_color_override("default_color")
 
 func refresh_description():
 	if not data:
@@ -59,9 +76,13 @@ func refresh_description():
 		if i < action_count - 1:
 			desc += "\n"
 	
+	desc += _shared_range_suffix()
+	
 	var regex = RegEx.new()
 	regex.compile("§([+\\-]?\\d+)§")
 	desc = regex.sub(desc, "[color=green]$1[/color]", true)
+	regex.compile("‡([+\\-]?\\d+)‡")
+	desc = regex.sub(desc, "[color=white]$1[/color]", true)
 	
 	desc = desc.replace("swag", "[img=16x16]res://Art/swag.png[/img]")
 	desc = desc.replace("marbles", "[img=16x16]res://Art/marbles.png[/img]")
@@ -81,6 +102,7 @@ func refresh_description():
 		keyword_suffix += "\n[b][color=red]Exhaust[/color][/b]"
 	
 	description.parse_bbcode(keyword_prefix + desc + keyword_suffix)
+	_fit_description_to_box()
 
 func _show_description_without_player():
 	if not data:
@@ -105,12 +127,16 @@ func _show_description_without_player():
 		if i < action_count - 1:
 			desc += "\n"
 	
+	desc += _shared_range_suffix()
+	
 	if desc.strip_edges() == "":
 		desc = "[i]Preview mode - full details available in combat[/i]"
 	
 	var regex = RegEx.new()
 	regex.compile("§([+\\-]?\\d+)§")
 	desc = regex.sub(desc, "[color=green]$1[/color]", true)
+	regex.compile("‡([+\\-]?\\d+)‡")
+	desc = regex.sub(desc, "[color=white]$1[/color]", true)
 	
 	desc = desc.replace("swag", "[img=36x36]res://Art/swag.png[/img]")
 	desc = desc.replace("marbles", "[img=36x36]res://Art/marbles.png[/img]")
@@ -130,6 +156,55 @@ func _show_description_without_player():
 		keyword_suffix += "\n[b][color=red]Exhaust[/color][/b]"
 	
 	description.parse_bbcode(keyword_prefix + desc + keyword_suffix)
+	_fit_description_to_box()
+
+## Shrinks the description font until the text fits the label's box, so long
+## descriptions never spawn a scrollbar — same behaviour as Card. Resets to the
+## theme size first so short cards are unaffected and a card whose text got
+## shorter can grow back to full size.
+func _fit_description_to_box() -> void:
+	if not description:
+		return
+	description.scroll_active = false           # never show a scrollbar
+	var box_h := description.size.y
+	if box_h <= 1.0:
+		return
+	description.remove_theme_font_size_override("normal_font_size")
+	var fsize := description.get_theme_font_size("normal_font_size")
+	while fsize > 8 and description.get_content_height() > box_h:
+		fsize -= 1
+		description.add_theme_font_size_override("normal_font_size", fsize)
+
+## Builds the card's single range clause: " - Range: X". Mirrors Card._shared_range_suffix:
+## actions that show their range inline (AttackAction) own that value, so we only
+## emit a line for ranges not already shown inline, and identical ranges collapse
+## to one entry — so an apply-condition card shows its range, while an attack +
+## apply at the same range still show "Range" only once. "" when nothing to add.
+func _shared_range_suffix() -> String:
+	if not data:
+		return ""
+	var inline_ranges := {}
+	var pending_ranges := {}
+	for action in data.actions:
+		if action == null or not action.shows_range():
+			continue
+		if action.displays_range_inline():
+			inline_ranges[action.max_range] = true
+		else:
+			pending_ranges[action.max_range] = true
+
+	var extra := []
+	for r in pending_ranges:
+		if not inline_ranges.has(r):
+			extra.append(r)
+	if extra.is_empty():
+		return ""
+
+	extra.sort()
+	var parts := []
+	for r in extra:
+		parts.append("‡%d‡" % r)
+	return " - Range: %s" % ", ".join(parts)
 
 func _connect_to_player_stats():
 	var player = get_tree().get_first_node_in_group("player")

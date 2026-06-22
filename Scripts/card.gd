@@ -6,8 +6,17 @@ signal card_hovered(card : Card)
 @onready var title = $BlankCard/title
 @onready var description : RichTextLabel = $BlankCard/description
 @onready var cost = $BlankCard/cost
+@onready var blank_card = $BlankCard
 
 var player_reference : Character = null
+
+## Title tint for cards retuned by the Workshop (data.modified). Change to taste.
+const TITLE_COLOR_MODIFIED : Color = Color(1.0, 0.84, 0.30)   # warm gold
+
+## Tints for cards the Auditor has amended (data.audited). Crimson title reads as
+## a malus (vs the Workshop's gold), and the frame gets a red wash. Change to taste.
+const TITLE_COLOR_AUDITED : Color = Color(0.86, 0.28, 0.28)   # crimson
+const FRAME_TINT_AUDITED  : Color = Color(1.0, 0.70, 0.70)    # red wash on the card frame
 
 ## Signature of the last-rendered dynamic card text. When a value that feeds the
 ## description changes (block, enemies, here, stats, etc.) this string changes and
@@ -58,6 +67,7 @@ func _on_mouse_exited() -> void:
 func set_data(card_data : CardData):
 	data = card_data
 	title.text = data.card_name
+	_apply_title_style()
 	cost.text = str(get_cost())
 
 	if description is RichTextLabel:
@@ -67,6 +77,35 @@ func set_data(card_data : CardData):
 
 
 	_connect_to_player_stats()
+
+	# Re-render this card whenever ANY card is played. A once-per-turn buff like
+	# Cool Head spends in the middle of a turn (after the first strike resolves),
+	# and the spend is announced by Global.card_played. The per-frame signature
+	# poll *should* catch the resulting text change, but it depends on this card's
+	# _process running every frame; hooking card_played guarantees the whole hand
+	# re-evaluates the instant a buff is armed or spent, so no card is left showing
+	# a stale buffed number. Connections are auto-cleared when the card is freed.
+	if not Global.card_played.is_connected(_on_any_card_played):
+		Global.card_played.connect(_on_any_card_played)
+
+
+## Tints the title and frame to signal the card's state. Audited (a malus from
+## the Auditor) takes precedence over the Workshop's modified glow. self_modulate
+## on the frame sprite tints only the frame art, never the text children, so the
+## card stays readable. Called from set_data and again whenever a flag flips on a
+## card that's already on screen (the Auditor calls this after amending).
+func _apply_title_style() -> void:
+	if not title or not data:
+		return
+	if data.audited:
+		title.add_theme_color_override("default_color", TITLE_COLOR_AUDITED)
+	elif data.modified:
+		title.add_theme_color_override("default_color", TITLE_COLOR_MODIFIED)
+	else:
+		title.remove_theme_color_override("default_color")
+
+	if blank_card:
+		blank_card.self_modulate = FRAME_TINT_AUDITED if data.audited else Color.WHITE
 
 
 ## Resolve the player once, preferring the cached reference. Returns null if the
@@ -104,6 +143,18 @@ func _process(_delta: float) -> void:
 		refresh_description()
 
 
+## Any card was just played — a once-per-turn buff may have armed or spent, so
+## re-render this card's face. DEFERRED on purpose: Cool Head (and any other
+## buff) also listens to card_played to spend itself, and handler order isn't
+## guaranteed — cards were usually connected first, so a direct refresh here would
+## render the buff while it's still live. call_deferred pushes this to the end of
+## the frame, after every card_played handler (including the spend) has run, so
+## get_card_text reflects the post-spend value. refresh_description also updates
+## _last_card_signature, keeping the per-frame poll in sync.
+func _on_any_card_played(_card_data) -> void:
+	call_deferred("refresh_description")
+
+
 func refresh_description():
 	var swag = preload("res://Art/swag.png")
 	var marbles = preload("res://Art/marbles.png")
@@ -136,11 +187,13 @@ func refresh_description():
 		if i < action_count - 1:
 			desc += "\n"
 
-
+	desc += _shared_range_suffix()
 
 	var regex = RegEx.new()
 	regex.compile("§([+\\-]?\\d+)§")
 	desc = regex.sub(desc, "[color=green]$1[/color]", true)
+	regex.compile("‡([+\\-]?\\d+)‡")
+	desc = regex.sub(desc, "[color=white]$1[/color]", true)
 	desc = desc.replace("swag", "[img=16x16]res://Art/swag.png[/img]")
 	desc = desc.replace("marbles", "[img=16x16]res://Art/marbles.png[/img]")
 	desc = desc.replace("guts", "[img=16x16]res://Art/guts.png[/img]")
@@ -156,6 +209,8 @@ func refresh_description():
 	# Prepend / append keyword lines so they always appear regardless of actions
 	var keyword_prefix := ""
 	var keyword_suffix := ""
+	if data.audited:
+		keyword_prefix += "[b][color=#db4747]Audited[/color][/b]\n"
 	if data.volatile:
 		keyword_prefix += "[b][color=orange]Volatile[/color][/b]\n"
 	if data.fickle:
@@ -166,6 +221,59 @@ func refresh_description():
 	if keyword_prefix != "" or keyword_suffix != "":
 		var full = keyword_prefix + desc + keyword_suffix
 		description.parse_bbcode(full)
+
+	# Shrink the font if needed so long descriptions never spawn a scrollbar.
+	_fit_description_to_box()
+
+
+## Builds the card's single range clause: " - Range: X". Actions that print their
+## range inline (AttackAction) own that value, so we only emit a line for ranges
+## NOT already shown inline — and identical ranges collapse to one entry. Result:
+## an apply-condition card finally shows its range, while an attack + apply at the
+## same range still show "Range" only once. Returns "" when there's nothing to add.
+func _shared_range_suffix() -> String:
+	if not data:
+		return ""
+	var inline_ranges := {}
+	var pending_ranges := {}
+	for action in data.actions:
+		if action == null or not action.shows_range():
+			continue
+		if action.displays_range_inline():
+			inline_ranges[action.max_range] = true
+		else:
+			pending_ranges[action.max_range] = true
+
+	var extra := []
+	for r in pending_ranges:
+		if not inline_ranges.has(r):
+			extra.append(r)
+	if extra.is_empty():
+		return ""
+
+	extra.sort()
+	var parts := []
+	for r in extra:
+		parts.append("‡%d‡" % r)   # white literal, matched by the ‡N‡ regex
+	return " - Range: %s" % ", ".join(parts)
+
+
+## Shrinks the description font until the text fits the label's box, so long
+## descriptions (turrets, or cards the Auditor has amended) never spawn a
+## scrollbar. Resets to the theme size first, so short cards are unaffected and
+## a card whose text got shorter can grow back to full size.
+func _fit_description_to_box() -> void:
+	if not description:
+		return
+	description.scroll_active = false           # never show a scrollbar
+	var box_h := description.size.y
+	if box_h <= 1.0:
+		return
+	description.remove_theme_font_size_override("normal_font_size")
+	var fsize := description.get_theme_font_size("normal_font_size")
+	while fsize > 8 and description.get_content_height() > box_h:
+		fsize -= 1
+		description.add_theme_font_size_override("normal_font_size", fsize)
 
 
 ## Plain-text breakdown for the card-hover tooltip: formula explanations for each

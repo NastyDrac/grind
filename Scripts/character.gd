@@ -66,17 +66,27 @@ func take_hit(who : Enemy, damage : int):
 	for con : Condition in character_data.special_effects:
 		if con.has_method("modify_damage"):
 			damage = con.modify_damage(damage)
-	if block > 0:
-		var absorbed = min(block, damage)
-		block -= absorbed
-		damage -= absorbed
 
-	if damage > 0:
-		health -= damage
+	var blocked : int = 0
+	if block > 0:
+		blocked = min(block, damage)
+		block -= blocked
+		damage -= blocked
+
+	var to_health : int = max(0, damage)
+	if to_health > 0:
+		health -= to_health
 		character_data.current_health = health
 
 	if block < 0:
 		block = 0
+
+	# Telemetry: report the hit that actually landed — HP lost, what block soaked,
+	# and who threw it. Fires even on a fully-blocked hit (to_health 0, blocked >0).
+	var src : String = ""
+	if who and is_instance_valid(who) and who.data:
+		src = who.data.enemy_name
+	Global.player_damaged.emit(to_health, blocked, src)
 
 	display_block()
 	set_health_bar()
@@ -201,7 +211,14 @@ func toggle_visible(visible : bool):
 	if block_display:
 		block_display.visible = visible and block > 0
 
-func reset_for_new_wave() -> void:
+## Strips all TEMPORARY combat state from the player: block, every applied
+## condition, and any in-combat stat buffs/debuffs (restored to permanent base
+## values via sync_from_data). Does NOT touch persistent special_effects/thingies
+## — those live in character_data.special_effects and are re-hooked separately at
+## wave start. Safe to call at combat END (before the reward/draft screen) so
+## leftover buffs never bleed into the draft card previews, and reused at wave
+## start by reset_for_new_wave().
+func clear_combat_modifiers() -> void:
 	block = 0
 	display_block()
 
@@ -214,6 +231,19 @@ func reset_for_new_wave() -> void:
 	# Restore all combat stats to their permanent base values,
 	# clearing any in-combat temporary buffs/debuffs.
 	sync_from_data()
+
+	if run_manager and run_manager.ui_bar:
+		run_manager.ui_bar.set_health()
+
+	# sync_from_data writes stat values directly (no stat_modified signal), so
+	# fire stats_changed ourselves to make any open card previews re-render
+	# against the cleaned base stats.
+	stats_changed.emit()
+
+
+func reset_for_new_wave() -> void:
+	# Clear last wave's block, conditions, and temporary stat buffs.
+	clear_combat_modifiers()
 
 	# Thingies are PERSISTENT — they live in special_effects and are NEVER
 	# duplicated into `conditions` (that caused the double icon). Re-run their

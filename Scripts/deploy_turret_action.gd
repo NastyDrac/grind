@@ -71,3 +71,18 @@ func get_description_with_values(character = null) -> String:
 	var who = character if character else player
 	var dmg : int = damage.calculate(who) if (damage and who) else 0
 	return "Deploy a turret.\nThe turret deals %d damage to a random enemy there." % dmg
+
+
+## Hover-tooltip breakdown: explains how each turret's per-shot damage is
+## computed, e.g. "8 damage = heat + marbles". Returns "" for flat-literal
+## damage (nothing to explain), so a fixed-damage turret adds no tooltip line.
+## Mirrors AttackAction's damage tooltip; turret shots use the player's stats at
+## fire time, so the breakdown is computed from the same character. Tooltip text
+## is plain (the card-hover label renders it without BBCode).
+func get_tooltip_text(character) -> String:
+	if not damage:
+		return ""
+	var who = character if character else player
+	if not who:
+		return ""
+	return _formula_breakdown("damage", damage.calculate(who), damage.formula)

@@ -76,18 +76,21 @@ icon = ExtResource("2_sdc1o")
 flat = true
 icon_alignment = 1
 
+[node name="HourglassIcon" type="Sprite2D" parent="."]
+position = Vector2(93.000046, 510)
+scale = Vector2(0.24, 0.24)
+texture = ExtResource("3_r6eh0")
+
 [node name="PassTimeButton" type="Button" parent="."]
 offset_left = 40.0
 offset_top = 451.0
 offset_right = 148.0
 offset_bottom = 565.8
+theme_override_colors/font_color = Color(1, 1, 1, 1)
 theme_override_colors/icon_pressed_color = Color(0.29219002, 0.29219005, 0.29219002, 1)
+theme_override_constants/outline_size = 11
 theme_override_constants/icon_max_width = 100
+text = "End Turn"
 flat = true
 text_overrun_behavior = 2
 icon_alignment = 1
-
-[node name="HourglassIcon" type="Sprite2D" parent="."]
-position = Vector2(93.000046, 510)
-scale = Vector2(0.24, 0.24)
-texture = ExtResource("3_r6eh0")

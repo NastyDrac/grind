@@ -42,6 +42,11 @@ var run : RunManager
 ## RunManager sets this before instantiating the reward scene.
 var current_horde : Horde = null
 
+## True when this reward follows a boss fight. Boss rewards offer a Rare-only
+## card draft (3 Rares), and one is guaranteed even if the horde didn't list a
+## CardDraft reward.
+var boss_reward : bool = false
+
 ## Tracks resource paths of thingies already offered this reward screen
 ## so that two Thingy buttons never show the same item.
 var _offered_thingy_paths : Array[String] = []
@@ -67,14 +72,20 @@ func _display_rewards() -> void:
 		_add_continue_button()
 		return
 
+	var has_draft := false
 	for reward_type in current_horde.rewards:
 		match reward_type:
 			REWARD_TYPE.Gold:
 				_add_gold_button()
 			REWARD_TYPE.CardDraft:
 				_add_card_draft_button()
+				has_draft = true
 			REWARD_TYPE.Thingy:
 				_add_thingy_button()
+
+	# Boss fights always grant a (Rare) draft, even if the horde didn't list one.
+	if boss_reward and not has_draft:
+		_add_card_draft_button()
 
 	_add_continue_button()
 
@@ -97,12 +108,12 @@ func _add_gold_button() -> void:
 
 func _add_card_draft_button() -> void:
 	var btn := Button.new()
-	btn.text = "🃏 Draft a Card"
+	btn.text = "🃏 Draft a Rare Card" if boss_reward else "🃏 Draft a Card"
 	options.add_child(btn)
 
 	btn.pressed.connect(func() -> void:
 		btn.disabled = true
-		run.create_draft_screen()
+		run.create_draft_screen(CardData.RARITY.Rare if boss_reward else -1)
 		# Wait for the draft to finish before re-enabling (or just leave disabled).
 		await run.current_draft_screen.draft_completed
 		btn.text = "🃏 Card Drafted"
@@ -131,6 +142,9 @@ func _add_thingy_button() -> void:
 	else:
 		display_name = thingy.resource_path.get_file().get_basename()
 	
+	# Telemetry: this thingy is being offered as a reward.
+	Global.thingy_offered.emit([display_name], "reward")
+	
 	var hbox := HBoxContainer.new()
 	hbox.alignment =BoxContainer.ALIGNMENT_CENTER
 	var icon := ConditionIcon.new()
@@ -143,6 +157,8 @@ func _add_thingy_button() -> void:
 
 	btn.pressed.connect(func() -> void:
 		run.add_thingy_condition(thingy)
+		# Telemetry: the player claimed this thingy reward.
+		Global.thingy_selected.emit(display_name, "reward")
 		btn.disabled = true
 		btn.text = "✨ %s (Claimed)" % display_name
 	)

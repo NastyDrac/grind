@@ -7,7 +7,7 @@ class_name Trumpeteer
 ## Noise resolution depends on the RangeManager's current spawn_mode:
 ##   IMMEDIATE / ENERGY_BANKED / TIERED  → spawns [stacks] enemies from the enemy pool
 ##   METER / MIDDLE_GROUND               → adds [stacks] to the noise meter
-
+const ICON := preload("res://Art/Icons/NoiseIcon.png")
 
 ## Override _fire() entirely — Trumpeteer has no triggered_effect and does not
 ## apply a condition to targets.  The base implementation returns early (with a

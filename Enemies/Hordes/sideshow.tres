@@ -17,7 +17,7 @@ noise_cost = 2
 [sub_resource type="Resource" id="HE_2"]
 script = ExtResource("hde_script")
 enemy = ExtResource("4_ac")
-noise_cost = 2
+noise_cost = 3
 
 [sub_resource type="Resource" id="HE_3"]
 script = ExtResource("hde_script")
@@ -39,5 +39,4 @@ enemy_entries = Array[ExtResource("hde_script")]([SubResource("HE_1"), SubResour
 max_column = 6
 rewards = Array[int]([0, 1])
 win_con = SubResource("Resource_win")
-starting_noise = 2.5
 metadata/_custom_type_script = "uid://b6h8ntxfaauo5"

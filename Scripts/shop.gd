@@ -52,6 +52,7 @@ func _populate_cards() -> void:
 		child.queue_free()
 
 	var offered_card_paths : Array[String] = []
+	var offered_names : Array = []
 
 	for _i in range(card_slots):
 		var card_data : CardData = run.get_random_card_data(offered_card_paths)
@@ -59,6 +60,7 @@ func _populate_cards() -> void:
 			continue
 		if card_data.resource_path != "":
 			offered_card_paths.append(card_data.resource_path)
+		offered_names.append(card_data.card_name)
 
 		var rarity : int = card_data.get("rarity") if card_data.get("rarity") != null else 0
 		var price  := _card_price(rarity)
@@ -85,12 +87,18 @@ func _populate_cards() -> void:
 
 		buy_btn.pressed.connect(_on_buy_card.bind(card_data, price, buy_btn))
 
+	# Telemetry: cards on sale this visit.
+	if not offered_names.is_empty():
+		Global.cards_offered.emit(offered_names, "shop")
+
 func _on_buy_card(card_data: CardData, price: int, btn: Button) -> void:
 	if run.character.gold < price:
 		_flash_button(btn, "Need %d Gold!" % price)
 		return
 	run.character.gold -= price
 	run.add_card_to_deck(card_data)
+	# Telemetry: the player bought (selected) this card.
+	Global.card_selected.emit(card_data.card_name, "shop")
 	btn.text = "Purchased!"
 	btn.disabled = true
 	_refresh_gold_label()
@@ -104,6 +112,7 @@ func _populate_thingies() -> void:
 
 	# Seed exclusions with everything the player already owns.
 	var excluded_thingy_paths : Array[String] = []
+	var offered_thingy_names : Array = []
 	for effect in run.character.special_effects:
 		if effect.resource_path != "":
 			excluded_thingy_paths.append(effect.resource_path)
@@ -115,6 +124,7 @@ func _populate_thingies() -> void:
 		# Exclude this thingy from subsequent slots in the same shop visit.
 		if condition.resource_path != "":
 			excluded_thingy_paths.append(condition.resource_path)
+		offered_thingy_names.append(condition.get_condition_name())
 
 		var rarity : int = condition.rarity
 		var price  := _thingy_price(rarity)
@@ -148,12 +158,18 @@ func _populate_thingies() -> void:
 
 		thingy_container.add_child(slot)
 
+	# Telemetry: thingies on sale this visit.
+	if not offered_thingy_names.is_empty():
+		Global.thingy_offered.emit(offered_thingy_names, "shop")
+
 func _on_buy_thingy(condition: ThingyCondition, price: int, btn: Button) -> void:
 	if run.character.gold < price:
 		_flash_button(btn, "Need %d Gold!" % price)
 		return
 	run.character.gold -= price
 	run.add_thingy_condition(condition)
+	# Telemetry: the player bought (selected) this thingy.
+	Global.thingy_selected.emit(condition.get_condition_name(), "shop")
 	btn.text = "Purchased!"
 	btn.disabled = true
 	_refresh_gold_label()

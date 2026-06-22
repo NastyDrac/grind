@@ -1,4 +1,4 @@
-[gd_scene load_steps=11 format=3 uid="uid://cv1u6tetkmfto"]
+[gd_scene load_steps=12 format=3 uid="uid://cv1u6tetkmfto"]
 
 [ext_resource type="Script" uid="uid://dkqjp5qb2gfw6" path="res://Scripts/card.gd" id="1_0qqmn"]
 [ext_resource type="Script" uid="uid://0gsjrx47no8b" path="res://Scripts/card_data.gd" id="2_brehn"]
@@ -6,6 +6,7 @@
 [ext_resource type="Script" uid="uid://cgrxhw8vqenhu" path="res://Scripts/ValueCalculator.gd" id="3_bnspj"]
 [ext_resource type="Script" uid="uid://clvjn77csx1a0" path="res://Scripts/AttackAction.gd" id="4_xnv4g"]
 [ext_resource type="Texture2D" uid="uid://ctnrg0beipfc0" path="res://Art/CARDTEMPLATEEMPTY.png" id="6_bnspj"]
+[ext_resource type="Texture2D" uid="uid://bag4l7g0g6cbf" path="res://Art/Icons/circle.png" id="7_xnv4g"]
 
 [sub_resource type="Resource" id="Resource_u5wvb"]
 script = ExtResource("3_bnspj")
@@ -46,11 +47,12 @@ position = Vector2(100, 150)
 texture = ExtResource("6_bnspj")
 
 [node name="title" type="RichTextLabel" parent="BlankCard"]
-offset_left = -90.666664
+offset_left = -78.666664
 offset_top = -126.666664
-offset_right = 70.666664
+offset_right = 82.666664
 offset_bottom = -94.666664
 mouse_filter = 2
+horizontal_alignment = 1
 
 [node name="description" type="RichTextLabel" parent="BlankCard"]
 offset_left = -88.0
@@ -60,22 +62,31 @@ offset_bottom = 133.97517
 scale = Vector2(1, 0.893335)
 mouse_filter = 2
 bbcode_enabled = true
+scroll_active = false
 autowrap_mode = 2
 horizontal_alignment = 1
 vertical_alignment = 1
 
+[node name="Sprite2D2" type="Sprite2D" parent="BlankCard"]
+self_modulate = Color(0.6659348, 0.7723388, 0.74255604, 1)
+position = Vector2(-86.666664, -125.33333)
+scale = Vector2(0.42, 0.42)
+texture = ExtResource("7_xnv4g")
+
 [node name="cost" type="RichTextLabel" parent="BlankCard"]
 custom_minimum_size = Vector2(200, 300)
-offset_left = 70.666664
-offset_top = -132.0
-offset_right = 270.66666
-offset_bottom = 168.0
+offset_left = -94.666664
+offset_top = -148.0
+offset_right = 105.333336
+offset_bottom = 152.0
 mouse_filter = 2
 theme_override_colors/default_color = Color(1, 0, 0, 1)
 theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
 theme_override_constants/outline_size = 5
 theme_override_font_sizes/normal_font_size = 30
 text = "2"
+
+[node name="Sprite2D" type="Sprite2D" parent="BlankCard"]
 
 [connection signal="mouse_entered" from="." to="." method="_on_mouse_entered"]
 [connection signal="mouse_exited" from="." to="." method="_on_mouse_exited"]

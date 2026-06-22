@@ -1,0 +1,45 @@
+[gd_resource type="Resource" script_class="CardData" load_steps=11 format=3 uid="uid://cdrfttrick01"]
+
+[ext_resource type="Script" uid="uid://dhxff5egnsgrv" path="res://Scripts/action.gd" id="1_action"]
+[ext_resource type="Script" uid="uid://0gsjrx47no8b" path="res://Scripts/card_data.gd" id="2_carddata"]
+[ext_resource type="Script" uid="uid://clvjn77csx1a0" path="res://Scripts/AttackAction.gd" id="3_attack"]
+[ext_resource type="Script" uid="uid://cgrxhw8vqenhu" path="res://Scripts/ValueCalculator.gd" id="4_calc"]
+[ext_resource type="Script" path="res://Scripts/apply_condition_action.gd" id="5_apply"]
+[ext_resource type="Script" path="res://Scripts/burning.gd" id="6_burn"]
+
+[sub_resource type="Resource" id="Calc_dmg"]
+script = ExtResource("4_calc")
+formula = "hustle"
+metadata/_custom_type_script = "uid://cgrxhw8vqenhu"
+
+[sub_resource type="Resource" id="Act_attack"]
+script = ExtResource("3_attack")
+damage_calculator = SubResource("Calc_dmg")
+max_range = 4
+animation_type = 1
+metadata/_custom_type_script = "uid://clvjn77csx1a0"
+
+[sub_resource type="Resource" id="Cond_burn"]
+script = ExtResource("6_burn")
+condition_name = "Burning"
+is_keyword = true
+
+[sub_resource type="Resource" id="Calc_stacks"]
+script = ExtResource("4_calc")
+formula = "mojo"
+metadata/_custom_type_script = "uid://cgrxhw8vqenhu"
+
+[sub_resource type="Resource" id="Act_apply"]
+script = ExtResource("5_apply")
+condition_resource = SubResource("Cond_burn")
+stacks_calculator = SubResource("Calc_stacks")
+target_type = 0
+max_range = 4
+
+[resource]
+script = ExtResource("2_carddata")
+card_name = "Trick Shot"
+card_cost = 1
+rarity = 2
+actions = Array[ExtResource("1_action")]([SubResource("Act_attack"), SubResource("Act_apply")])
+metadata/_custom_type_script = "uid://0gsjrx47no8b"

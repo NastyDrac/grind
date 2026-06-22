@@ -4,7 +4,7 @@
 [ext_resource type="Script" uid="uid://bpr8cwurcrxy3" path="res://Scripts/triggered_condition.gd" id="2_fwqp7"]
 [ext_resource type="Script" uid="uid://tnxg66jw03v3" path="res://Scripts/enemy_data.gd" id="2_hxerl"]
 [ext_resource type="Script" uid="uid://d0hdj6yes681x" path="res://Scripts/damage_buff.gd" id="3_ca644"]
-[ext_resource type="Texture2D" uid="uid://b2rjhiy4rifig" path="res://icon.svg" id="5_61wmx"]
+[ext_resource type="Texture2D" uid="uid://cejtpktjn1cj3" path="res://Art/Characters/DeadAdventurerAlt.png" id="5_fwqp7"]
 
 [sub_resource type="Resource" id="Resource_70542"]
 script = ExtResource("3_ca644")
@@ -22,9 +22,10 @@ metadata/_custom_type_script = "uid://bpr8cwurcrxy3"
 [resource]
 script = ExtResource("2_hxerl")
 enemy_name = "The Handler"
-texture = ExtResource("5_61wmx")
+texture = ExtResource("5_fwqp7")
 min_health = 18
 max_health = 24
-damage = 4
+damage = 6
+attack_range = 3
 conditions = Array[ExtResource("1_0542y")]([SubResource("Resource_o8he8")])
 metadata/_custom_type_script = "uid://tnxg66jw03v3"

@@ -1,36 +1,22 @@
 extends EventEffect
 class_name EffectRemoveCard
 
-## Opens the DeckViewer in SELECT mode.
-## The player picks a card from their deck; that card is removed.
+## Opens the DeckViewer in SELECT mode, [count] times in a row.
+## Each pick removes one card from the deck; the player can Skip to stop early.
+@export var count : int = 1
 
 
 func execute(run_manager: RunManager, parent: Node, done: Callable) -> void:
-	var unique_cards := _unique_deck(run_manager.deck)
+	# Fresh unique list each round, so removed cards drop out of the picker.
+	var provider := func() -> Array[CardData]:
+		return _unique_deck(run_manager.deck)
 
-	var viewer := DeckViewer.new()
-	parent.add_child(viewer)
-	viewer.setup(
-		"Your Deck  —  %d cards" % run_manager.deck.size(),
-		unique_cards,
-		DeckViewer.Mode.SELECT,
-		"Choose a card to remove:"
-	)
-
-	var _picked := false
-
-	viewer.card_selected.connect(func(card_data: CardData) -> void:
-		_picked = true
+	var on_pick := func(card_data: CardData) -> void:
 		var idx := run_manager.deck.find(card_data)
 		if idx != -1:
 			run_manager.deck.remove_at(idx)
-		done.call()
-	)
 
-	viewer.closed.connect(func() -> void:
-		if not _picked:
-			done.call()
-	)
+	_select_cards(run_manager, parent, count, "Choose a card to remove:", provider, on_pick, done)
 
 
 func _unique_deck(deck: Array[CardData]) -> Array[CardData]:
@@ -43,4 +29,6 @@ func _unique_deck(deck: Array[CardData]) -> Array[CardData]:
 	return result
 
 func get_description(run : RunManager) -> String:
-	return "Remove a card from your deck."
+	if count <= 1:
+		return "Remove a card from your deck."
+	return "Remove up to %d cards from your deck." % count

@@ -21,6 +21,7 @@ metadata/_custom_type_script = "uid://y73360xhw2qs"
 [resource]
 script = ExtResource("2_carddata")
 card_name = "Valor"
+card_cost = 4
 type = 2
 rarity = 1
 actions = Array[ExtResource("1_action")]([SubResource("Act_0")])

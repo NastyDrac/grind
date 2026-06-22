@@ -14,7 +14,10 @@ var move_icon = preload("res://Art/Icons/ArrowIcon.png")
 func _ready() -> void:
 	label = Label.new()
 	add_child(label)
-	label.add_theme_color_override("font_color", Color.BLACK)
+	label.add_theme_color_override("font_color", Color.WHITE)
+	label.add_theme_constant_override("outline_size", 3)
+	label.add_theme_color_override("font_outline_color", Color.BLACK)
+	label.add_theme_font_size_override("font_size", 24)
 	Global.enemy_advanced.connect(get_intent.bind())
 	get_intent(enemy, 0, enemy.current_range)
 

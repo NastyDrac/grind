@@ -63,22 +63,22 @@ func get_description_with_values(character: Character) -> String:
 	match target_type:
 		TargetType.CARD_IN_HAND:
 			if count > 1:
-				return "Exhaust §%d§ cards" % count
+				return "Exhaust %s cards" % _cv(count, num_cards.formula)
 			else:
 				return "Exhaust a card"
 		TargetType.CARD_IN_DISCARD:
 			if count > 1:
-				return "Exhaust §%d§ cards from discard pile" % count
+				return "Exhaust %s cards from discard pile" % _cv(count, num_cards.formula)
 			else:
 				return "Exhaust a card from discard pile"
 		TargetType.CARD_IN_DRAW:
 			if count > 1:
-				return "Exhaust §%d§ cards from draw pile" % count
+				return "Exhaust %s cards from draw pile" % _cv(count, num_cards.formula)
 			else:
 				return "Exhaust a card from draw pile"
 		TargetType.RANDOM_CARD_IN_HAND:
 			if count > 1:
-				return "Exhaust §%d§ random cards" % count
+				return "Exhaust %s random cards" % _cv(count, num_cards.formula)
 			else:
 				return "Exhaust a random card"
 		TargetType.ALL_CARDS_IN_HAND:

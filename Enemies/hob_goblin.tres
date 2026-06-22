@@ -8,7 +8,7 @@
 script = ExtResource("1_8vfdf")
 enemy_name = "Hob Goblin"
 texture = ExtResource("5_hwfw4")
-min_health = 5
-max_health = 7
+min_health = 6
+max_health = 8
 damage = 3
 metadata/_custom_type_script = "uid://tnxg66jw03v3"

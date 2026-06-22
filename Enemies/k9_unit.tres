@@ -7,9 +7,10 @@
 [resource]
 script = ExtResource("2_12gq3")
 enemy_name = "K9 Unit"
+max_health = 22
 texture = ExtResource("3_12gq3")
-min_health = 7
+min_health = 15
 damage = 6
-move_speed = 4
+move_speed = 5
 noise_cost = 2
 metadata/_custom_type_script = "uid://tnxg66jw03v3"

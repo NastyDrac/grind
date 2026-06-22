@@ -4,7 +4,7 @@
 [ext_resource type="Script" uid="uid://b2o6hip7peiwb" path="res://Scripts/move_pattern.gd" id="2_ac"]
 [ext_resource type="Script" uid="uid://tnxg66jw03v3" path="res://Scripts/enemy_data.gd" id="3_ac"]
 [ext_resource type="Script" uid="uid://rf04wb68htw8" path="res://Scripts/move_step.gd" id="4_ac"]
-[ext_resource type="Texture2D" uid="uid://b2rjhiy4rifig" path="res://icon.svg" id="5_ac"]
+[ext_resource type="Texture2D" uid="uid://br835dgt7fbys" path="res://Art/Characters/Troll.png" id="5_mfwpv"]
 
 [sub_resource type="Resource" id="Resource_ac_attack"]
 script = ExtResource("4_ac")
@@ -24,9 +24,9 @@ metadata/_custom_type_script = "uid://b2o6hip7peiwb"
 [resource]
 script = ExtResource("3_ac")
 enemy_name = "The Acrobat"
-texture = ExtResource("5_ac")
-min_health = 5
-max_health = 7
+texture = ExtResource("5_mfwpv")
+min_health = 6
+max_health = 8
 damage = 5
 move_speed = 2
 attack_range = 2

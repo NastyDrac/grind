@@ -1,0 +1,27 @@
+[gd_resource type="Resource" script_class="AuditorData" load_steps=7 format=3 uid="uid://baud1t0rb0ss1"]
+
+[ext_resource type="Script" uid="uid://cxsboto4sepqh" path="res://Scripts/auditor_data.gd" id="1_audit"]
+[ext_resource type="Script" uid="uid://b1ogi3xh5xakp" path="res://Scripts/condition.gd" id="2_cond"]
+[ext_resource type="Script" uid="uid://hlgmrnuuc6lq" path="res://Scripts/auditing_condition.gd" id="3_audcond"]
+[ext_resource type="Texture2D" uid="uid://b2rjhiy4rifig" path="res://icon.svg" id="4_icon"]
+[ext_resource type="Texture2D" uid="uid://dmt8yyb40okdu" path="res://Art/Characters/GoblinPriestAlt.png" id="5_ignv6"]
+
+[sub_resource type="Resource" id="Cond_auditing"]
+script = ExtResource("3_audcond")
+condition_name = "Auditing"
+stacks = 1
+icon = ExtResource("4_icon")
+description = "Each turn, the Auditor amends one of your cards. Playing an amended card heals him. Defeat the Auditor to void every amendment."
+is_keyword = true
+metadata/_custom_type_script = "uid://caud1t0rcondsc"
+
+[resource]
+script = ExtResource("1_audit")
+enemy_name = "The Auditor"
+texture = ExtResource("5_ignv6")
+min_health = 58
+max_health = 65
+damage = 6
+conditions = Array[ExtResource("2_cond")]([SubResource("Cond_auditing")])
+is_elite = true
+metadata/_custom_type_script = "uid://caud1t0rdatasc"

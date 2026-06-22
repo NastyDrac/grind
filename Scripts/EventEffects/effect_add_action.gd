@@ -1,9 +1,10 @@
 extends EventEffect
 class_name EffectAddAction
 
-## Opens the DeckViewer in SELECT mode.
-## The player picks a card; [action] is appended to that card's actions array.
+## Opens the DeckViewer in SELECT mode, [count] times in a row.
+## Each pick appends [action] to that card's actions array; Skip stops early.
 @export var action: Action = null
+@export var count : int = 1
 
 
 func execute(run_manager: RunManager, parent: Node, done: Callable) -> void:
@@ -12,28 +13,17 @@ func execute(run_manager: RunManager, parent: Node, done: Callable) -> void:
 		done.call()
 		return
 
-	var viewer := DeckViewer.new()
-	parent.add_child(viewer)
-	viewer.setup(
-		"Your Deck  —  %d cards" % run_manager.deck.size(),
-		run_manager.deck,
-		DeckViewer.Mode.SELECT,
-		"Choose a card to add an action to:"
-	)
+	var provider := func() -> Array[CardData]:
+		return run_manager.deck
 
-	var _picked := false
-
-	viewer.card_selected.connect(func(card_data: CardData) -> void:
-		_picked = true
+	var on_pick := func(card_data: CardData) -> void:
 		card_data.actions.append(action)
-		done.call()
-	)
 
-	viewer.closed.connect(func() -> void:
-		if not _picked:
-			done.call()
-	)
+	_select_cards(run_manager, parent, count, "Choose a card to add an action to:", provider, on_pick, done)
 
 
 func get_description(run : RunManager) -> String:
-	return "Add (" + action.get_description_with_values(run.player) + ") to a card"
+	var what := "(" + action.get_description_with_values(run.player) + ")"
+	if count <= 1:
+		return "Add %s to a card" % what
+	return "Add %s to up to %d cards" % [what, count]

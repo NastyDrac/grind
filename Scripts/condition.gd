@@ -30,6 +30,28 @@ func trigger_condition() -> void:
 func remove_condition(who) -> void:
 	who.conditions.erase(self)
 
+## Resolves the icon shown in the HUD and tooltips. Resolution order:
+##   1. the `icon` set on this instance in the inspector (always wins)
+##   2. a `const ICON := preload(...)` defined on the subclass
+##   3. null (or a fallback you set in _default_icon)
+## UI must call this — never read `icon` directly.
+func get_icon() -> Texture2D:
+	if icon:
+		return icon
+	return _default_icon()
+
+## Returns the subclass's standard icon by reading its `ICON` constant, so a
+## subclass only needs `const ICON := preload("...")` — no override required.
+## Subclasses with a dynamic icon (e.g. TriggeredCondition) override this.
+func _default_icon() -> Texture2D:
+	var script = get_script()
+	if script:
+		var consts = script.get_script_constant_map()
+		if consts.has("ICON"):
+			return consts["ICON"]
+		else: return preload("res://icon.svg")
+	return null
+
 ## Returns the description string shown in tooltips and the shop.
 ## Override in subclasses to include dynamic values (e.g. calculated damage).
 ## Falls back to the exported description field if not overridden.

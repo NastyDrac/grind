@@ -62,7 +62,7 @@ func get_card_text(character) -> String:
 	var mod_value : int = modify_calculator.calculate(character)
 	var stat_name : String = _get_stat_name(stat_to_modify)
 	var sign : String = "+" if mod_value >= 0 else ""
-	return "Modify %s: §%s%d§" % [stat_name, sign, mod_value]
+	return "Modify %s: %s" % [stat_name, _cv("%s%d" % [sign, mod_value], modify_calculator.formula)]
 
 
 func get_tooltip_text(character) -> String:

@@ -1,30 +1,38 @@
-[gd_resource type="Resource" script_class="Horde" load_steps=10 format=3 uid="uid://c4ssmelbab2s0"]
+[gd_resource type="Resource" script_class="Horde" load_steps=12 format=3 uid="uid://c4ssmelbab2s0"]
 
 [ext_resource type="Script" uid="uid://tnxg66jw03v3" path="res://Scripts/enemy_data.gd" id="1_xwmup"]
 [ext_resource type="Script" uid="uid://b6h8ntxfaauo5" path="res://Scripts/horde.gd" id="2_eoi6q"]
 [ext_resource type="Resource" uid="uid://rwhy6iobb6it" path="res://Enemies/goon.tres" id="2_nar6w"]
 [ext_resource type="Resource" uid="uid://blr5l5gd28mj" path="res://Enemies/juggernaut.tres" id="3_ofni0"]
 [ext_resource type="Resource" uid="uid://cayjeqeyt177k" path="res://Enemies/handler.tres" id="4_lnh27"]
+[ext_resource type="Script" uid="uid://dbrkkfbjmvvar" path="res://Scripts/defeat_x_enemies.gd" id="7_lnh27"]
 [ext_resource type="Script" uid="uid://bl2ttj5d643xd" path="res://Scripts/horde_enemy.gd" id="hde_script"]
 
 [sub_resource type="Resource" id="HE_1"]
 script = ExtResource("hde_script")
 enemy = ExtResource("2_nar6w")
-noise_cost = 2
+noise_cost = 3
 
 [sub_resource type="Resource" id="HE_2"]
 script = ExtResource("hde_script")
 enemy = ExtResource("3_ofni0")
-noise_cost = 5
+noise_cost = 7
 
 [sub_resource type="Resource" id="HE_3"]
 script = ExtResource("hde_script")
 enemy = ExtResource("4_lnh27")
-noise_cost = 4
+noise_cost = 5
+
+[sub_resource type="Resource" id="Resource_mrk66"]
+script = ExtResource("7_lnh27")
+enemies_to_defeat = 15
+metadata/_custom_type_script = "uid://dbrkkfbjmvvar"
 
 [resource]
 script = ExtResource("2_eoi6q")
 recipe_name = "Riot"
 enemy_entries = Array[ExtResource("hde_script")]([SubResource("HE_1"), SubResource("HE_2"), SubResource("HE_3")])
 max_column = 6
+win_con = SubResource("Resource_mrk66")
+starting_noise = 4.5
 metadata/_custom_type_script = "uid://b6h8ntxfaauo5"

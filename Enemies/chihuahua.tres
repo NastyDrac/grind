@@ -1,15 +1,16 @@
-[gd_resource type="Resource" script_class="EnemyData" load_steps=6 format=3 uid="uid://ch1hu4hu4aaa1"]
+[gd_resource type="Resource" script_class="EnemyData" load_steps=7 format=3 uid="uid://ch1hu4hu4aaa1"]
 
 [ext_resource type="Script" uid="uid://b1ogi3xh5xakp" path="res://Scripts/condition.gd" id="1_ch1"]
+[ext_resource type="Texture2D" uid="uid://k61vja8o7hkl" path="res://Art/Icons/DeathRattle.png" id="2_6ffkp"]
 [ext_resource type="Texture2D" uid="uid://b2rjhiy4rifig" path="res://icon.svg" id="2_ch1"]
 [ext_resource type="Script" uid="uid://do7yj12cpcfq4" path="res://Scripts/trumpeteer.gd" id="3_ch1"]
 [ext_resource type="Script" uid="uid://tnxg66jw03v3" path="res://Scripts/enemy_data.gd" id="4_ch1"]
 
 [sub_resource type="Resource" id="Resource_ch1"]
 script = ExtResource("3_ch1")
-condition_name = "Yapping"
+condition_name = "Death Rattle"
 stacks = 2
-icon = ExtResource("2_ch1")
+icon = ExtResource("2_6ffkp")
 metadata/_custom_type_script = "uid://do7yj12cpcfq4"
 
 [resource]

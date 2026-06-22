@@ -1,42 +1,29 @@
 extends EventEffect
 class_name EffectCardFlag
 
-## Opens the DeckViewer in SELECT mode.
-## The player picks a card; the chosen flag (Exhaust, Fickle, or Volatile)
-## is set to [value] on that card.
+## Opens the DeckViewer in SELECT mode, [count] times in a row.
+## Each pick sets the chosen flag (Exhaust, Fickle, or Volatile) to [value] on
+## that card; the player can Skip to stop early.
 
 enum Flag { EXHAUST, FICKLE, VOLATILE }
 
 @export var flag: Flag = Flag.EXHAUST
 ## true = add the flag, false = remove it.
 @export var value: bool = true
+@export var count : int = 1
 
 
 func execute(run_manager: RunManager, parent: Node, done: Callable) -> void:
-	var viewer := DeckViewer.new()
-	parent.add_child(viewer)
-	viewer.setup(
-		"Your Deck  —  %d cards" % run_manager.deck.size(),
-		run_manager.deck,
-		DeckViewer.Mode.SELECT,
-		_prompt()
-	)
+	var provider := func() -> Array[CardData]:
+		return run_manager.deck
 
-	var _picked := false
-
-	viewer.card_selected.connect(func(card_data: CardData) -> void:
-		_picked = true
+	var on_pick := func(card_data: CardData) -> void:
 		match flag:
 			Flag.EXHAUST:  card_data.exhaust  = value
 			Flag.FICKLE:   card_data.fickle   = value
-			Flag.VOLATILE: card_data.volatile  = value
-		done.call()
-	)
+			Flag.VOLATILE: card_data.volatile = value
 
-	viewer.closed.connect(func() -> void:
-		if not _picked:
-			done.call()
-	)
+	_select_cards(run_manager, parent, count, _prompt(), provider, on_pick, done)
 
 
 func _prompt() -> String:

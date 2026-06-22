@@ -53,12 +53,12 @@ func get_description_with_values(character: Character) -> String:
 	match target_type:
 		TargetType.CARD_IN_HAND:
 			if count > 1:
-				return "Discard §%d§ cards" % count
+				return "Discard %s cards" % _cv(count, num_cards.formula)
 			else:
 				return "Discard a card"
 		TargetType.RANDOM_CARD_IN_HAND:
 			if count > 1:
-				return "Discard §%d§ random cards" % count
+				return "Discard %s random cards" % _cv(count, num_cards.formula)
 			else:
 				return "Discard a random card"
 		TargetType.ALL_CARDS_IN_HAND:

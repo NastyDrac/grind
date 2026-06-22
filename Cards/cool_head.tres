@@ -1,0 +1,35 @@
+[gd_resource type="Resource" script_class="CardData" load_steps=9 format=3 uid="uid://d2u8cu2h5hvo3"]
+
+[ext_resource type="Script" uid="uid://dhxff5egnsgrv" path="res://Scripts/action.gd" id="1_ee2k4"]
+[ext_resource type="Script" uid="uid://mwkyhxkmq3sg" path="res://Scripts/cool_head.gd" id="2_jlnb2"]
+[ext_resource type="Script" uid="uid://0gsjrx47no8b" path="res://Scripts/card_data.gd" id="2_k2cgg"]
+[ext_resource type="Script" uid="uid://dm2bmau6ctnm8" path="res://Scripts/apply_condition_action.gd" id="3_v2deu"]
+[ext_resource type="Script" uid="uid://cgrxhw8vqenhu" path="res://Scripts/ValueCalculator.gd" id="4_v2deu"]
+
+[sub_resource type="Resource" id="Resource_ydfdx"]
+script = ExtResource("2_jlnb2")
+quiet_threshold = 3.0
+condition_name = "Cool Head"
+metadata/_custom_type_script = "uid://mwkyhxkmq3sg"
+
+[sub_resource type="Resource" id="Resource_eic81"]
+script = ExtResource("4_v2deu")
+formula = "hustle"
+metadata/_custom_type_script = "uid://cgrxhw8vqenhu"
+
+[sub_resource type="Resource" id="Resource_tl0ml"]
+script = ExtResource("3_v2deu")
+condition_resource = SubResource("Resource_ydfdx")
+stacks_calculator = SubResource("Resource_eic81")
+target_type = 4
+animation_type = 4
+metadata/_custom_type_script = "uid://dm2bmau6ctnm8"
+
+[resource]
+script = ExtResource("2_k2cgg")
+card_name = "Cool Head"
+type = 2
+rarity = 1
+actions = Array[ExtResource("1_ee2k4")]([SubResource("Resource_tl0ml")])
+exhaust = true
+metadata/_custom_type_script = "uid://0gsjrx47no8b"

@@ -1,0 +1,29 @@
+[gd_resource type="Resource" script_class="CardData" load_steps=7 format=3 uid="uid://du7d8l5vkcmmf"]
+
+[ext_resource type="Script" uid="uid://dhxff5egnsgrv" path="res://Scripts/action.gd" id="1_bupgk"]
+[ext_resource type="Script" uid="uid://0gsjrx47no8b" path="res://Scripts/card_data.gd" id="2_7lhom"]
+[ext_resource type="Script" uid="uid://d0hdj6yes681x" path="res://Scripts/damage_buff.gd" id="2_klar2"]
+[ext_resource type="Script" uid="uid://dm2bmau6ctnm8" path="res://Scripts/apply_condition_action.gd" id="3_umbtr"]
+
+[sub_resource type="Resource" id="Resource_0yh53"]
+script = ExtResource("2_klar2")
+condition_name = "Hype"
+stacks = -1
+show_stacks = true
+is_keyword = true
+metadata/_custom_type_script = "uid://d0hdj6yes681x"
+
+[sub_resource type="Resource" id="Resource_bofms"]
+script = ExtResource("3_umbtr")
+condition_resource = SubResource("Resource_0yh53")
+target_type = 1
+metadata/_custom_type_script = "uid://dm2bmau6ctnm8"
+
+[resource]
+script = ExtResource("2_7lhom")
+card_name = "Deafen"
+card_cost = 4
+type = 1
+rarity = 2
+actions = Array[ExtResource("1_bupgk")]([SubResource("Resource_bofms")])
+metadata/_custom_type_script = "uid://0gsjrx47no8b"

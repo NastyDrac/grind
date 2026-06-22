@@ -1,0 +1,59 @@
+[gd_resource type="Resource" script_class="EventData" load_steps=16 format=3 uid="uid://dcardsharp01"]
+
+[ext_resource type="Script" uid="uid://ccujthovl5rv7" path="res://Scripts/event_option.gd" id="1_opt"]
+[ext_resource type="Script" uid="uid://c8bk1dof3250" path="res://Scripts/event_data.gd" id="2_evt"]
+[ext_resource type="Script" uid="uid://chli81s5gxydu" path="res://Scripts/event_effect.gd" id="3_eff"]
+[ext_resource type="Script" uid="uid://ckmlhw3dcvb0k" path="res://Scripts/EventEffects/effect_mod_stat.gd" id="4_mod"]
+[ext_resource type="Script" uid="uid://cvilgkn5daoav" path="res://Scripts/EventEffects/effect_card_draft.gd" id="5_draft"]
+[ext_resource type="Script" uid="uid://vmf5r7vnle4e" path="res://Scripts/EventEffects/effect_add_card.gd" id="6_addc"]
+[ext_resource type="Script" uid="uid://vdwy0p0apc5" path="res://Scripts/EventEffects/effect_remove_card.gd" id="7_r6hye"]
+[ext_resource type="Resource" uid="uid://dwc1deadwt01" path="res://OOR Cards/Status/dead_weight.tres" id="9_dead"]
+
+[sub_resource type="Resource" id="Res_mod"]
+script = ExtResource("4_mod")
+modify_value = 1
+random_stat = true
+metadata/_custom_type_script = "uid://ckmlhw3dcvb0k"
+
+[sub_resource type="Resource" id="Res_optA"]
+script = ExtResource("1_opt")
+option_text = "Watch the table a while."
+result_text = "You say nothing and learn plenty — the flick of the wrist, the count of the deck, the tell he doesn't know he has. You walk off a shade sharper than you sat down."
+effects = Array[ExtResource("3_eff")]([SubResource("Res_mod")])
+metadata/_custom_type_script = "uid://ccujthovl5rv7"
+
+[sub_resource type="Resource" id="Res_draft"]
+script = ExtResource("5_draft")
+metadata/_custom_type_script = "uid://cvilgkn5daoav"
+
+[sub_resource type="Resource" id="Res_optB"]
+script = ExtResource("1_opt")
+option_text = "Buy into the game."
+result_text = "Coin on the felt, and the cards come kinder. You leave the table with something worth keeping and the rare good sense to quit while you're ahead."
+effects = Array[ExtResource("3_eff")]([SubResource("Res_draft")])
+gold_cost = 40
+metadata/_custom_type_script = "uid://ccujthovl5rv7"
+
+[sub_resource type="Resource" id="Resource_02s57"]
+script = ExtResource("7_r6hye")
+count = 2
+metadata/_custom_type_script = "uid://vdwy0p0apc5"
+
+[sub_resource type="Resource" id="Res_addc"]
+script = ExtResource("6_addc")
+card = ExtResource("9_dead")
+metadata/_custom_type_script = "res://Scripts/EventEffects/effect_add_card.gd"
+
+[sub_resource type="Resource" id="Res_optC"]
+script = ExtResource("1_opt")
+option_text = "Mark the deck."
+result_text = "He never sees you do it — or he's too well-mannered to say so. You leave with a fine prize tucked in your coat and one slick, worthless card you'll be cursing every time it surfaces at precisely the wrong moment."
+effects = Array[ExtResource("3_eff")]([SubResource("Resource_02s57"), SubResource("Res_addc")])
+metadata/_custom_type_script = "uid://ccujthovl5rv7"
+
+[resource]
+script = ExtResource("2_evt")
+event_title = "The Card Sharp"
+event_description = "A man with too many rings and not nearly enough tells is dealing to nobody in particular at a crooked little table. 'Friend,' he says without looking up, 'you have the look of a soul who appreciates a favorable arrangement. I deal in opportunity — the genuine, unvarnished article — and I find myself presently of a generous disposition. Pull up a chair. The house, on this rare and fleeting occasion, is feelin' charitable.'"
+options = Array[ExtResource("1_opt")]([SubResource("Res_optA"), SubResource("Res_optB"), SubResource("Res_optC")])
+metadata/_custom_type_script = "uid://c8bk1dof3250"

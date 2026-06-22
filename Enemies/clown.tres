@@ -1,23 +1,23 @@
-[gd_resource type="Resource" script_class="EnemyData" load_steps=6 format=3 uid="uid://cl0wnaaa1aaa1"]
+[gd_resource type="Resource" script_class="EnemyData" load_steps=7 format=3 uid="uid://cl0wnaaa1aaa1"]
 
 [ext_resource type="Script" uid="uid://b1ogi3xh5xakp" path="res://Scripts/condition.gd" id="1_cl"]
+[ext_resource type="Texture2D" uid="uid://k61vja8o7hkl" path="res://Art/Icons/DeathRattle.png" id="2_3ljph"]
 [ext_resource type="Texture2D" uid="uid://b2rjhiy4rifig" path="res://icon.svg" id="2_cl"]
 [ext_resource type="Script" uid="uid://do7yj12cpcfq4" path="res://Scripts/trumpeteer.gd" id="3_cl"]
 [ext_resource type="Script" uid="uid://tnxg66jw03v3" path="res://Scripts/enemy_data.gd" id="4_cl"]
 
 [sub_resource type="Resource" id="Resource_cl"]
 script = ExtResource("3_cl")
-condition_name = "Honk"
+condition_name = "Death Rattle"
 stacks = 2
-icon = ExtResource("2_cl")
+icon = ExtResource("2_3ljph")
 metadata/_custom_type_script = "uid://do7yj12cpcfq4"
 
 [resource]
 script = ExtResource("4_cl")
 enemy_name = "The Clown"
 texture = ExtResource("2_cl")
-min_health = 6
-max_health = 10
+min_health = 7
 damage = 2
 move_speed = 2
 conditions = Array[ExtResource("1_cl")]([SubResource("Resource_cl")])

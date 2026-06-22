@@ -1,8 +1,7 @@
-[gd_resource type="Resource" script_class="EventData" load_steps=15 format=3 uid="uid://dl83c5o7wxf4p"]
+[gd_resource type="Resource" script_class="EventData" load_steps=14 format=3 uid="uid://dl83c5o7wxf4p"]
 
 [ext_resource type="Script" uid="uid://ccujthovl5rv7" path="res://Scripts/event_option.gd" id="1_r6vbk"]
 [ext_resource type="Script" uid="uid://c8bk1dof3250" path="res://Scripts/event_data.gd" id="2_o1fic"]
-[ext_resource type="Script" uid="uid://tnxg66jw03v3" path="res://Scripts/enemy_data.gd" id="3_cxpmo"]
 [ext_resource type="Script" uid="uid://chli81s5gxydu" path="res://Scripts/event_effect.gd" id="3_v6gwo"]
 [ext_resource type="Script" uid="uid://ckmlhw3dcvb0k" path="res://Scripts/EventEffects/effect_mod_stat.gd" id="4_ma4jp"]
 [ext_resource type="Script" uid="uid://b2h1ochum01o" path="res://Scripts/stat.gd" id="5_wmdkq"]

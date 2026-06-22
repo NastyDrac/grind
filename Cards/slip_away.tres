@@ -1,0 +1,40 @@
+[gd_resource type="Resource" script_class="CardData" load_steps=10 format=3 uid="uid://cdrftslip001"]
+
+[ext_resource type="Script" uid="uid://dhxff5egnsgrv" path="res://Scripts/action.gd" id="1_action"]
+[ext_resource type="Script" uid="uid://0gsjrx47no8b" path="res://Scripts/card_data.gd" id="2_carddata"]
+[ext_resource type="Script" uid="uid://px415e6h6tao" path="res://Scripts/block_action.gd" id="3_block"]
+[ext_resource type="Script" uid="uid://cgrxhw8vqenhu" path="res://Scripts/ValueCalculator.gd" id="4_calc"]
+[ext_resource type="Script" uid="uid://c3g4jmcp7xiqk" path="res://Scripts/pushpull_action.gd" id="5_push"]
+
+[sub_resource type="Resource" id="Calc_blk"]
+script = ExtResource("4_calc")
+formula = "hustle"
+metadata/_custom_type_script = "uid://cgrxhw8vqenhu"
+
+[sub_resource type="Resource" id="Act_block"]
+script = ExtResource("3_block")
+block_calculator = SubResource("Calc_blk")
+target_type = 4
+animation_type = 4
+metadata/_custom_type_script = "uid://px415e6h6tao"
+
+[sub_resource type="Resource" id="Calc_dist"]
+script = ExtResource("4_calc")
+formula = "2"
+metadata/_custom_type_script = "uid://cgrxhw8vqenhu"
+
+[sub_resource type="Resource" id="Act_push"]
+script = ExtResource("5_push")
+distance_calculator = SubResource("Calc_dist")
+target_type = 1
+animation_type = 4
+metadata/_custom_type_script = "uid://c3g4jmcp7xiqk"
+
+[resource]
+script = ExtResource("2_carddata")
+card_name = "Slip Away"
+card_cost = 1
+type = 1
+rarity = 1
+actions = Array[ExtResource("1_action")]([SubResource("Act_block"), SubResource("Act_push")])
+metadata/_custom_type_script = "uid://0gsjrx47no8b"

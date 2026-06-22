@@ -41,7 +41,14 @@ func _get_existing_thorns(who) -> ThornsCondition:
 func react_to_attacker(attacker) -> void:
 	if stacks <= 0 or damage <= 0:
 		return
-	if attacker and is_instance_valid(attacker) and attacker.has_method("take_damgage"):
+	if not (attacker and is_instance_valid(attacker)):
+		return
+	# Reflect with NO source: a sourceless hit doesn't trigger the recipient's
+	# own react_to_attacker, so thorns-on-player and thorns-on-enemy can't loop.
+	# take_hit now exists on both entities; take_damgage is a legacy fallback.
+	if attacker.has_method("take_hit"):
+		attacker.take_hit(null, damage)
+	elif attacker.has_method("take_damgage"):
 		attacker.take_damgage(damage)
 
 ## End of each enemy turn: burn one turn of duration; remove at zero.

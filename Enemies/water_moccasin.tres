@@ -8,8 +8,8 @@
 script = ExtResource("1_wm")
 enemy_name = "The Water Moccasin"
 texture = ExtResource("3_wm")
-min_health = 5
-max_health = 8
+min_health = 6
+max_health = 9
 damage = 4
 move_speed = 2
 attack_range = 1

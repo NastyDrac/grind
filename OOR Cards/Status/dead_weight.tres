@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="CardData" load_steps=2 format=3 uid="uid://dwc1deadwt01"]
+
+[ext_resource type="Script" uid="uid://0gsjrx47no8b" path="res://Scripts/card_data.gd" id="1_cd"]
+
+[resource]
+script = ExtResource("1_cd")
+card_name = "Dead Weight"
+card_cost = 1
+type = 3
+rarity = 0
+actions = Array[Object]([])
+exhaust = false
+fickle = false
+volatile = false
+metadata/_custom_type_script = "uid://0gsjrx47no8b"

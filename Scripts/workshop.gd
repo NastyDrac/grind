@@ -253,6 +253,10 @@ func _show_stat_phase(token_index: int) -> void:
 # ─── Apply ──────────────────────────────────────────────────────────────────────
 
 func _apply_retune(token_index: int, target: String) -> void:
+	# Telemetry: capture the before→after term BEFORE retune_token mutates it.
+	var _old_term : String = str(_picker_calc.value_tokens()[token_index].text)
+	Global.card_workshopped.emit(_picker_card.card_name, "%s→%s" % [_old_term, target])
+
 	_picker_calc.retune_token(token_index, target)
 	_picker_card.modified = true
 	_close_picker()

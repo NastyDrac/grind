@@ -1,0 +1,10 @@
+[gd_resource type="Resource" script_class="HeatCurse" load_steps=2 format=3 uid="uid://dwc2heatcs01"]
+
+[ext_resource type="Script" uid="uid://dluo7b273d1yw" path="res://Scripts/heat_curse.gd" id="1_hc"]
+
+[resource]
+script = ExtResource("1_hc")
+duration_combats = 2
+condition_name = "Heat-Drawn"
+description = "The air runs hot. +2 opening noise and +1 noise per turn. Lasts 2 combats."
+show_stacks = true

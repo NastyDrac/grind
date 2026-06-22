@@ -44,6 +44,7 @@ var is_passing_time := false
 
 # Targeting state
 var is_targeting : bool = false
+var _shadow_committed : bool = false  # true once a Shadow chain has landed its first hit
 var frozen_card_position : Vector2
 var frozen_card_scale : Vector2
 var current_action : Action
@@ -534,6 +535,7 @@ func play_card(card: Card):
 	store_target_type = Action.TargetType.SINGLE_ENEMY
 	stored_max_range = 0
 	current_action_index = 0
+	_shadow_committed = false
 	action_queue.clear()  # Clear the action queue
 	
 	# Start collecting targets for all actions
@@ -588,7 +590,15 @@ func _collect_targets_for_next_action():
 
 func _execute_queued_non_card_actions():
 	"""Execute all non-card actions in the queue, then continue collecting targets"""
-	for action_data in action_queue:
+	# Snapshot and clear the shared queue up front. The timer await below suspends
+	# this function, and during that pause action_queue can be mutated or this
+	# function re-entered — iterating it directly then went out of bounds. Working
+	# from a stable local copy makes each run self-contained.
+	var queued : Array = action_queue.duplicate()
+	action_queue.clear()
+	
+	for idx in range(queued.size()):
+		var action_data = queued[idx]
 		var action = action_data["action"]
 		var targets = action_data["targets"]
 		
@@ -596,17 +606,22 @@ func _execute_queued_non_card_actions():
 			action.player = run_manager.player
 		
 		# Fire animation+damage without awaiting — damage still lands after the
-		# animation internally, but the card handler moves on immediately so
-		# the card is discarded and enemies spawn without delay.
+		# animation internally, and the card handler moves on so the card discards
+		# and enemies spawn without delay.
 		if targets.is_empty():
 			action.play_animation_and_execute(run_manager.player)
 		else:
 			for i in range(targets.size()):
 				var target = targets[i]
 				action.play_animation_and_execute(target)
-	
-	# Clear executed actions from queue
-	action_queue.clear()
+		
+		# A movement action (e.g. a pull) gets a short, bounded beat before the
+		# NEXT action runs, so its animation + the enemy's slide finish first. Only
+		# between actions — never after the last. A SceneTreeTimer always fires, so
+		# the queue can never stall here.
+		var is_last : bool = idx == queued.size() - 1
+		if not is_last and action.blocks_until_resolved():
+			await get_tree().create_timer(maxf(0.0, action.get_resolve_delay())).timeout
 	
 	# Rearrange hand (cards may have been drawn)
 	arrange_cards()
@@ -684,6 +699,16 @@ func _execute_all_queued_actions():
 func _can_reuse_targets(action : Action) -> bool:
 	if stored_targets.is_empty():
 		return false
+	# Explicit opt-in flag.
+	if action.reuse_previous_target:
+		return true
+	# A player-targeting action with no reach of its own (max_range <= 0) literally
+	# can't select a target — range(1, 1) makes nothing selectable — so it MUST
+	# reuse the previous one. This is what lets a pull (range 5) hand its target to
+	# a follow-up melee hit (range 0) without a second prompt, even if the
+	# reuse_previous_target export didn't load from the .tres.
+	if action.requires_player_target() and action.max_range <= 0:
+		return true
 	if action.target_type != store_target_type:
 		return false
 	if action.max_range != stored_max_range:
@@ -712,6 +737,12 @@ func _on_targets_confirmed(targets: Array[Enemy]):
 	if targeting_arrow:
 		targeting_arrow.hide_arrow()
 	
+	# Shadow Strike resolves interactively: hit the chosen target, and if the
+	# blow is lethal, re-open targeting so the player can strike again.
+	if current_action and current_action.has_method("chains_on_kill") and current_action.chains_on_kill():
+		await _resolve_shadow_chain(targets)
+		return
+
 	stored_targets.assign(targets)
 	store_target_type = current_action.target_type
 	stored_max_range = current_action.max_range
@@ -725,11 +756,82 @@ func _on_targets_confirmed(targets: Array[Enemy]):
 	current_action_index += 1
 	await _collect_targets_for_next_action()
 
+func _resolve_shadow_chain(targets: Array) -> void:
+	# Pick the first living enemy from the confirmed selection.
+	var target = null
+	for t in targets:
+		if is_instance_valid(t):
+			target = t
+			break
+	if target == null:
+		await _end_shadow_chain()
+		return
+
+	if not current_action.player:
+		current_action.player = run_manager.player
+
+	# Land the hit, then check whether it was lethal.
+	await current_action.play_animation_and_execute(target)
+	_shadow_committed = true
+
+	var killed = not is_instance_valid(target) or target.current_health <= 0
+
+	# Strike again ONLY if the blow was lethal AND a living enemy the player
+	# could actually reach still remains. Otherwise the chain ends and the card
+	# finalises — this is what guarantees we never strand the player in an
+	# empty targeting prompt.
+	if killed and not _living_targets_in_range(current_action.max_range).is_empty():
+		_start_targeting_for_action(current_action)
+		return
+
+	await _end_shadow_chain()
+
+
+## Enemies that are alive, valid, and within `reach` (reach <= 0 means no
+## limit, matching the targeting rules). Dead-but-not-yet-freed enemies are
+## excluded via both the _is_dead flag and the health check, so a fresh kill
+## never counts as a remaining target.
+func _living_targets_in_range(reach: int) -> Array:
+	var result : Array = []
+	# The chain may have just killed the LAST enemy, which can end combat and tear
+	# down the range manager. Bail safely so the chain simply finishes instead of
+	# calling get_all_enemies() on a null manager.
+	if not run_manager or not run_manager.range_manager:
+		return result
+	for e in run_manager.range_manager.get_all_enemies():
+		if not is_instance_valid(e):
+			continue
+		if e._is_dead or e.current_health <= 0:
+			continue
+		if reach > 0 and e.get_current_range() > reach:
+			continue
+		result.append(e)
+	return result
+
+
+func _end_shadow_chain() -> void:
+	_shadow_committed = false
+	# Force a clean exit from targeting no matter how the chain ended, so the
+	# hand re-arranges and cards become playable again. arrange_cards() refuses
+	# to run while is_targeting is true, which is what froze the hand.
+	is_targeting = false
+	if targeting_arrow:
+		targeting_arrow.hide_arrow()
+	current_action_index += 1
+	await _collect_targets_for_next_action()
+
+
 func _on_targeting_cancelled():
 	is_targeting = false
 	
 	if targeting_arrow:
 		targeting_arrow.hide_arrow()
+	
+	# A Shadow chain that has already drawn blood is committed: cancelling a
+	# follow-up just ends the chain and finishes the card; it must NOT refund.
+	if _shadow_committed:
+		await _end_shadow_chain()
+		return
 	
 	# Clear the action queue - nothing should execute
 	action_queue.clear()

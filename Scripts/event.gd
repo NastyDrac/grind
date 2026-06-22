@@ -90,6 +90,10 @@ func _on_option_selected(option: EventOption):
 	current_option = option
 	option_selected.emit(option)
 
+	# Telemetry: which event and which option the player chose.
+	Global.event_option_chosen.emit(
+		current_event.event_title if current_event else "", option.option_text)
+
 	if option.gold_cost > 0:
 		run_manager.character.gold -= option.gold_cost
 		run_manager.ui_bar.set_gold()
@@ -141,10 +145,15 @@ func _finish_event(option: EventOption):
 
 
 func _start_combat(option: EventOption):
-	if option.combat_horde.size() > 0:
-		run_manager.horde = option.combat_horde.duplicate()
-	if option.win_con:
-		run_manager.win_condition = option.win_con
-	run_manager.initial_enemy_count = int(run_manager.initial_enemy_count * option.combat_difficulty_modifier)
+	if option.combat_horde == null:
+		push_warning("EventOption.triggers_combat is on but combat_horde is null; skipping combat.")
+		event_completed.emit()
+		queue_free()
+		return
+
+	# Hand the fight to the RunManager, which launches it once this scene closes
+	# (see RunManager._on_event_completed). get_spawn_pool() is read there off the
+	# Horde, so the Array[HordeEnemy] / Array[EnemyData] mismatch is gone.
+	run_manager.queue_event_combat(option.combat_horde, option.combat_difficulty_modifier, option.win_con)
 	event_completed.emit()
 	queue_free()

@@ -52,8 +52,8 @@ func _process(_delta: float) -> void:
 		stacks_label.visible = false
 
 func update_display():
-	if condition and condition.icon:
-		texture = condition.icon
+	if condition and condition.get_icon():
+		texture = condition.get_icon()
 
 	if stacks_label:
 		if condition and condition.show_stacks:
@@ -104,8 +104,8 @@ func _populate_tooltip():
 	var name_node = tooltip_instance.get_node_or_null("MarginContainer/VBoxContainer/HBoxContainer/condition_name")
 	var desc_node = tooltip_instance.get_node_or_null("MarginContainer/VBoxContainer/condition_description")
 
-	if icon_node and condition.icon:
-		icon_node.texture = condition.icon
+	if icon_node and condition.get_icon():
+		icon_node.texture = condition.get_icon()
 
 	if name_node:
 		name_node.text = condition.get_condition_name()

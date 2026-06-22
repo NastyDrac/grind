@@ -1,0 +1,87 @@
+[gd_resource type="Resource" script_class="EventData" load_steps=29 format=3 uid="uid://bxe53wy1mu7mm"]
+
+[ext_resource type="Script" uid="uid://ccujthovl5rv7" path="res://Scripts/event_option.gd" id="1_k0b0n"]
+[ext_resource type="Script" uid="uid://chli81s5gxydu" path="res://Scripts/event_effect.gd" id="2_7khxb"]
+[ext_resource type="Script" uid="uid://b3mi542wlp4b0" path="res://Scripts/EventEffects/effect_cost_gold.gd" id="3_qjvjd"]
+[ext_resource type="Script" uid="uid://b1ogi3xh5xakp" path="res://Scripts/condition.gd" id="4_rte3y"]
+[ext_resource type="Resource" uid="uid://c2xrf1pv6gxsb" path="res://Thingys/plot_armor.tres" id="5_1xveg"]
+[ext_resource type="Resource" uid="uid://ciod8shdudtso" path="res://Thingys/newtons_cradle.tres" id="6_54w2n"]
+[ext_resource type="Resource" uid="uid://bar2msv83fqy5" path="res://Thingys/montage.tres" id="7_2vhw8"]
+[ext_resource type="Resource" uid="uid://cu07w36tcqxpg" path="res://Thingys/bullet_time.tres" id="8_kyjpe"]
+[ext_resource type="Resource" uid="uid://mheuqibxxawq" path="res://Thingys/broom_of_reform.tres" id="9_d61qd"]
+[ext_resource type="Script" uid="uid://cj25eabp5jigj" path="res://Scripts/EventEffects/effect_add_thingy.gd" id="10_jgape"]
+[ext_resource type="Script" uid="uid://tnxg66jw03v3" path="res://Scripts/enemy_data.gd" id="11_iivak"]
+[ext_resource type="Script" uid="uid://bl2ttj5d643xd" path="res://Scripts/horde_enemy.gd" id="12_28fev"]
+[ext_resource type="Resource" uid="uid://byxygfcotqt5s" path="res://Enemies/berzerker.tres" id="13_y5guh"]
+[ext_resource type="Resource" uid="uid://dn2i7s3fx05aw" path="res://Enemies/brawler.tres" id="14_c1jmh"]
+[ext_resource type="Resource" uid="uid://bfr5bliq5oiih" path="res://Enemies/hob_goblin.tres" id="15_3esly"]
+[ext_resource type="Script" uid="uid://b6h8ntxfaauo5" path="res://Scripts/horde.gd" id="16_7ix01"]
+[ext_resource type="Script" uid="uid://dbrkkfbjmvvar" path="res://Scripts/defeat_x_enemies.gd" id="17_ad30t"]
+[ext_resource type="Script" uid="uid://c8bk1dof3250" path="res://Scripts/event_data.gd" id="18_7yfxu"]
+
+[sub_resource type="Resource" id="Resource_4nf8t"]
+script = ExtResource("3_qjvjd")
+amount = 100
+metadata/_custom_type_script = "uid://b3mi542wlp4b0"
+
+[sub_resource type="Resource" id="Resource_1miy6"]
+script = ExtResource("10_jgape")
+random_pool = Array[ExtResource("4_rte3y")]([ExtResource("5_1xveg"), ExtResource("6_54w2n"), ExtResource("7_2vhw8"), ExtResource("8_kyjpe"), ExtResource("9_d61qd")])
+metadata/_custom_type_script = "uid://cj25eabp5jigj"
+
+[sub_resource type="Resource" id="Resource_2wcht"]
+script = ExtResource("1_k0b0n")
+option_text = "Fair trade"
+result_text = "You know a good deal when you see one."
+effects = Array[ExtResource("2_7khxb")]([SubResource("Resource_4nf8t"), SubResource("Resource_1miy6")])
+metadata/_custom_type_script = "uid://ccujthovl5rv7"
+
+[sub_resource type="Resource" id="Resource_4oxmw"]
+script = ExtResource("12_28fev")
+enemy = ExtResource("13_y5guh")
+noise_cost = 2
+metadata/_custom_type_script = "uid://bl2ttj5d643xd"
+
+[sub_resource type="Resource" id="Resource_mf458"]
+script = ExtResource("12_28fev")
+enemy = ExtResource("14_c1jmh")
+noise_cost = 3
+metadata/_custom_type_script = "uid://bl2ttj5d643xd"
+
+[sub_resource type="Resource" id="Resource_dvyrr"]
+script = ExtResource("12_28fev")
+enemy = ExtResource("15_3esly")
+noise_cost = 2
+metadata/_custom_type_script = "uid://bl2ttj5d643xd"
+
+[sub_resource type="Resource" id="Resource_oq6bj"]
+script = ExtResource("16_7ix01")
+recipe_name = "3 Finger Gang"
+enemy_entries = Array[ExtResource("12_28fev")]([SubResource("Resource_4oxmw"), SubResource("Resource_mf458"), SubResource("Resource_dvyrr")])
+metadata/_custom_type_script = "uid://b6h8ntxfaauo5"
+
+[sub_resource type="Resource" id="Resource_6q3hq"]
+script = ExtResource("10_jgape")
+random_pool = Array[ExtResource("4_rte3y")]([ExtResource("9_d61qd"), ExtResource("8_kyjpe"), ExtResource("7_2vhw8"), ExtResource("6_54w2n"), ExtResource("5_1xveg")])
+metadata/_custom_type_script = "uid://cj25eabp5jigj"
+
+[sub_resource type="Resource" id="Resource_afakb"]
+script = ExtResource("17_ad30t")
+metadata/_custom_type_script = "uid://dbrkkfbjmvvar"
+
+[sub_resource type="Resource" id="Resource_kch7q"]
+script = ExtResource("1_k0b0n")
+option_text = "Take it by force."
+result_text = "Stolen goods stay stolen no matter how many times they are taken.  Three finger Lou is easily intimidated.    But what are all these other things emerging from the shadows?"
+effects = Array[ExtResource("2_7khxb")]([SubResource("Resource_6q3hq")])
+triggers_combat = true
+combat_horde = SubResource("Resource_oq6bj")
+win_con = SubResource("Resource_afakb")
+metadata/_custom_type_script = "uid://ccujthovl5rv7"
+
+[resource]
+script = ExtResource("18_7yfxu")
+event_title = "Three Finger Lou"
+event_description = "You are approached by one shady individual from a darkened alley.  \"Care to see my wares, Stranger?\" He whispers.  He opens his long coat to reveal something new and shiney."
+options = Array[ExtResource("1_k0b0n")]([SubResource("Resource_2wcht"), SubResource("Resource_kch7q")])
+metadata/_custom_type_script = "uid://c8bk1dof3250"

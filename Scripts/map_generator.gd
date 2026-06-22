@@ -9,6 +9,19 @@ class_name MapGenerator
 @export var left_margin    : float = 120.0
 @export var top_margin     : float = 80.0
 
+# ── Shape variation ────────────────────────────────────────────────────────────
+# These break the rigid columns×rows rectangle into a more organic silhouette.
+@export_group("Shape Variation")
+## Each non-boss column gets a random node count in [min_nodes_per_col, rows],
+## so the map's vertical density varies column to column.
+@export var min_nodes_per_col : int   = 2
+## How far a column's vertical centre may drift from the map centre (px). The
+## "spine" of the map meanders between columns instead of sitting in a flat band.
+@export var column_drift      : float = 70.0
+## Per-column horizontal jitter (px) so columns aren't perfectly evenly spaced.
+@export var column_x_jitter   : float = 26.0
+@export_group("")
+
 # ── Road appearance ────────────────────────────────────────────────────────────
 ## Width of the main road surface in pixels
 @export var road_width     : float = 18.0
@@ -458,32 +471,54 @@ func _dist_pt_seg(p: Vector2, a: Vector2, b: Vector2) -> float:
 # ─────────────────────────────────────────────────────────────────────────────
 
 func _calculate_map_size() -> void:
+	# Pad for the vertical spine drift and the accumulated per-column x jitter so
+	# nodes always stay inside the scrollable bounds.
 	_map_size = Vector2(
-		left_margin + (columns - 1) * node_spacing_x + left_margin,
-		top_margin  + (rows   - 1) * node_spacing_y  + top_margin)
+		left_margin + (columns - 1) * node_spacing_x + left_margin
+			+ (columns - 1) * column_x_jitter,
+		top_margin  + (rows   - 1) * node_spacing_y  + top_margin
+			+ 2.0 * column_drift)
 
 func _generate_nodes() -> void:
 	_grid = []; _all_nodes = []
-	var hcol     := node_spacing_x * 0.30  # reduced jitter — columns stay readable
 	var boss_col := columns - 1
+	var mid_y    := _map_size.y * 0.5
+
+	# The vertical "spine" meanders via a bounded random walk; the horizontal
+	# position drifts off the perfect grid. Together these de-uniform the shape.
+	var spine_y := mid_y
+	var col_x   := left_margin
+	var lo      := clampi(min_nodes_per_col, 1, rows)
 
 	for c in range(columns):
 		var col_arr : Array = []
+
+		if c > 0:
+			col_x += node_spacing_x + _rng.randf_range(-column_x_jitter, column_x_jitter)
+
 		if c == boss_col:
+			# Boss sits on the map centre line so the run always ends centred.
 			var boss = _create_node(MapNode.NodeType.BOSS, c, 0)
 			var half = MapNode.BOSS_NODE_RADIUS + 4.0
-			boss.position = Vector2(
-				left_margin + c * node_spacing_x - half,
-				_map_size.y * 0.5 - half)
+			boss.position = Vector2(col_x - half, mid_y - half)
 			add_child(boss); col_arr.append(boss); _all_nodes.append(boss)
 		else:
-			for r in range(rows):
+			# Drift the spine, then distribute this column's nodes around it.
+			spine_y = clampf(spine_y + _rng.randf_range(-column_drift, column_drift),
+							 mid_y - column_drift, mid_y + column_drift)
+
+			var count   := _rng.randi_range(lo, rows)
+			var total_h  := float(count - 1) * node_spacing_y
+			var start_y  := spine_y - total_h * 0.5
+
+			for r in range(count):
 				var node := _create_node(_pick_node_type(c), c, r)
+				var ny := start_y + r * node_spacing_y \
+						+ _rng.randf_range(-node_spacing_y * 0.22, node_spacing_y * 0.22)
+				ny = clampf(ny, top_margin, _map_size.y - top_margin)
 				var pos := Vector2(
-					left_margin + c * node_spacing_x
-						+ _rng.randf_range(-hcol * 0.4, hcol * 0.4),
-					top_margin + r * node_spacing_y
-						+ _rng.randf_range(-node_spacing_y * 0.20, node_spacing_y * 0.20))
+					col_x + _rng.randf_range(-node_spacing_x * 0.12, node_spacing_x * 0.12),
+					ny)
 				node.position = pos - Vector2(MapNode.NODE_RADIUS + 4, MapNode.NODE_RADIUS + 4)
 				add_child(node); col_arr.append(node); _all_nodes.append(node)
 		_grid.append(col_arr)
@@ -501,14 +536,40 @@ func _generate_paths() -> void:
 	for c in range(columns - 1):
 		var cur = _grid[c].duplicate()
 		var nxt = _grid[c + 1].duplicate()
+		if cur.is_empty() or nxt.is_empty():
+			continue
 		cur.sort_custom(func(a, b): return _node_centre(a).y < _node_centre(b).y)
 		nxt.sort_custom(func(a, b): return _node_centre(a).y < _node_centre(b).y)
+
+		# 1) Every current node gets a forward edge. Proportional mapping keeps
+		#    the fan tidy even when the two columns have different node counts.
 		for i in range(cur.size()):
-			_add_edge(cur[i], nxt[i % nxt.size()])
+			var j := int(round(float(i) / maxf(cur.size() - 1, 1) * (nxt.size() - 1)))
+			_add_edge(cur[i], nxt[j])
+
+		# 2) Every NEXT node must have at least one incoming edge, or it'd be
+		#    unreachable. Hook any orphan to the nearest current node by y.
+		for j in range(nxt.size()):
+			var has_incoming := false
+			for n in cur:
+				if n.next_nodes.has(nxt[j]):
+					has_incoming = true
+					break
+			if not has_incoming:
+				var best : MapNode = cur[0]
+				var best_d := absf(_node_centre(cur[0]).y - _node_centre(nxt[j]).y)
+				for n in cur:
+					var d := absf(_node_centre(n).y - _node_centre(nxt[j]).y)
+					if d < best_d:
+						best_d = d; best = n
+				_add_edge(best, nxt[j])
+
+		# 3) Occasional extra cross-link for branching texture.
 		for i in range(cur.size()):
-			if _rng.randf() < 0.38:
+			if _rng.randf() < 0.34:
+				var k := int(round(float(i) / maxf(cur.size() - 1, 1) * (nxt.size() - 1)))
 				var offset := 1 if _rng.randf() < 0.5 else -1
-				_add_edge(cur[i], nxt[clampi(i + offset, 0, nxt.size() - 1)])
+				_add_edge(cur[i], nxt[clampi(k + offset, 0, nxt.size() - 1)])
 
 func _add_edge(a: MapNode, b: MapNode) -> void:
 	if a.next_nodes.has(b): return

@@ -8,8 +8,8 @@
 script = ExtResource("1_st")
 enemy_name = "The Snapping Turtle"
 texture = ExtResource("3_st")
-min_health = 22
-max_health = 28
+min_health = 25
+max_health = 32
 damage = 8
 move_speed = 1
 attack_range = 1

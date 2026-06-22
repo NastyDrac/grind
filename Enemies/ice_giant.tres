@@ -8,8 +8,8 @@
 script = ExtResource("1_xh5ad")
 enemy_name = "Ice Giant"
 texture = ExtResource("5_pheru")
-min_health = 10
-max_health = 14
+min_health = 12
+max_health = 16
 damage = 6
 noise_cost = 3
 metadata/_custom_type_script = "uid://tnxg66jw03v3"

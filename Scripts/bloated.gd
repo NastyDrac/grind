@@ -4,7 +4,7 @@ class_name Bloated
 ## Guards the death explosion so it triggers exactly once, even if the damage it
 ## deals causes further enemy_dies emissions.
 var _exploded : bool = false
-
+const ICON := preload("res://Art/Icons/InfectedIcon.png")
 func apply_condition(who, condition: Condition):
 	entity = who
 	

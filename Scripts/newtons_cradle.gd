@@ -12,9 +12,9 @@ class_name NewtonsCradle
 # -- Configuration -------------------------------------------------------------
 
 ## Damage dealt to each enemy in the swept ranges.
-## Formula can use: swag, guts, bang, hustle, marbles, mojo
+## Formula can use: swag, guts, heat, hustle, marbles, mojo
 @export var damage_calculator: ValueCalculator
-
+const ICON := preload("res://Art/Icons/NewtonCradle.png")
 # -- Combat lifecycle ----------------------------------------------------------
 
 func setup(who, rm) -> void:

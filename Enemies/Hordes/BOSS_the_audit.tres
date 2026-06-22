@@ -1,0 +1,43 @@
+[gd_resource type="Resource" script_class="Horde" load_steps=14 format=3 uid="uid://btheaud1tb0ss"]
+
+[ext_resource type="Script" uid="uid://b6h8ntxfaauo5" path="res://Scripts/horde.gd" id="1_horde"]
+[ext_resource type="Script" uid="uid://tnxg66jw03v3" path="res://Scripts/enemy_data.gd" id="1_kxd4l"]
+[ext_resource type="Script" uid="uid://bl2ttj5d643xd" path="res://Scripts/horde_enemy.gd" id="2_hde"]
+[ext_resource type="Resource" uid="uid://baud1t0rb0ss1" path="res://Enemies/bosses/auditor.tres" id="3_boss"]
+[ext_resource type="Resource" uid="uid://rwhy6iobb6it" path="res://Enemies/goon.tres" id="4_goon"]
+[ext_resource type="Resource" uid="uid://b1ce613eo25tp" path="res://Enemies/sniper.tres" id="5_sniper"]
+[ext_resource type="Resource" uid="uid://cah0ikljw5jep" path="res://Enemies/devil_office_worker.tres" id="6_acct"]
+[ext_resource type="Script" uid="uid://dbrkkfbjmvvar" path="res://Scripts/defeat_x_enemies.gd" id="7_wincon"]
+
+[sub_resource type="Resource" id="HE_BOSS"]
+script = ExtResource("2_hde")
+enemy = ExtResource("3_boss")
+noise_cost = 6
+
+[sub_resource type="Resource" id="HE_GOON"]
+script = ExtResource("2_hde")
+enemy = ExtResource("4_goon")
+noise_cost = 2
+
+[sub_resource type="Resource" id="HE_SNIPER"]
+script = ExtResource("2_hde")
+enemy = ExtResource("5_sniper")
+noise_cost = 3
+
+[sub_resource type="Resource" id="HE_ACCT"]
+script = ExtResource("2_hde")
+enemy = ExtResource("6_acct")
+noise_cost = 2
+
+[sub_resource type="Resource" id="WinCon_audit"]
+script = ExtResource("7_wincon")
+metadata/_custom_type_script = "uid://dbrkkfbjmvvar"
+
+[resource]
+script = ExtResource("1_horde")
+recipe_name = "The Audit"
+enemy_entries = Array[ExtResource("2_hde")]([SubResource("HE_BOSS"), SubResource("HE_GOON"), SubResource("HE_SNIPER"), SubResource("HE_ACCT")])
+rewards = Array[int]([0, 1])
+win_con = SubResource("WinCon_audit")
+starting_noise = 4.0
+metadata/_custom_type_script = "uid://b6h8ntxfaauo5"

@@ -75,17 +75,31 @@ func set_data(enemy_data: EnemyData, spawn_range : int = 5):
 		for condition in data.conditions:
 			condition.apply_condition(self, condition)
 
-func take_damgage(amount : int):
+func take_hit(who, damage : int):
 	if _is_dead:
 		return
-	current_health -= amount
+	# Source-aware reactions (thorns / retaliate) fire on being attacked, even
+	# if the hit is later reduced to nothing — mirrors Character.take_hit().
+	# A null `who` (reflections, damage-over-time) skips this, which is exactly
+	# what stops two thorns-bearers from reflecting into each other forever.
+	if who and is_instance_valid(who):
+		for con in conditions:
+			if con.has_method("react_to_attacker"):
+				con.react_to_attacker(who)
+	current_health -= damage
 	for con : Condition in conditions:
 		if con.has_method("on_take_damage"):
-			con.on_take_damage(amount)
+			con.on_take_damage(damage)
 	set_health_bar()
 	Animations._flash_red(self, .2)
 	if current_health <= 0:
 		die()
+
+## Sourceless damage entry. Kept for every existing caller (turret, newtons_cradle,
+## broom_of_reform, burning, reflections) and so the long-standing name stays
+## valid. Forwards with no attacker, so it never triggers a react_to_attacker.
+func take_damgage(amount : int):
+	take_hit(null, amount)
 
 func die():
 	if _is_dead:
@@ -223,15 +237,23 @@ func get_attack_damage() -> int:
 func push(amount: int) -> void:
 	if amount == 0:
 		return
-	var ceiling := range_manager.current_max_range if (range_manager and range_manager.current_max_range > 0) else 9999
+	# Clamp to the playfield's farthest range (the same bound the enemy's own
+	# retreat uses), NOT the targeting reach — otherwise a push can shove an enemy
+	# into a range that has no bucket in the range manager and crash layout.
+	# MIN_RANGE keeps it out of range 0 (the player's slot).
+	var ceiling := (range_manager.enemies_by_range.size() - 1) if range_manager else 9999
 	var old_range := current_range
 	current_range = clampi(current_range + amount, MIN_RANGE, ceiling)
 	if old_range == current_range:
 		return   # fully clamped — no actual move, so emit nothing
-	if range_manager:
-		target_position = range_manager.get_position_for_enemy(self)
+	# Re-bucket into the new range FIRST: enemy_advanced drives the range manager
+	# to move us into the new range's list (creating it if needed). Reading the
+	# layout position before this could index a range bucket that doesn't exist
+	# yet — which is exactly the crash this ordering prevents.
 	Global.enemy_advanced.emit(self, old_range, current_range)
 	Global.enemy_player_moved.emit(self, old_range, current_range)
+	if range_manager:
+		target_position = range_manager.get_position_for_enemy(self)
 
 func get_current_range() -> int:
 	return current_range
@@ -388,9 +410,10 @@ func _show_enemy_tooltip():
 			var con_row := HBoxContainer.new()
 			con_row.add_theme_constant_override("separation", 4)
 
-			if con.icon:
+			var con_icon := con.get_icon()
+			if con_icon:
 				var icon_rect := TextureRect.new()
-				icon_rect.texture = con.icon
+				icon_rect.texture = con_icon
 				icon_rect.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
 				icon_rect.custom_minimum_size = Vector2(16, 16)
 				icon_rect.expand_mode = TextureRect.EXPAND_FIT_WIDTH_PROPORTIONAL

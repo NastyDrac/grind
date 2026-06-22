@@ -14,7 +14,7 @@ enemy = ExtResource("3_u2u86")
 [sub_resource type="Resource" id="HE_2"]
 script = ExtResource("hde_script")
 enemy = ExtResource("3_7p6vt")
-noise_cost = 2
+noise_cost = 3
 
 [sub_resource type="Resource" id="Resource_jc8i7"]
 script = ExtResource("8_lgte3")
@@ -27,4 +27,5 @@ enemy_entries = Array[ExtResource("hde_script")]([SubResource("HE_1"), SubResour
 max_column = 7
 rewards = Array[int]([0, 1])
 win_con = SubResource("Resource_jc8i7")
+starting_noise = 3.5
 metadata/_custom_type_script = "uid://b6h8ntxfaauo5"

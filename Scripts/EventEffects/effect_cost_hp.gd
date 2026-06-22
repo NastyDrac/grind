@@ -13,13 +13,15 @@ func execute(run_manager: RunManager, _parent: Node, done: Callable) -> void:
 		0,
 		run_manager.character.max_health.calculate(run_manager.player)
 	)
-	run_manager.ui_bar.set_health()
+	# Same guard as gold: no ui_bar outside combat.
+	if run_manager.ui_bar:
+		run_manager.ui_bar.set_health()
 	done.call()
 
 func get_description(run : RunManager) -> String:
 	if amount > 0:
-		return "Lose %s health." %amount
+		return "Lose %s health." % amount
 	elif amount < 0:
-		return "Gain %s health." %abs(amount)
+		return "Gain %s health." % abs(amount)
 	else:
 		return ""

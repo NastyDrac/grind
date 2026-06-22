@@ -7,8 +7,8 @@
 [resource]
 script = ExtResource("2_8nrnr")
 texture = ExtResource("3_8nrnr")
-min_health = 30
-max_health = 40
+min_health = 60
+max_health = 80
 damage = 9
 noise_cost = 5
 metadata/_custom_type_script = "uid://tnxg66jw03v3"

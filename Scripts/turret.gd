@@ -106,10 +106,18 @@ func _on_time_passed() -> void:
 			# Fire a projectile visual then apply damage once it arrives.
 			# Capture values now — target or stats may change by the time the
 			# animation finishes, so we freeze them in the closure.
+			if damage == null:
+				push_warning("Turret at range %d has no damage ValueCalculator." % assigned_range)
+				break
 			var hit_damage: int = damage.calculate(run_manager.player)
 			var anim_manager := get_tree().get_first_node_in_group("animation_manager") as AnimationManager
 			if anim_manager:
-				var on_hit := func(): target.take_damgage(hit_damage)
+				# The projectile lands a frame or two later; by then this enemy
+				# may already be dead (another stack/shot killed it) and freed.
+				# Guard before applying, or take_damgage() hits a freed instance.
+				var on_hit := func():
+					if is_instance_valid(target) and target.current_health > 0:
+						target.take_damgage(hit_damage)
 				anim_manager.fire_projectile(_sprite.global_position, target, on_hit)
-			else:
+			elif is_instance_valid(target) and target.current_health > 0:
 				target.take_damgage(hit_damage)

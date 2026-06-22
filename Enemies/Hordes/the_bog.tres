@@ -12,7 +12,6 @@
 [sub_resource type="Resource" id="HE_1"]
 script = ExtResource("hde_script")
 enemy = ExtResource("3_wm")
-noise_cost = 2
 
 [sub_resource type="Resource" id="HE_2"]
 script = ExtResource("hde_script")

@@ -22,3 +22,18 @@ signal item_dropped(item : Item, location : Vector2)
 
 #items actions
 signal item_picked_up(item : Item)
+
+# ── Telemetry / gameplay event signals ──────────────────────────────────────
+# Observed by the Telemetry autoload, and free for anything else to hook later.
+# Emit these at the relevant call sites; Telemetry writes them to per-run JSON.
+signal run_started(character_name: String, seed_val: int)
+signal run_ended(won: bool)
+signal fight_started(fight_name: String, fight_type: String, win_condition: String)
+signal fight_ended(won: bool)
+signal player_damaged(to_health: int, blocked: int, source: String)
+signal cards_offered(card_names: Array, context: String)
+signal card_selected(card_name: String, context: String)
+signal thingy_offered(names: Array, context: String)
+signal thingy_selected(thingy_name: String, context: String)
+signal event_option_chosen(event_name: String, option_text: String)
+signal card_workshopped(card_name: String, detail: String)

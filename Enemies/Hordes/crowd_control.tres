@@ -11,17 +11,17 @@
 [sub_resource type="Resource" id="HE_1"]
 script = ExtResource("hde_script")
 enemy = ExtResource("2_k3h35")
-noise_cost = 2
+noise_cost = 3
 
 [sub_resource type="Resource" id="HE_2"]
 script = ExtResource("hde_script")
 enemy = ExtResource("3_qydlk")
-noise_cost = 2
+noise_cost = 3
 
 [sub_resource type="Resource" id="HE_3"]
 script = ExtResource("hde_script")
 enemy = ExtResource("4_rvmed")
-noise_cost = 4
+noise_cost = 5
 
 [sub_resource type="Resource" id="Resource_qquoa"]
 script = ExtResource("6_0eb30")
@@ -35,4 +35,5 @@ min_column = 2
 max_column = 8
 rewards = Array[int]([0, 1])
 win_con = SubResource("Resource_qquoa")
+starting_noise = 4.5
 metadata/_custom_type_script = "uid://b6h8ntxfaauo5"

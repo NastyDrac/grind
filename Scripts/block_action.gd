@@ -25,7 +25,7 @@ func get_description_with_values(character: Variant) -> String:
 func get_card_text(character) -> String:
 	if not character or not block_calculator:
 		return "Block"
-	return "Gain §%d§ Block" % block_calculator.calculate(character)
+	return "Gain %s Block" % _cv(block_calculator.calculate(character), block_calculator.formula)
 
 
 func get_tooltip_text(character) -> String:

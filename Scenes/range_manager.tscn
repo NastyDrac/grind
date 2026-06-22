@@ -1,9 +1,10 @@
-[gd_scene load_steps=5 format=3 uid="uid://dr7da44fhrnr6"]
+[gd_scene load_steps=6 format=3 uid="uid://dr7da44fhrnr6"]
 
 [ext_resource type="Script" uid="uid://dwf57omdtsayx" path="res://Scripts/range_manager.gd" id="1_i32wm"]
 [ext_resource type="Texture2D" uid="uid://c5yrw4almrlyt" path="res://Art/Icons/NoiseIcon.png" id="3_3sn1v"]
 [ext_resource type="Texture2D" uid="uid://c7ks8q4t0tkw3" path="res://Art/Icons/VerminBar.png" id="3_07snb"]
 [ext_resource type="Texture2D" uid="uid://bc7pa6phewpss" path="res://Art/GrassBG2.png" id="4_07snb"]
+[ext_resource type="Script" uid="uid://bnc4c63cxprot" path="res://Scripts/bg_cover.gd" id="5_bgcov"]
 
 [node name="RangeManager" type="Node2D" node_paths=PackedStringArray("win_condition_bar", "win_condition_label", "noise_icon", "noise_meter_label", "camera")]
 script = ExtResource("1_i32wm")
@@ -21,14 +22,14 @@ passive_noise_per_turn = 0.5
 camera = NodePath("Camera2D")
 metadata/_custom_type_script = "uid://dwf57omdtsayx"
 
-[node name="GrassBg2" type="Sprite2D" parent="."]
-show_behind_parent = true
-position = Vector2(746, 350)
-texture = ExtResource("4_07snb")
-
 [node name="Camera2D" type="Camera2D" parent="."]
 position = Vector2(574, 300)
 zoom = Vector2(0.75, 0.75)
+
+[node name="background" type="Sprite2D" parent="Camera2D"]
+z_index = -10
+texture = ExtResource("4_07snb")
+script = ExtResource("5_bgcov")
 
 [node name="Sprite2D" type="Sprite2D" parent="Camera2D"]
 position = Vector2(706, -305)

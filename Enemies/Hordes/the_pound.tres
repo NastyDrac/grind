@@ -34,4 +34,5 @@ min_column = 2
 max_column = 8
 rewards = Array[int]([0, 1])
 win_con = SubResource("Resource_win")
+starting_noise = 3.4
 metadata/_custom_type_script = "uid://b6h8ntxfaauo5"

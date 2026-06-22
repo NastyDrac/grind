@@ -15,6 +15,7 @@ enemy = ExtResource("2_kestc")
 [sub_resource type="Resource" id="HE_2"]
 script = ExtResource("hde_script")
 enemy = ExtResource("3_1jdwj")
+noise_cost = 2
 
 [sub_resource type="Resource" id="HE_3"]
 script = ExtResource("hde_script")

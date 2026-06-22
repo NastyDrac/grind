@@ -21,6 +21,38 @@ enum TargetType {
 @export var target_type: TargetType = TargetType.SINGLE_ENEMY
 @export var max_range : int = 0
 
+## When true, this enemy-targeting action skips its own target prompt and reuses
+## the target(s) chosen by the previous targeting action on the same card — even
+## if their ranges differ. Use it for follow-ups like "pull the enemy in, THEN
+## hit it" so the player only picks a target once. Leave false (default) for the
+## first targeting action and for any action that should prompt for its own.
+@export var reuse_previous_target : bool = false
+
+## When true, the card handler waits a short, fixed beat after firing this action
+## before running the next action on the card — long enough for this action's
+## animation and any enemy movement it causes to play out. Set it on a pull/push
+## that precedes an attack so the target finishes sliding in before the hit.
+@export var resolve_before_next : bool = false
+
+## How long (seconds) the card handler waits after this action when it must
+## resolve before the next one. Tune it to cover the animation + slide: a pull
+## with a projectile needs ~0.6–0.8s; bump it up if the hit still lands early.
+@export var resolve_delay : float = 0.7
+
+
+## Whether the card handler should wait for this action to play out before running
+## the next action on the same card. Driven by code (not only the export) so a
+## pull works out of the box without a .tres reimport — PushPullAction overrides
+## this to true. The export stays as an extra opt-in for other action types.
+func blocks_until_resolved() -> bool:
+	return resolve_before_next
+
+
+## Seconds to wait when blocks_until_resolved() is true. Falls back to a sane
+## default if the export wasn't set.
+func get_resolve_delay() -> float:
+	return resolve_delay if resolve_delay > 0.0 else 0.7
+
 # ============================================================================
 # ANIMATION
 # ============================================================================
@@ -77,6 +109,30 @@ func get_action_type() -> String:
 	return "Action"
 
 
+## Whether this action has a range worth showing on the card face. Range is
+## meaningless for self-buffs, card-targeting, and automatic-card actions, and for
+## actions with no configured range. Subclasses can override to opt out entirely
+## (e.g. ShadowStrike, which closes the gap and intentionally hides its range).
+func shows_range() -> bool:
+	if max_range <= 0:
+		return false
+	if target_type == TargetType.SELF:
+		return false
+	if requires_card_target() or is_automatic_card_action():
+		return false
+	return true
+
+
+## True if this action already prints its range INLINE inside its own
+## get_card_text. The card renderer uses this to avoid emitting a second range
+## line for the same value. Only AttackAction does this today; everything else
+## defers to the card's single shared range line, which is what lets an
+## apply-condition card finally show a range without doubling up when an attack
+## on the same card already shows one.
+func displays_range_inline() -> bool:
+	return false
+
+
 func get_description_with_values(character) -> String:
 	if not character:
 		return ""
@@ -93,6 +149,15 @@ func get_card_text(character) -> String:
 ## value, keyword-condition explanations, etc. Empty by default.
 func get_tooltip_text(character) -> String:
 	return ""
+
+
+## Card-body value formatter. Green when the value comes from a real formula
+## (a calculation), white when it's a plain integer. Pass the calculator's
+## `formula`; omit it for hard-coded literals (e.g. range).
+func _cv(value, formula: String = "") -> String:
+	if formula != "" and not formula.is_valid_int():
+		return "§%s§" % str(value)   # calculation -> green
+	return "‡%s‡" % str(value)       # literal -> white
 
 
 ## A "<value> <label> = <formula>" tooltip line, or "" when the value is a plain

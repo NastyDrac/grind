@@ -19,6 +19,12 @@ enum RARITY {Common, Uncommon, Rare}
 ## drives the "modified" glow. Exported so it survives card duplication.
 @export var modified : bool = false
 
+## Set true when the Auditor amends this card in combat. Drives the crimson
+## audited tint + keyword. Exported so it survives the deep-copy the Auditor
+## makes before amending; the run deck keeps the un-audited originals, so this
+## never leaks past the fight.
+@export var audited : bool = false
+
 func get_description_with_values(character_data: Character) -> String:
 	var desc = card_description
 	

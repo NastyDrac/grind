@@ -1,0 +1,50 @@
+[gd_resource type="Resource" script_class="EventData" load_steps=15 format=3 uid="uid://dbones3evt01"]
+
+[ext_resource type="Script" uid="uid://ccujthovl5rv7" path="res://Scripts/event_option.gd" id="1_opt"]
+[ext_resource type="Script" uid="uid://c8bk1dof3250" path="res://Scripts/event_data.gd" id="2_evt"]
+[ext_resource type="Script" uid="uid://chli81s5gxydu" path="res://Scripts/event_effect.gd" id="3_eff"]
+[ext_resource type="Script" uid="uid://bggju16i5y2vm" path="res://Scripts/EventEffects/effect_cost_hp.gd" id="4_hp"]
+[ext_resource type="Script" uid="uid://b1ogi3xh5xakp" path="res://Scripts/condition.gd" id="5_2d3cu"]
+[ext_resource type="Script" uid="uid://vdwy0p0apc5" path="res://Scripts/EventEffects/effect_remove_card.gd" id="5_rem"]
+[ext_resource type="Script" uid="uid://cj25eabp5jigj" path="res://Scripts/EventEffects/effect_add_thingy.gd" id="6_thy"]
+[ext_resource type="Script" uid="uid://dluo7b273d1yw" path="res://Scripts/heat_curse.gd" id="7_xkulp"]
+
+[sub_resource type="Resource" id="Res_heal"]
+script = ExtResource("4_hp")
+amount = -3
+metadata/_custom_type_script = "uid://bggju16i5y2vm"
+
+[sub_resource type="Resource" id="Res_optA"]
+script = ExtResource("1_opt")
+option_text = "Let him look you over."
+result_text = "He prods, hums, and sets two things back where they belong with a crack that echoes down the stairwell. 'No charge for the obvious,' he says, almost gentle. You stand up straighter than you have in days."
+effects = Array[ExtResource("3_eff")]([SubResource("Res_heal")])
+metadata/_custom_type_script = "uid://ccujthovl5rv7"
+
+[sub_resource type="Resource" id="Res_remove"]
+script = ExtResource("5_rem")
+metadata/_custom_type_script = "uid://vdwy0p0apc5"
+
+[sub_resource type="Resource" id="Resource_oddrk"]
+script = ExtResource("7_xkulp")
+condition_name = "Heat Curse"
+metadata/_custom_type_script = "uid://dluo7b273d1yw"
+
+[sub_resource type="Resource" id="Res_curse"]
+script = ExtResource("6_thy")
+thingy = SubResource("Resource_oddrk")
+metadata/_custom_type_script = "uid://cj25eabp5jigj"
+
+[sub_resource type="Resource" id="Res_optC"]
+script = ExtResource("1_opt")
+option_text = "Let him cut quick and cheap."
+result_text = "'Cheap,' he allows, 'is a thing with consequences.' The regret comes out fast and ungentle. You leave lighter — but feverish and jumpy, hearin' trouble in every shadow for a good while yet."
+effects = Array[ExtResource("3_eff")]([SubResource("Res_remove"), SubResource("Res_curse")])
+metadata/_custom_type_script = "uid://ccujthovl5rv7"
+
+[resource]
+script = ExtResource("2_evt")
+event_title = "The Bonesetter"
+event_description = "Down a flight of stairs that smell of vinegar and worse, a wide man in a stained apron looks up from honing a very large knife. 'Ah. A patient.' He says it the way other men say 'supper.' 'I am, by trade and by temperament, a remover of that which no longer serves — splinters, debts, regrets, the occasional rib. Sit. Tell me what's troublin' you, and I'll tell you what it costs to be shed of it.'"
+options = Array[ExtResource("1_opt")]([SubResource("Res_optA"), SubResource("Res_optC")])
+metadata/_custom_type_script = "uid://c8bk1dof3250"

@@ -30,5 +30,4 @@ max_health = 9
 damage = 12
 attack_range = 5
 move_pattern = SubResource("Resource_ka2i2")
-noise_cost = 3
 metadata/_custom_type_script = "uid://tnxg66jw03v3"

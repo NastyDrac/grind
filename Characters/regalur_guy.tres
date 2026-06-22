@@ -1,4 +1,4 @@
-[gd_resource type="Resource" script_class="CharacterData" load_steps=24 format=3 uid="uid://c2xwf8l4o67yn"]
+[gd_resource type="Resource" script_class="CharacterData" load_steps=41 format=3 uid="uid://c2xwf8l4o67yn"]
 
 [ext_resource type="Script" uid="uid://dpayg0f6j5y2n" path="res://Scripts/character_data.gd" id="1_5j4wt"]
 [ext_resource type="Script" uid="uid://b2h1ochum01o" path="res://Scripts/stat.gd" id="1_8ety0"]
@@ -8,6 +8,10 @@
 [ext_resource type="Script" uid="uid://b1ogi3xh5xakp" path="res://Scripts/condition.gd" id="4_rw86x"]
 [ext_resource type="Script" uid="uid://dfo48c3dx2d7" path="res://Scripts/item_dropper.gd" id="5_p2jjl"]
 [ext_resource type="Script" uid="uid://0gsjrx47no8b" path="res://Scripts/card_data.gd" id="7_rw86x"]
+[ext_resource type="Script" uid="uid://dhxff5egnsgrv" path="res://Scripts/action.gd" id="8_x6t1t"]
+[ext_resource type="Script" uid="uid://clvjn77csx1a0" path="res://Scripts/AttackAction.gd" id="9_ill6o"]
+[ext_resource type="Script" uid="uid://px415e6h6tao" path="res://Scripts/block_action.gd" id="10_utx1w"]
+[ext_resource type="Script" uid="uid://c3g4jmcp7xiqk" path="res://Scripts/pushpull_action.gd" id="11_x83ha"]
 
 [sub_resource type="Resource" id="Resource_sjutl"]
 script = ExtResource("2_8k2ij")
@@ -26,6 +30,88 @@ condition_name = "Gold Digger"
 stacks = 1
 description = "enemies have a chance to drop gold"
 metadata/_custom_type_script = "uid://dfo48c3dx2d7"
+
+[sub_resource type="Resource" id="Resource_4cdc4"]
+script = ExtResource("2_8k2ij")
+formula = "5"
+metadata/_custom_type_script = "uid://cgrxhw8vqenhu"
+
+[sub_resource type="Resource" id="Resource_qqj17"]
+script = ExtResource("9_ill6o")
+damage_calculator = SubResource("Resource_4cdc4")
+max_range = 4
+animation_type = 2
+metadata/_custom_type_script = "uid://clvjn77csx1a0"
+
+[sub_resource type="Resource" id="Resource_y5qv4"]
+script = ExtResource("7_rw86x")
+card_name = "Attack"
+actions = Array[ExtResource("8_x6t1t")]([SubResource("Resource_qqj17")])
+metadata/_custom_type_script = "uid://0gsjrx47no8b"
+
+[sub_resource type="Resource" id="Resource_s20c5"]
+script = ExtResource("2_8k2ij")
+formula = "5"
+metadata/_custom_type_script = "uid://cgrxhw8vqenhu"
+
+[sub_resource type="Resource" id="Resource_km05c"]
+script = ExtResource("10_utx1w")
+block_calculator = SubResource("Resource_s20c5")
+target_type = 4
+metadata/_custom_type_script = "uid://px415e6h6tao"
+
+[sub_resource type="Resource" id="Resource_fsp27"]
+script = ExtResource("7_rw86x")
+card_name = "Evade"
+type = 1
+actions = Array[ExtResource("8_x6t1t")]([SubResource("Resource_km05c")])
+metadata/_custom_type_script = "uid://0gsjrx47no8b"
+
+[sub_resource type="Resource" id="Resource_itkf7"]
+script = ExtResource("2_8k2ij")
+formula = "-5"
+metadata/_custom_type_script = "uid://cgrxhw8vqenhu"
+
+[sub_resource type="Resource" id="Resource_yq8e5"]
+script = ExtResource("2_8k2ij")
+formula = "1"
+metadata/_custom_type_script = "uid://cgrxhw8vqenhu"
+
+[sub_resource type="Resource" id="Resource_hh41u"]
+script = ExtResource("11_x83ha")
+distance_calculator = SubResource("Resource_itkf7")
+enemy_count_calculator = SubResource("Resource_yq8e5")
+max_range = 5
+resolve_before_next = true
+animation_type = 1
+metadata/_custom_type_script = "uid://c3g4jmcp7xiqk"
+
+[sub_resource type="Resource" id="Resource_xhgi2"]
+script = ExtResource("2_8k2ij")
+formula = "block"
+metadata/_custom_type_script = "uid://cgrxhw8vqenhu"
+
+[sub_resource type="Resource" id="Resource_5rxwk"]
+script = ExtResource("2_8k2ij")
+formula = "1"
+metadata/_custom_type_script = "uid://cgrxhw8vqenhu"
+
+[sub_resource type="Resource" id="Resource_o63gg"]
+script = ExtResource("9_ill6o")
+damage_calculator = SubResource("Resource_xhgi2")
+enemy_count_calculator = SubResource("Resource_5rxwk")
+consume_block = true
+max_range = 1
+reuse_previous_target = true
+animation_type = 2
+metadata/_custom_type_script = "uid://clvjn77csx1a0"
+
+[sub_resource type="Resource" id="Resource_x8jid"]
+script = ExtResource("7_rw86x")
+card_name = "Tally Hoe!"
+card_cost = 2
+actions = Array[ExtResource("8_x6t1t")]([SubResource("Resource_hh41u"), SubResource("Resource_o63gg")])
+metadata/_custom_type_script = "uid://0gsjrx47no8b"
 
 [sub_resource type="Resource" id="Resource_rw86x"]
 script = ExtResource("2_8k2ij")
@@ -100,4 +186,5 @@ max_health = SubResource("Resource_sjutl")
 stats = Array[ExtResource("1_8ety0")]([SubResource("Resource_8ety0"), SubResource("Resource_82thg"), SubResource("Resource_ml0kd"), SubResource("Resource_o2qd2"), SubResource("Resource_8k2ij"), SubResource("Resource_dvkhi")])
 gold = 100
 special_effects = Array[ExtResource("4_rw86x")]([SubResource("Resource_x6t1t")])
+starting_deck = Array[ExtResource("7_rw86x")]([SubResource("Resource_y5qv4"), SubResource("Resource_y5qv4"), SubResource("Resource_y5qv4"), SubResource("Resource_y5qv4"), SubResource("Resource_y5qv4"), SubResource("Resource_fsp27"), SubResource("Resource_fsp27"), SubResource("Resource_fsp27"), SubResource("Resource_fsp27"), SubResource("Resource_fsp27"), SubResource("Resource_x8jid")])
 metadata/_custom_type_script = "uid://dpayg0f6j5y2n"

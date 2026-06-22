@@ -11,17 +11,17 @@
 [sub_resource type="Resource" id="HE_1"]
 script = ExtResource("hde_script")
 enemy = ExtResource("2_3b3fb")
-noise_cost = 3
+noise_cost = 4
 
 [sub_resource type="Resource" id="HE_2"]
 script = ExtResource("hde_script")
 enemy = ExtResource("3_kacq8")
-noise_cost = 2
+noise_cost = 3
 
 [sub_resource type="Resource" id="HE_3"]
 script = ExtResource("hde_script")
 enemy = ExtResource("4_87bxn")
-noise_cost = 2
+noise_cost = 3
 
 [sub_resource type="Resource" id="Resource_tnqs8"]
 script = ExtResource("6_dun0q")
@@ -33,4 +33,5 @@ recipe_name = "Backdraft"
 enemy_entries = Array[ExtResource("hde_script")]([SubResource("HE_1"), SubResource("HE_2"), SubResource("HE_3")])
 rewards = Array[int]([0, 1])
 win_con = SubResource("Resource_tnqs8")
+starting_noise = 4.5
 metadata/_custom_type_script = "uid://b6h8ntxfaauo5"

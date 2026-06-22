@@ -1,0 +1,11 @@
+[gd_resource type="Resource" script_class="LeakyPurse" load_steps=2 format=3 uid="uid://bmttowwr8xdhy"]
+
+[ext_resource type="Script" uid="uid://b26b68w4tu72s" path="res://Scripts/leaky_purse.gd" id="1_lj7vi"]
+
+[resource]
+script = ExtResource("1_lj7vi")
+duration_combats = 3
+rarity = 1
+condition_name = "Leaky Purse"
+show_stacks = true
+metadata/_custom_type_script = "uid://b26b68w4tu72s"

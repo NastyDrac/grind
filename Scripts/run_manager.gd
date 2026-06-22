@@ -35,6 +35,12 @@ signal run_finished(won: bool)
 var run_seed : int
 var rng : RandomNumberGenerator
 
+## Map generation uses its own RNG, re-seeded per act from run_seed so each act's
+## layout is visibly different yet a given run_seed stays fully reproducible.
+## Keeping it separate from `rng` means reseeding it never disturbs horde, boss,
+## or event rolls.
+var map_rng : RandomNumberGenerator = RandomNumberGenerator.new()
+
 ## The run's character. Set at runtime by Game.start_run and deep-copied in
 ## begin_run -- NOT assigned in the Inspector, so it's a plain var, not @export.
 var character : CharacterData
@@ -42,6 +48,15 @@ var character : CharacterData
 var card_handler : CardHandler
 var player : Character
 var draft_amount : int = 3
+
+## Relative weights for normal card-reward drafts, keyed by CardData.RARITY.
+## Higher = shows up more often. Rares are deliberately scarce. Boss drafts
+## ignore these and offer Rares only (see get_random_card_data's only_rarity).
+@export var rarity_weights : Dictionary = {
+	CardData.RARITY.Common: 70,
+	CardData.RARITY.Uncommon: 25,
+	CardData.RARITY.Rare: 5,
+}
 
 var range_manager : RangeManager
 var ui_bar : UIBar
@@ -58,6 +73,17 @@ var _used_event_names : Array[String] = []
 ## specific fight; consumed by _pick_horde_for_combat. Not inspector-assigned,
 ## so it's a plain var rather than an export.
 var horde : Array[EnemyData] = []
+
+## Set by an event option that triggers combat (event.gd → queue_event_combat).
+## When non-null, _on_event_completed launches THIS fight instead of returning to
+## the map, and _pick_horde_for_combat forces this exact Horde over the act pool.
+var _pending_event_horde : Horde = null
+## Opening-noise scalar for an event combat (the modern stand-in for the old
+## enemy-count modifier). 1.0 = the horde's own starting noise.
+var _pending_event_difficulty : float = 1.0
+## Optional win-condition override for an event combat; when null the horde's own
+## win_con is used.
+var _pending_event_win_con : WinCondition = null
 
 ## The Horde selected for the current/most recent combat. Used by RewardScene.
 var current_horde : Horde = null
@@ -139,6 +165,10 @@ func begin_run(seed : int = -1):
 		if fx.has_method("activate"):
 			fx.activate(self)
 
+	# Telemetry: a run is starting. Emitting here makes run_started the first
+	# event logged, so everything after it is attributed to this run.
+	Global.run_started.emit(character.character_name if character else "", run_seed)
+
 func _ready() -> void:
 	begin_run()
 	Global.card_played.connect(_on_card_played)
@@ -157,7 +187,8 @@ func _show_map() -> void:
 			add_child(map_generator)
 			map_generator.node_chosen.connect(_on_map_node_chosen)
 			_choose_act_boss()
-			map_generator.build(rng)
+			_seed_map_for_act()
+			map_generator.build(map_rng)
 		else:
 			push_error("RunManager: map_generator_scene is not assigned in the inspector!")
 			return
@@ -231,7 +262,26 @@ func _show_event_for_node(node: MapNode) -> void:
 
 func _on_event_completed():
 	current_event_scene = null
+
+	# An event option chose to trigger combat: launch that fight instead of
+	# resolving the node back to the map. The event's map node stays pending so
+	# it's marked visited when the combat is won, exactly like a combat node.
+	if _pending_event_horde != null:
+		Transitions.transition_style = Transitions.TransitionStyle.BROKEN_GLASS
+		await Transitions.transition(func(): begin_combat())
+		return
+
 	_resolve_pending_node()
+
+
+## Called by EventScene when a combat-triggering option resolves. Stores the
+## fight to run; the combat actually starts once the event scene finishes and
+## _on_event_completed runs. difficulty scales the opening noise; win_con (when
+## set) overrides the horde's own win condition.
+func queue_event_combat(combat_horde: Horde, difficulty: float = 1.0, win_con: WinCondition = null) -> void:
+	_pending_event_horde = combat_horde
+	_pending_event_difficulty = maxf(0.1, difficulty)
+	_pending_event_win_con = win_con
 
 # ------------------------------------------------------------------------------
 #  COMBAT
@@ -287,6 +337,13 @@ func begin_boss_combat():
 	# fires automatically and wires up DefeatSingleEnemy + the announcement.
 	range_manager.spawn_enemy(boss_data, 5)
 
+	# Telemetry: a boss fight is starting. The win condition is wired by the
+	# range manager on elite spawn, so read it off the horde resource if set.
+	Global.fight_started.emit(
+		current_horde.recipe_name if current_horde else "",
+		"boss",
+		current_horde.win_con.get_announcement_text() if current_horde and current_horde.win_con else "")
+
 func begin_wave():
 	create_range_manager()
 	player.position_character()
@@ -306,8 +363,19 @@ func begin_wave():
 	ui_bar.set_health()
 	setup_win_condition()
 
+	# Telemetry: a normal fight is fully set up (horde + win condition known).
+	Global.fight_started.emit(
+		current_horde.recipe_name if current_horde else "",
+		"normal",
+		current_win_condition.get_announcement_text() if current_win_condition else "")
+
 func setup_win_condition():
 	var wc_source : WinCondition = current_horde.win_con if current_horde else null
+
+	# An event option can override the horde's own win condition. Consumed once.
+	if _pending_event_win_con:
+		wc_source = _pending_event_win_con
+		_pending_event_win_con = null
 
 	if wc_source:
 		current_win_condition = wc_source.duplicate(true)
@@ -339,7 +407,7 @@ func create_range_manager():
 	# the first wave of spawns through the noise system.
 	range_manager.enemy_pool.append_array(_pick_horde_for_combat())
 	range_manager.noise_cost_map = current_horde.get_noise_costs() if current_horde else {}
-	range_manager.starting_noise = current_horde.starting_noise if current_horde else 0.0
+	range_manager.starting_noise = (current_horde.starting_noise if current_horde else 0.0) * _pending_event_difficulty
 	add_child(range_manager)
 
 ## Selects enemies from a Horde in the current act's pool that is valid for
@@ -347,6 +415,14 @@ func create_range_manager():
 ## there are no other column-valid options. Falls back to the legacy horde array if needed.
 ## Also stores the chosen Horde resource in current_horde for use by RewardScene.
 func _pick_horde_for_combat() -> Array[EnemyData]:
+	# Event-injected combat forces a specific Horde, bypassing the act pool.
+	# current_horde is set to it so noise costs, rewards, and win condition all
+	# flow through the normal paths. Consumed once here.
+	if _pending_event_horde != null:
+		current_horde = _pending_event_horde
+		_pending_event_horde = null
+		return current_horde.get_spawn_pool()
+
 	var col : int = _pending_map_node.col if _pending_map_node else 0
 
 	if current_act < act_recipe_pools.size():
@@ -384,6 +460,13 @@ func create_card_handler():
 		card_handler.create_card(card)
 	card_handler.draw_stack.shuffle()
 
+	# Deal the opening hand so the player can act on turn 1 — block, attack,
+	# position — BEFORE any enemy moves. Enemies only act when the player ends
+	# the turn (pass_time), so without this you'd end an empty first turn and
+	# take the first hit (e.g. the Audit's sniper) straight to HP before ever
+	# drawing a card.
+	card_handler.draw_multiple_cards(card_handler.cards_to_draw)
+
 func create_player():
 	player = load("res://Scenes/character.tscn").instantiate()
 	add_child(player)
@@ -410,6 +493,22 @@ func _teardown_combat() -> void:
 		current_win_condition.cleanup()
 		current_win_condition = null
 
+	# Event-combat overrides are per-fight; clear them so a later normal combat
+	# isn't affected. (_pending_event_horde is normally consumed in
+	# _pick_horde_for_combat, but reset here too in case combat ended early.)
+	_pending_event_horde = null
+	_pending_event_difficulty = 1.0
+	_pending_event_win_con = null
+
+	# Strip the player's temporary combat buffs (block, conditions, in-combat
+	# stat changes) NOW, while range_manager is still alive in case a condition's
+	# removal reads from it. Doing this here — before create_reward_scene() — is
+	# what keeps the post-combat draft cards showing BASE values instead of the
+	# buffed numbers left over from the fight. (reset_for_new_wave still clears
+	# state again at the next combat's start; this is harmless overlap.)
+	if player and player.has_method("clear_combat_modifiers"):
+		player.clear_combat_modifiers()
+
 	# Thingy condition teardown happens at the START of the next wave inside
 	# reset_for_new_wave, so nothing extra is needed here.
 
@@ -431,31 +530,36 @@ func _teardown_combat() -> void:
 ## Called by _on_event_completed. Tears down and returns to the map.
 func _resolve_pending_node() -> void:
 	_teardown_combat()
+	Transitions.transition_style = Transitions.TransitionStyle.FADE
 	await Transitions.transition(func(): _show_map())
 
 func on_combat_won():
+	# Telemetry: the fight was won. Emit before teardown clears combat state.
+	Global.fight_ended.emit(true)
+
 	## Check before _teardown_combat clears _pending_map_node.
 	var was_boss := _pending_map_node != null \
 					and _pending_map_node.node_type == MapNode.NodeType.BOSS
 	_teardown_combat()
 
-	# Show the reward scene (contains gold / card draft / thingy buttons).
-	# The reward scene handles the card draft internally and emits
-	# reward_scene_completed when the player clicks Continue.
-	create_reward_scene()
+	# Reward scene (gold / card draft / thingy). Boss wins get a Rare-only draft.
+	create_reward_scene(was_boss)
 	await current_reward_scene.reward_scene_completed
 
-	await Transitions.transition(func(): _show_map())
-
-	# Boss defeated: either advance to the next act, or — if this was the
-	# final act — the whole run is won.
 	if was_boss:
-		# Act count is defined by the size of act_recipe_pools -- a single source
-		# of truth, nothing separate to keep in sync. Last act's boss = victory.
+		# Boss defeated: advance to the next act (which builds & shows its own
+		# fresh map behind a fade), or win the run if this was the final act.
 		if current_act + 1 >= act_recipe_pools.size():
 			on_run_won()
 		else:
 			_start_new_act()
+		return
+
+	# Normal wave: fade back to the SAME map. No regeneration here — that only
+	# happens after a boss (in _start_new_act). Fade replaces the old glass-break
+	# that used to play over the map.
+	Transitions.transition_style = Transitions.TransitionStyle.FADE
+	await Transitions.transition(func(): _show_map())
 
 ## Increments the act counter and generates a brand-new map for the next act.
 func _start_new_act() -> void:
@@ -465,9 +569,22 @@ func _start_new_act() -> void:
 	print("RunManager: beginning Act %d" % (current_act + 1))
 	_choose_act_boss()
 	if map_generator:
-		await Transitions.transition(func(): map_generator.build(rng))
+		# Build AND reveal the next act's map behind a fade. (Boss-win flow no
+		# longer shows the old map first, so this path must show it itself.)
+		# Re-seed per act so the new act's layout differs from the previous one.
+		_seed_map_for_act()
+		Transitions.transition_style = Transitions.TransitionStyle.FADE
+		await Transitions.transition(func():
+			map_generator.build(map_rng)
+			current_state = GameState.MAP
+			map_generator.show())
 	else:
 		push_error("RunManager: _start_new_act called but map_generator is null")
+
+## Re-seeds the map RNG from run_seed + the current act, so each act produces a
+## distinct-but-reproducible layout. Called immediately before every build.
+func _seed_map_for_act() -> void:
+	map_rng.seed = run_seed + (current_act + 1) * 1000003
 
 ## Picks this act's boss from its HordePool.boss_recipes using the seeded RNG,
 ## and stores it in current_boss. Called once whenever an act's map is built, so
@@ -489,6 +606,11 @@ func _choose_act_boss() -> void:
 
 ## Called from character.die() when the player's health hits 0.
 func on_player_death():
+	# Telemetry: the fight was lost, which also ends the run. Emit both now so
+	# they flush immediately, even if the player quits from the end screen.
+	Global.fight_ended.emit(false)
+	Global.run_ended.emit(false)
+
 	if current_win_condition:
 		current_win_condition.cleanup()
 		current_win_condition = null
@@ -499,6 +621,10 @@ func on_player_death():
 
 ## Called from on_combat_won() when the final act's boss is defeated.
 func on_run_won():
+	# Telemetry: final boss down — the run is won. Emit before the end screen so
+	# it's captured even if the player quits without restarting.
+	Global.run_ended.emit(true)
+
 	print("Run complete -- victory!")
 	get_tree().paused = true
 	_show_end_screen(victory_screen_scene, "Victory", true)
@@ -644,7 +770,7 @@ func _on_character_sheet_closed():
 #  DRAFT SCREEN
 # ------------------------------------------------------------------------------
 
-func create_draft_screen():
+func create_draft_screen(only_rarity : int = -1):
 	if current_draft_screen:
 		current_draft_screen.queue_free()
 
@@ -655,7 +781,7 @@ func create_draft_screen():
 
 	current_draft_screen = draft_screen_scene.instantiate()
 	add_child(current_draft_screen)
-	current_draft_screen.display_card_options(self)
+	current_draft_screen.display_card_options(self, only_rarity)
 
 func close_draft_screen():
 	if current_draft_screen:
@@ -666,13 +792,14 @@ func close_draft_screen():
 #  REWARD SCENE
 # ------------------------------------------------------------------------------
 
-func create_reward_scene() -> void:
+func create_reward_scene(boss_reward : bool = false) -> void:
 	if current_reward_scene:
 		current_reward_scene.queue_free()
 
 	current_reward_scene = load("res://Scenes/reward_scene.tscn").instantiate()
 	current_reward_scene.run = self
 	current_reward_scene.current_horde = current_horde
+	current_reward_scene.boss_reward = boss_reward
 	get_tree().root.add_child(current_reward_scene)
 	current_reward_scene.set_anchors_preset(Control.PRESET_FULL_RECT)
 
@@ -804,32 +931,53 @@ func close_workshop() -> void:
 #  CARDS — random card lookup
 # ------------------------------------------------------------------------------
 
-func get_random_card_data(excluded_paths: Array[String] = []) -> CardData:
+func get_random_card_data(excluded_paths: Array[String] = [], only_rarity : int = -1) -> CardData:
 	var dir := DirAccess.open("res://Cards/")
 	if dir == null:
 		push_error("Could not open Cards directory")
 		return null
-	var card_paths := []
 
+	# Gather candidate cards (loaded so we can read rarity). Godot caches loads,
+	# so re-scanning per draft pick is cheap.
+	var candidates : Array[CardData] = []
 	dir.list_dir_begin()
 	var file_name := dir.get_next()
-
 	while file_name != "":
 		if not dir.current_is_dir() and file_name.ends_with(".tres"):
 			var path := "res://Cards/" + file_name
 			if path not in excluded_paths:
-				card_paths.append(path)
+				var c : CardData = load(path)
+				if c and (only_rarity < 0 or c.rarity == only_rarity):
+					candidates.append(c)
 		file_name = dir.get_next()
-
 	dir.list_dir_end()
 
-	if card_paths.is_empty():
+	if candidates.is_empty():
+		# A forced-rarity draft with no cards of that rarity falls back to any
+		# rarity rather than handing the player nothing.
+		if only_rarity >= 0:
+			push_warning("No cards of rarity %d available; falling back to any rarity." % only_rarity)
+			return get_random_card_data(excluded_paths, -1)
 		push_error("No CardData files found in Cards directory")
 		return null
 
-	var random_path = card_paths[randi() % card_paths.size()]
-	var new_card : CardData = load(random_path)
-	return new_card
+	# Forced rarity (e.g. boss rewards): uniform pick within that tier.
+	if only_rarity >= 0:
+		return candidates[randi() % candidates.size()]
+
+	# Normal draft: weight by rarity so Rares surface far less often.
+	var weights : Array[float] = []
+	var total := 0.0
+	for c in candidates:
+		var w : float = float(rarity_weights.get(c.rarity, 1))
+		weights.append(w)
+		total += w
+	var roll := randf() * total
+	for i in candidates.size():
+		roll -= weights[i]
+		if roll <= 0.0:
+			return candidates[i]
+	return candidates.back()
 
 # ------------------------------------------------------------------------------
 #  THINGY CONDITIONS (RESOURCES)
