@@ -2,16 +2,14 @@
 
 [ext_resource type="Script" uid="uid://tnxg66jw03v3" path="res://Scripts/enemy_data.gd" id="1_wm"]
 [ext_resource type="Script" uid="uid://b1ogi3xh5xakp" path="res://Scripts/condition.gd" id="2_wm"]
-[ext_resource type="Texture2D" uid="uid://b2rjhiy4rifig" path="res://icon.svg" id="3_wm"]
+[ext_resource type="Texture2D" uid="uid://capvwd4pppubm" path="res://Art/watermaccasin.png" id="3_3pqa2"]
 
 [resource]
 script = ExtResource("1_wm")
 enemy_name = "The Water Moccasin"
-texture = ExtResource("3_wm")
+texture = ExtResource("3_3pqa2")
 min_health = 6
 max_health = 9
 damage = 4
 move_speed = 2
-attack_range = 1
-noise_cost = 2
 metadata/_custom_type_script = "uid://tnxg66jw03v3"

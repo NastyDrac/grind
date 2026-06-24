@@ -132,6 +132,9 @@ func get_description_with_values(character: Character) -> String:
 	if max_range > 0:
 		desc += " - Range: %s" % _cv(max_range)
 
+	if consume_block:
+		desc += "\nConsume all Block"
+
 	return desc
 
 
@@ -176,6 +179,9 @@ func get_card_text(character) -> String:
 
 	if max_range > 0:
 		desc += " - Range: %s" % _cv(max_range)
+
+	if consume_block:
+		desc += "\nConsume all Block"
 
 	return desc
 

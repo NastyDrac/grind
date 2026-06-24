@@ -4,7 +4,7 @@
 [ext_resource type="Script" uid="uid://tnxg66jw03v3" path="res://Scripts/enemy_data.gd" id="2_armft"]
 [ext_resource type="Script" uid="uid://b2o6hip7peiwb" path="res://Scripts/move_pattern.gd" id="2_cpw3x"]
 [ext_resource type="Script" uid="uid://rf04wb68htw8" path="res://Scripts/move_step.gd" id="3_f8gmx"]
-[ext_resource type="Texture2D" uid="uid://b2rjhiy4rifig" path="res://icon.svg" id="5_boull"]
+[ext_resource type="Texture2D" uid="uid://crxyopnx3t57" path="res://Art/sniper.png" id="5_cpw3x"]
 
 [sub_resource type="Resource" id="Resource_gr5m6"]
 script = ExtResource("3_f8gmx")
@@ -24,7 +24,7 @@ metadata/_custom_type_script = "uid://b2o6hip7peiwb"
 [resource]
 script = ExtResource("2_armft")
 enemy_name = "Sniper"
-texture = ExtResource("5_boull")
+texture = ExtResource("5_cpw3x")
 min_health = 6
 max_health = 9
 damage = 12

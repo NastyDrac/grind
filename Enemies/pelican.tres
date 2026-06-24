@@ -2,9 +2,9 @@
 
 [ext_resource type="Script" uid="uid://b1ogi3xh5xakp" path="res://Scripts/condition.gd" id="1_pel"]
 [ext_resource type="Texture2D" uid="uid://k61vja8o7hkl" path="res://Art/Icons/DeathRattle.png" id="2_ko5qj"]
-[ext_resource type="Texture2D" uid="uid://b2rjhiy4rifig" path="res://icon.svg" id="2_pel"]
 [ext_resource type="Script" uid="uid://do7yj12cpcfq4" path="res://Scripts/trumpeteer.gd" id="3_pel"]
 [ext_resource type="Script" uid="uid://tnxg66jw03v3" path="res://Scripts/enemy_data.gd" id="4_pel"]
+[ext_resource type="Texture2D" uid="uid://jhxpwpo1kixi" path="res://Art/pelican.png" id="5_ko5qj"]
 
 [sub_resource type="Resource" id="Resource_pel"]
 script = ExtResource("3_pel")
@@ -16,7 +16,7 @@ metadata/_custom_type_script = "uid://do7yj12cpcfq4"
 [resource]
 script = ExtResource("4_pel")
 enemy_name = "The Pelican"
-texture = ExtResource("2_pel")
+texture = ExtResource("5_ko5qj")
 min_health = 14
 max_health = 18
 damage = 4

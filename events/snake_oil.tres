@@ -1,0 +1,78 @@
+[gd_resource type="Resource" script_class="EventData" load_steps=17 format=3 uid="uid://dsnakeoil0001"]
+
+[ext_resource type="Script" uid="uid://ccujthovl5rv7" path="res://Scripts/event_option.gd" id="1_opt"]
+[ext_resource type="Script" uid="uid://c8bk1dof3250" path="res://Scripts/event_data.gd" id="2_evt"]
+[ext_resource type="Script" uid="uid://chli81s5gxydu" path="res://Scripts/event_effect.gd" id="3_eff"]
+[ext_resource type="Script" uid="uid://bggju16i5y2vm" path="res://Scripts/EventEffects/effect_cost_hp.gd" id="4_hp"]
+[ext_resource type="Script" uid="uid://ckmlhw3dcvb0k" path="res://Scripts/EventEffects/effect_mod_stat.gd" id="5_mod"]
+[ext_resource type="Script" uid="uid://b2h1ochum01o" path="res://Scripts/stat.gd" id="6_stat"]
+
+[sub_resource type="Resource" id="Stat_heat"]
+script = ExtResource("6_stat")
+stat_type = 3
+metadata/_custom_type_script = "uid://b2h1ochum01o"
+
+[sub_resource type="Resource" id="Stat_marb"]
+script = ExtResource("6_stat")
+stat_type = 1
+metadata/_custom_type_script = "uid://b2h1ochum01o"
+
+[sub_resource type="Resource" id="Res_heatUp"]
+script = ExtResource("5_mod")
+stat_to_mod = SubResource("Stat_heat")
+modify_value = 2
+random_stat = false
+metadata/_custom_type_script = "uid://ckmlhw3dcvb0k"
+
+[sub_resource type="Resource" id="Res_marbDown"]
+script = ExtResource("5_mod")
+stat_to_mod = SubResource("Stat_marb")
+modify_value = -1
+random_stat = false
+metadata/_custom_type_script = "uid://ckmlhw3dcvb0k"
+
+[sub_resource type="Resource" id="Res_randUp"]
+script = ExtResource("5_mod")
+modify_value = 2
+random_stat = true
+metadata/_custom_type_script = "uid://ckmlhw3dcvb0k"
+
+[sub_resource type="Resource" id="Res_randDown"]
+script = ExtResource("5_mod")
+modify_value = -2
+random_stat = true
+metadata/_custom_type_script = "uid://ckmlhw3dcvb0k"
+
+[sub_resource type="Resource" id="Res_sick"]
+script = ExtResource("4_hp")
+amount = 3
+metadata/_custom_type_script = "uid://bggju16i5y2vm"
+
+[sub_resource type="Resource" id="Res_optA"]
+script = ExtResource("1_opt")
+option_text = "Buy the red tonic."
+result_text = "It burns going down like swallowing a lit match, and a furnace kicks on somewhere behind your ribs. Your hands won't quite stop shaking after — but oh, you feel like running somebody down."
+effects = Array[ExtResource("3_eff")]([SubResource("Res_heatUp"), SubResource("Res_marbDown")])
+gold_cost = 20
+metadata/_custom_type_script = "uid://ccujthovl5rv7"
+
+[sub_resource type="Resource" id="Res_optB"]
+script = ExtResource("1_opt")
+option_text = "Drink the unmarked bottle."
+result_text = "The salesman's smile twitches as you reach past the labeled stuff. 'That one's... ambitious,' he allows. It tastes like pennies and lightning. Something in you gets stronger. Something else packs up and leaves. You throw up a little. Worth it? Ask later."
+effects = Array[ExtResource("3_eff")]([SubResource("Res_randUp"), SubResource("Res_randDown"), SubResource("Res_sick")])
+metadata/_custom_type_script = "uid://ccujthovl5rv7"
+
+[sub_resource type="Resource" id="Res_optC"]
+script = ExtResource("1_opt")
+option_text = "Move along."
+result_text = "'Your loss, friend! Your loss and your lumbago's!' he calls after you, already flagging down the next mark on the road."
+metadata/_custom_type_script = "uid://ccujthovl5rv7"
+
+[resource]
+script = ExtResource("2_evt")
+event_title = "Snake Oil"
+event_description = "A medicine-show wagon sits parked crooked at the roadside, every shelf glittering with bottles that catch the light a touch too eagerly. The salesman sweeps off his hat and bows like you're royalty. 'Tinctures, tonics, and treatments for what ails the modern wanderer! Each one tested' — he doesn't say on whom — 'and guaranteed to do SOMETHING. Step right up. The body's just a ledger, friend, and I am here to help you cook the books.'"
+options = Array[ExtResource("1_opt")]([SubResource("Res_optA"), SubResource("Res_optB"), SubResource("Res_optC")])
+event_type = 1
+metadata/_custom_type_script = "uid://c8bk1dof3250"

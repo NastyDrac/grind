@@ -2,16 +2,13 @@
 
 [ext_resource type="Script" uid="uid://tnxg66jw03v3" path="res://Scripts/enemy_data.gd" id="1_sm"]
 [ext_resource type="Script" uid="uid://b1ogi3xh5xakp" path="res://Scripts/condition.gd" id="2_sm"]
-[ext_resource type="Texture2D" uid="uid://b2rjhiy4rifig" path="res://icon.svg" id="3_sm"]
+[ext_resource type="Texture2D" uid="uid://dr15n1w3om80c" path="res://Art/strongman.png" id="3_84it7"]
 
 [resource]
 script = ExtResource("1_sm")
 enemy_name = "The Strongman"
-texture = ExtResource("3_sm")
+texture = ExtResource("3_84it7")
 min_health = 22
 max_health = 28
 damage = 10
-move_speed = 1
-attack_range = 1
-noise_cost = 5
 metadata/_custom_type_script = "uid://tnxg66jw03v3"

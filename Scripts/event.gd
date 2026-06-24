@@ -14,6 +14,10 @@ var current_option: EventOption
 
 var _effect_queue: Array[EventEffect] = []
 
+## Hover preview: a copy of a card an option would add, shown while hovering.
+const _CARD_PREVIEW_SCENE := preload("res://Scenes/draftable_card.tscn")
+var _card_preview : DraftableCard = null
+
 
 signal option_selected(option: EventOption)
 signal event_completed
@@ -38,6 +42,7 @@ func display_event(event: EventData):
 		event_image.visible = false
 
 	if options_container:
+		_hide_card_preview()
 		for child in options_container.get_children():
 			child.queue_free()
 
@@ -83,12 +88,29 @@ func _create_option_button(option: EventOption):
 
 	button.add_child(hbox)
 	button.pressed.connect(_on_option_selected.bind(option))
+
+	# Hover extras: a card copy for add-card effects, a text tooltip for relics.
+	var preview_card : CardData = null
+	var tip_text := ""
+	for each in option.effects:
+		if preview_card == null:
+			preview_card = each.get_preview_card()
+		var t = each.get_tooltip_text()
+		if t != "":
+			tip_text += (("\n" + t) if tip_text != "" else t)
+	if can_select and tip_text != "":
+		button.tooltip_text = tip_text   # disabled buttons keep their reason text
+	if preview_card != null:
+		button.mouse_entered.connect(_show_card_preview.bind(preview_card, button))
+		button.mouse_exited.connect(_hide_card_preview)
+
 	options_container.add_child(button)
 
 
 func _on_option_selected(option: EventOption):
 	current_option = option
 	option_selected.emit(option)
+	_hide_card_preview()
 
 	# Telemetry: which event and which option the player chose.
 	Global.event_option_chosen.emit(
@@ -100,6 +122,45 @@ func _on_option_selected(option: EventOption):
 
 	_effect_queue = option.effects.duplicate()
 	_process_next_effect()
+
+
+# ── Hover card preview ────────────────────────────────────────────────────────
+
+## Show a DISPLAY_ONLY copy of [card_data] next to [anchor] (the option button).
+func _show_card_preview(card_data: CardData, anchor: Control) -> void:
+	_hide_card_preview()
+	if card_data == null:
+		return
+
+	var preview : DraftableCard = _CARD_PREVIEW_SCENE.instantiate()
+	add_child(preview)                                   # enters tree → @onready ready
+	preview.current_mode = DraftableCard.Mode.DISPLAY_ONLY
+	preview.set_data(card_data)
+	preview.mouse_filter = Control.MOUSE_FILTER_IGNORE   # never steal the hover
+	preview.top_level = true                             # position in global space
+	preview.z_index = 100
+	preview.scale = Vector2(0.85, 0.85)
+	_card_preview = preview
+
+	# Wait one frame so the card has a real size, then place it beside the button,
+	# flipping to the left side if it would run off the right edge.
+	await get_tree().process_frame
+	if not is_instance_valid(preview) or _card_preview != preview:
+		return
+	var vp := get_viewport().get_visible_rect().size
+	var card_size : Vector2 = preview.size * preview.scale
+	var pos := anchor.global_position + Vector2(anchor.size.x + 16, anchor.size.y * 0.5 - card_size.y * 0.5)
+	if pos.x + card_size.x > vp.x:
+		pos.x = anchor.global_position.x - card_size.x - 16
+	pos.x = maxf(8.0, pos.x)
+	pos.y = clampf(pos.y, 8.0, maxf(8.0, vp.y - card_size.y - 8.0))
+	preview.global_position = pos
+
+
+func _hide_card_preview() -> void:
+	if is_instance_valid(_card_preview):
+		_card_preview.queue_free()
+	_card_preview = null
 
 
 # ==== EFFECT QUEUE ============================================================

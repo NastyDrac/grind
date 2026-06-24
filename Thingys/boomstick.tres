@@ -1,0 +1,10 @@
+[gd_resource type="Resource" script_class="Boomstick" load_steps=2 format=3 uid="uid://cboomstick0001"]
+
+[ext_resource type="Script" path="res://Scripts/boomstick.gd" id="1_bstk"]
+
+[resource]
+script = ExtResource("1_bstk")
+condition_name = "Boomstick"
+rarity = 1
+close_range = 1
+bonus = 4

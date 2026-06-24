@@ -2,16 +2,14 @@
 
 [ext_resource type="Script" uid="uid://tnxg66jw03v3" path="res://Scripts/enemy_data.gd" id="1_grey"]
 [ext_resource type="Script" uid="uid://b1ogi3xh5xakp" path="res://Scripts/condition.gd" id="2_grey"]
-[ext_resource type="Texture2D" uid="uid://b2rjhiy4rifig" path="res://icon.svg" id="3_grey"]
+[ext_resource type="Texture2D" uid="uid://dierp8v5lh6kv" path="res://Art/greyhound.png" id="3_qimu4"]
 
 [resource]
 script = ExtResource("1_grey")
 enemy_name = "The Greyhound"
-texture = ExtResource("3_grey")
+texture = ExtResource("3_qimu4")
 min_health = 6
 max_health = 8
 damage = 4
 move_speed = 5
-attack_range = 1
-noise_cost = 2
 metadata/_custom_type_script = "uid://tnxg66jw03v3"

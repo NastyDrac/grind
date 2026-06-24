@@ -3,6 +3,10 @@ extends Node
 # Card actions
 signal card_played(card_data: CardData)  # When player plays a card
 signal time_passed()
+## Emitted at each turn boundary once the meter holds the turn's FULL noise
+## (card costs + passive tick) but BEFORE it drains into spawns — so listeners can
+## judge how loud the turn actually was. Fires once per turn in METER mode.
+signal noise_settled(total_noise: float)
 signal apply_condition(target, condition : Condition)
 signal request_animation(action: Action, target: Object, anim_type: Action.AnimationType)
 # Enemy actions

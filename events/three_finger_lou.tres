@@ -1,14 +1,8 @@
-[gd_resource type="Resource" script_class="EventData" load_steps=29 format=3 uid="uid://bxe53wy1mu7mm"]
+[gd_resource type="Resource" script_class="EventData" load_steps=23 format=3 uid="uid://bxe53wy1mu7mm"]
 
 [ext_resource type="Script" uid="uid://ccujthovl5rv7" path="res://Scripts/event_option.gd" id="1_k0b0n"]
 [ext_resource type="Script" uid="uid://chli81s5gxydu" path="res://Scripts/event_effect.gd" id="2_7khxb"]
 [ext_resource type="Script" uid="uid://b3mi542wlp4b0" path="res://Scripts/EventEffects/effect_cost_gold.gd" id="3_qjvjd"]
-[ext_resource type="Script" uid="uid://b1ogi3xh5xakp" path="res://Scripts/condition.gd" id="4_rte3y"]
-[ext_resource type="Resource" uid="uid://c2xrf1pv6gxsb" path="res://Thingys/plot_armor.tres" id="5_1xveg"]
-[ext_resource type="Resource" uid="uid://ciod8shdudtso" path="res://Thingys/newtons_cradle.tres" id="6_54w2n"]
-[ext_resource type="Resource" uid="uid://bar2msv83fqy5" path="res://Thingys/montage.tres" id="7_2vhw8"]
-[ext_resource type="Resource" uid="uid://cu07w36tcqxpg" path="res://Thingys/bullet_time.tres" id="8_kyjpe"]
-[ext_resource type="Resource" uid="uid://mheuqibxxawq" path="res://Thingys/broom_of_reform.tres" id="9_d61qd"]
 [ext_resource type="Script" uid="uid://cj25eabp5jigj" path="res://Scripts/EventEffects/effect_add_thingy.gd" id="10_jgape"]
 [ext_resource type="Script" uid="uid://tnxg66jw03v3" path="res://Scripts/enemy_data.gd" id="11_iivak"]
 [ext_resource type="Script" uid="uid://bl2ttj5d643xd" path="res://Scripts/horde_enemy.gd" id="12_28fev"]
@@ -26,7 +20,7 @@ metadata/_custom_type_script = "uid://b3mi542wlp4b0"
 
 [sub_resource type="Resource" id="Resource_1miy6"]
 script = ExtResource("10_jgape")
-random_pool = Array[ExtResource("4_rte3y")]([ExtResource("5_1xveg"), ExtResource("6_54w2n"), ExtResource("7_2vhw8"), ExtResource("8_kyjpe"), ExtResource("9_d61qd")])
+random_thingy = true
 metadata/_custom_type_script = "uid://cj25eabp5jigj"
 
 [sub_resource type="Resource" id="Resource_2wcht"]
@@ -62,7 +56,7 @@ metadata/_custom_type_script = "uid://b6h8ntxfaauo5"
 
 [sub_resource type="Resource" id="Resource_6q3hq"]
 script = ExtResource("10_jgape")
-random_pool = Array[ExtResource("4_rte3y")]([ExtResource("9_d61qd"), ExtResource("8_kyjpe"), ExtResource("7_2vhw8"), ExtResource("6_54w2n"), ExtResource("5_1xveg")])
+random_thingy = true
 metadata/_custom_type_script = "uid://cj25eabp5jigj"
 
 [sub_resource type="Resource" id="Resource_afakb"]

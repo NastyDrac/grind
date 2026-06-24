@@ -2,16 +2,13 @@
 
 [ext_resource type="Script" uid="uid://tnxg66jw03v3" path="res://Scripts/enemy_data.gd" id="1_rot"]
 [ext_resource type="Script" uid="uid://b1ogi3xh5xakp" path="res://Scripts/condition.gd" id="2_rot"]
-[ext_resource type="Texture2D" uid="uid://b2rjhiy4rifig" path="res://icon.svg" id="3_rot"]
+[ext_resource type="Texture2D" uid="uid://beb48vsnuj2o0" path="res://Art/rottweiler.png" id="3_huh23"]
 
 [resource]
 script = ExtResource("1_rot")
 enemy_name = "The Rottweiler"
-texture = ExtResource("3_rot")
+texture = ExtResource("3_huh23")
 min_health = 14
 max_health = 18
 damage = 8
-move_speed = 1
-attack_range = 1
-noise_cost = 4
 metadata/_custom_type_script = "uid://tnxg66jw03v3"

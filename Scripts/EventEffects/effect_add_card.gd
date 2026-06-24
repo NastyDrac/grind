@@ -20,3 +20,8 @@ func get_description(run : RunManager) -> String:
 	if count <= 1:
 		return "Add %s to your deck." % card.card_name
 	return "Add %d copies of %s to your deck." % [count, card.card_name]
+
+
+## Show a copy of the card being added when the player hovers this option.
+func get_preview_card() -> CardData:
+	return card

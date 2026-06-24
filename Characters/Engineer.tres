@@ -1,4 +1,4 @@
-[gd_resource type="Resource" script_class="CharacterData" load_steps=31 format=3 uid="uid://ce6l5lqjxvcs6"]
+[gd_resource type="Resource" script_class="CharacterData" load_steps=41 format=3 uid="uid://ce6l5lqjxvcs6"]
 
 [ext_resource type="Texture2D" uid="uid://bdwqxwxli60bi" path="res://Art/engineer.png" id="1_486th"]
 [ext_resource type="Script" uid="uid://dpayg0f6j5y2n" path="res://Scripts/character_data.gd" id="1_t1uqq"]
@@ -12,6 +12,12 @@
 [ext_resource type="Script" uid="uid://bbikocjwp04x5" path="res://Scripts/scrap_collector.gd" id="8_486th"]
 [ext_resource type="Texture2D" uid="uid://btoj6g7v0x2vq" path="res://Art/Icons/ScrapCollectorIcon.png" id="9_qa6lw"]
 [ext_resource type="Script" uid="uid://0gsjrx47no8b" path="res://Scripts/card_data.gd" id="11_qa6lw"]
+[ext_resource type="Resource" uid="uid://b8frafoxvhevc" path="res://OOR Cards/attack.tres" id="12_tikh6"]
+[ext_resource type="Resource" uid="uid://bocjesq014je8" path="res://OOR Cards/evade.tres" id="13_a167t"]
+[ext_resource type="Script" uid="uid://dhxff5egnsgrv" path="res://Scripts/action.gd" id="14_51bej"]
+[ext_resource type="Script" uid="uid://clvjn77csx1a0" path="res://Scripts/AttackAction.gd" id="15_xjt1d"]
+[ext_resource type="Resource" uid="uid://bhuosuqlkj32" path="res://items/junk.tres" id="16_nh7vn"]
+[ext_resource type="Script" uid="uid://crr7awrla465p" path="res://Scripts/drop_item_action.gd" id="17_2t2is"]
 
 [sub_resource type="Resource" id="Resource_livrn"]
 script = ExtResource("4_486th")
@@ -51,6 +57,29 @@ turret_damage = SubResource("Resource_7ytw7")
 icon = ExtResource("9_qa6lw")
 show_stacks = true
 metadata/_custom_type_script = "uid://bbikocjwp04x5"
+
+[sub_resource type="Resource" id="Resource_e1q2h"]
+script = ExtResource("4_486th")
+formula = "marbles"
+metadata/_custom_type_script = "uid://cgrxhw8vqenhu"
+
+[sub_resource type="Resource" id="Resource_vd324"]
+script = ExtResource("15_xjt1d")
+damage_calculator = SubResource("Resource_e1q2h")
+max_range = 5
+metadata/_custom_type_script = "uid://clvjn77csx1a0"
+
+[sub_resource type="Resource" id="Resource_jl6nw"]
+script = ExtResource("17_2t2is")
+item = ExtResource("16_nh7vn")
+metadata/_custom_type_script = "uid://crr7awrla465p"
+
+[sub_resource type="Resource" id="Resource_f1d2t"]
+script = ExtResource("11_qa6lw")
+card_name = "Strip Parts"
+card_cost = 2
+actions = Array[ExtResource("14_51bej")]([SubResource("Resource_vd324"), SubResource("Resource_jl6nw")])
+metadata/_custom_type_script = "uid://0gsjrx47no8b"
 
 [sub_resource type="Resource" id="Resource_lgl55"]
 script = ExtResource("4_486th")
@@ -125,4 +154,5 @@ max_health = SubResource("Resource_livrn")
 stats = Array[ExtResource("3_wqn1a")]([SubResource("Resource_486th"), SubResource("Resource_kdvfq"), SubResource("Resource_fnqnm"), SubResource("Resource_tikh6"), SubResource("Resource_51bej"), SubResource("Resource_nh7vn")])
 gold = 100
 special_effects = Array[ExtResource("2_th448")]([SubResource("Resource_v44ua"), SubResource("Resource_2t2is")])
+starting_deck = Array[ExtResource("11_qa6lw")]([ExtResource("12_tikh6"), ExtResource("12_tikh6"), ExtResource("12_tikh6"), ExtResource("12_tikh6"), ExtResource("12_tikh6"), ExtResource("13_a167t"), ExtResource("13_a167t"), ExtResource("13_a167t"), ExtResource("13_a167t"), ExtResource("13_a167t"), SubResource("Resource_f1d2t")])
 metadata/_custom_type_script = "uid://dpayg0f6j5y2n"

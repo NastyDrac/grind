@@ -3,7 +3,7 @@
 [ext_resource type="Script" uid="uid://b1ogi3xh5xakp" path="res://Scripts/condition.gd" id="1_0iymy"]
 [ext_resource type="Script" uid="uid://tnxg66jw03v3" path="res://Scripts/enemy_data.gd" id="2_7q5tt"]
 [ext_resource type="Script" uid="uid://bgw241a265wyo" path="res://Scripts/bloated.gd" id="2_spt0a"]
-[ext_resource type="Texture2D" uid="uid://b2rjhiy4rifig" path="res://icon.svg" id="4_mnsng"]
+[ext_resource type="Texture2D" uid="uid://dh3ghgo4uvj2i" path="res://Art/runner.png" id="4_spt0a"]
 
 [sub_resource type="Resource" id="Resource_trnji"]
 script = ExtResource("2_spt0a")
@@ -14,7 +14,7 @@ metadata/_custom_type_script = "uid://bgw241a265wyo"
 [resource]
 script = ExtResource("2_7q5tt")
 enemy_name = "The Infeced"
-texture = ExtResource("4_mnsng")
+texture = ExtResource("4_spt0a")
 min_health = 28
 max_health = 36
 damage = 4

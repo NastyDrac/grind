@@ -1,11 +1,10 @@
-[gd_resource type="Resource" script_class="EventData" load_steps=16 format=3 uid="uid://0a4r1sfyqvum"]
+[gd_resource type="Resource" script_class="EventData" load_steps=15 format=3 uid="uid://0a4r1sfyqvum"]
 
 [ext_resource type="Script" uid="uid://ccujthovl5rv7" path="res://Scripts/event_option.gd" id="1_7tr81"]
 [ext_resource type="Script" uid="uid://c8bk1dof3250" path="res://Scripts/event_data.gd" id="2_bui7i"]
 [ext_resource type="Script" uid="uid://chli81s5gxydu" path="res://Scripts/event_effect.gd" id="3_qe5d8"]
 [ext_resource type="Script" uid="uid://vdwy0p0apc5" path="res://Scripts/EventEffects/effect_remove_card.gd" id="4_46c15"]
 [ext_resource type="Script" uid="uid://cvilgkn5daoav" path="res://Scripts/EventEffects/effect_card_draft.gd" id="5_fjpqp"]
-[ext_resource type="Script" uid="uid://b1ogi3xh5xakp" path="res://Scripts/condition.gd" id="5_worqd"]
 [ext_resource type="Script" uid="uid://cj25eabp5jigj" path="res://Scripts/EventEffects/effect_add_thingy.gd" id="6_bc8rt"]
 [ext_resource type="Resource" uid="uid://c2xrf1pv6gxsb" path="res://Thingys/plot_armor.tres" id="7_6fkn1"]
 [ext_resource type="Script" uid="uid://b3mi542wlp4b0" path="res://Scripts/EventEffects/effect_cost_gold.gd" id="8_max1c"]

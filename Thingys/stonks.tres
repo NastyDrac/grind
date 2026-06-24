@@ -1,0 +1,10 @@
+[gd_resource type="Resource" script_class="Stonks" load_steps=2 format=3 uid="uid://cstonks000001"]
+
+[ext_resource type="Script" path="res://Scripts/stonks.gd" id="1_stnk"]
+
+[resource]
+script = ExtResource("1_stnk")
+condition_name = "Stonks"
+rarity = 2
+amount = 1
+stat_type = 5

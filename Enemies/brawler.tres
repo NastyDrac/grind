@@ -4,7 +4,7 @@
 [ext_resource type="Script" uid="uid://bpr8cwurcrxy3" path="res://Scripts/triggered_condition.gd" id="2_bh2cu"]
 [ext_resource type="Script" uid="uid://tnxg66jw03v3" path="res://Scripts/enemy_data.gd" id="2_fkt03"]
 [ext_resource type="Script" uid="uid://d0hdj6yes681x" path="res://Scripts/damage_buff.gd" id="3_wdvpy"]
-[ext_resource type="Texture2D" uid="uid://b2rjhiy4rifig" path="res://icon.svg" id="5_jlfdq"]
+[ext_resource type="Texture2D" uid="uid://ck44o7lm0htiy" path="res://Art/brawler.png" id="5_bh2cu"]
 
 [sub_resource type="Resource" id="Resource_khncr"]
 script = ExtResource("3_wdvpy")
@@ -24,7 +24,7 @@ metadata/_custom_type_script = "uid://bpr8cwurcrxy3"
 [resource]
 script = ExtResource("2_fkt03")
 enemy_name = "Brawler"
-texture = ExtResource("5_jlfdq")
+texture = ExtResource("5_bh2cu")
 min_health = 16
 max_health = 22
 damage = 5

@@ -5,7 +5,7 @@
 [ext_resource type="Script" uid="uid://tnxg66jw03v3" path="res://Scripts/enemy_data.gd" id="2_w5fhw"]
 [ext_resource type="Script" uid="uid://b2o6hip7peiwb" path="res://Scripts/move_pattern.gd" id="3_5w4w8"]
 [ext_resource type="Script" uid="uid://rf04wb68htw8" path="res://Scripts/move_step.gd" id="4_bxj2k"]
-[ext_resource type="Texture2D" uid="uid://b2rjhiy4rifig" path="res://icon.svg" id="6_v2wkv"]
+[ext_resource type="Texture2D" uid="uid://cejtpktjn1cj3" path="res://Art/Characters/DeadAdventurerAlt.png" id="6_5f5gq"]
 
 [sub_resource type="Resource" id="Resource_nsiv2"]
 script = ExtResource("2_5f5gq")
@@ -24,7 +24,7 @@ metadata/_custom_type_script = "uid://b2o6hip7peiwb"
 [resource]
 script = ExtResource("2_w5fhw")
 enemy_name = "The Lookout"
-texture = ExtResource("6_v2wkv")
+texture = ExtResource("6_5f5gq")
 min_health = 8
 max_health = 12
 damage = 4

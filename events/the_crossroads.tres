@@ -1,0 +1,53 @@
+[gd_resource type="Resource" script_class="EventData" load_steps=13 format=3 uid="uid://dcrossroads01"]
+
+[ext_resource type="Script" uid="uid://ccujthovl5rv7" path="res://Scripts/event_option.gd" id="1_opt"]
+[ext_resource type="Script" uid="uid://c8bk1dof3250" path="res://Scripts/event_data.gd" id="2_evt"]
+[ext_resource type="Script" uid="uid://chli81s5gxydu" path="res://Scripts/event_effect.gd" id="3_eff"]
+[ext_resource type="Script" uid="uid://bggju16i5y2vm" path="res://Scripts/EventEffects/effect_cost_hp.gd" id="4_hp"]
+[ext_resource type="Script" uid="uid://cj25eabp5jigj" path="res://Scripts/EventEffects/effect_add_thingy.gd" id="5_thy"]
+[ext_resource type="Script" uid="uid://ckmlhw3dcvb0k" path="res://Scripts/EventEffects/effect_mod_stat.gd" id="6_mod"]
+
+[sub_resource type="Resource" id="Res_blood"]
+script = ExtResource("4_hp")
+amount = 8
+metadata/_custom_type_script = "uid://bggju16i5y2vm"
+
+[sub_resource type="Resource" id="Res_relic"]
+script = ExtResource("5_thy")
+random_thingy = true
+count = 1
+metadata/_custom_type_script = "uid://cj25eabp5jigj"
+
+[sub_resource type="Resource" id="Res_essence"]
+script = ExtResource("6_mod")
+modify_value = -1
+random_stat = true
+metadata/_custom_type_script = "uid://ckmlhw3dcvb0k"
+
+[sub_resource type="Resource" id="Res_optA"]
+script = ExtResource("1_opt")
+option_text = "Shake the stranger's hand."
+result_text = "His grip is cold and it lasts a beat too long. Something passes between you — out of you, more like — and when he lets go there's a weight in your pocket that wasn't there before. He's already walking away. There was never any walking away."
+effects = Array[ExtResource("3_eff")]([SubResource("Res_blood"), SubResource("Res_relic")])
+metadata/_custom_type_script = "uid://ccujthovl5rv7"
+
+[sub_resource type="Resource" id="Res_optB"]
+script = ExtResource("1_opt")
+option_text = "Sign your name in red."
+result_text = "The pen's already warm. You sign, and feel something quiet leave you for good — not blood this time, something further in. The gift he leaves is real enough. They always are. That's the trick of it."
+effects = Array[ExtResource("3_eff")]([SubResource("Res_essence"), SubResource("Res_relic")])
+metadata/_custom_type_script = "uid://ccujthovl5rv7"
+
+[sub_resource type="Resource" id="Res_optC"]
+script = ExtResource("1_opt")
+option_text = "Tip your hat and walk on."
+result_text = "You touch your brim, say nothing, and keep your boots moving. Behind you the gentleman doesn't call out. Men like that don't have to. They know the road brings everyone back around eventually."
+metadata/_custom_type_script = "uid://ccujthovl5rv7"
+
+[resource]
+script = ExtResource("2_evt")
+event_title = "The Crossroads"
+event_description = "Midnight, where two dirt roads cut across each other in the middle of nowhere. A gentleman waits there in a clean black suit, no horse, no lantern, and — you notice with a crawl up your neck — no shadow pooled under him despite the fat moon. 'Evenin',' he says warmly, producing a folded contract from inside his coat. 'I deal in arrangements. You've got the look of someone a few cards short of the hand they wanted. I can fix that. The price is fair — it always feels fair, right up until it's paid.'"
+options = Array[ExtResource("1_opt")]([SubResource("Res_optA"), SubResource("Res_optB"), SubResource("Res_optC")])
+event_type = 3
+metadata/_custom_type_script = "uid://c8bk1dof3250"

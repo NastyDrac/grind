@@ -1,0 +1,9 @@
+[gd_resource type="Resource" script_class="LootGoblin" load_steps=2 format=3 uid="uid://clootgob00001"]
+
+[ext_resource type="Script" path="res://Scripts/loot_goblin.gd" id="1_loot"]
+
+[resource]
+script = ExtResource("1_loot")
+condition_name = "Loot Goblin"
+rarity = 0
+gold_per_item = 3

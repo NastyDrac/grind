@@ -261,10 +261,14 @@ func _on_time_passed():
 		SpawnMode.METER:
 			# Passive tick: pressure builds even when the player plays cheaply.
 			noise_meter += passive_noise_per_turn
+			# Announce the turn's full noise (card costs + passive) before it drains,
+			# so quiet-play listeners (e.g. Cool Head) see the real total.
+			Global.noise_settled.emit(noise_meter)
 			_drain_meter_into_spawns()
 		SpawnMode.MIDDLE_GROUND:
 			# No passive tick — only card costs charge the meter —
 			# but drain whatever has accumulated from card plays this turn.
+			Global.noise_settled.emit(noise_meter)
 			_drain_meter_into_spawns()
 
 	# Sequential movement: pick one enemy to advance this turn.

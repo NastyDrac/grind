@@ -597,6 +597,14 @@ func _execute_queued_non_card_actions():
 	var queued : Array = action_queue.duplicate()
 	action_queue.clear()
 	
+	# Capture the play's state up front too. current_action_index and selected_card
+	# are instance vars that another flow can change while we're suspended on the
+	# timer await; if we read them AFTER the loop the play can mis-route back into
+	# targeting and strand the card. We decide completion from these captured values.
+	var card := selected_card
+	var resume_index : int = current_action_index
+	var actions_total : int = card.data.actions.size() if (card and card.data) else 0
+	
 	for idx in range(queued.size()):
 		var action_data = queued[idx]
 		var action = action_data["action"]
@@ -626,11 +634,16 @@ func _execute_queued_non_card_actions():
 	# Rearrange hand (cards may have been drawn)
 	arrange_cards()
 	
-	# Continue with next action (will be card targeting)
-	if current_action_index < selected_card.data.actions.size():
+	# If a different play replaced/cancelled this one during an await, don't touch it.
+	if selected_card != card:
+		return
+	
+	# Continue with next action (card targeting) ONLY if more remain; otherwise the
+	# play is finished. Uses the captured index so a clobbered current_action_index
+	# can't send us back into targeting for an already-resolved action.
+	if resume_index < actions_total:
 		await _collect_targets_for_next_action()
 	else:
-		# All done
 		_complete_card_play()
 
 func _get_automatic_targets(action: Action) -> Array:
@@ -1205,6 +1218,14 @@ func _execute_action_on_targets(action: Action, targets: Array):
 
 func _complete_card_play():
 	Global.card_played.emit(selected_card.data)
+
+	# The play is over: make sure no targeting state or visuals linger. The arrow
+	# is a self-redrawing Line2D, so it must be explicitly hidden here — nulling
+	# selected_card alone leaves its last frame on screen.
+	is_targeting = false
+	is_card_targeting = false
+	if targeting_arrow:
+		targeting_arrow.hide_arrow()
 
 	selected_card.reparent(self)
 

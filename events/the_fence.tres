@@ -1,26 +1,20 @@
-[gd_resource type="Resource" script_class="EventData" load_steps=20 format=3 uid="uid://dfence4evt01"]
+[gd_resource type="Resource" script_class="EventData" load_steps=14 format=3 uid="uid://dfence4evt01"]
 
 [ext_resource type="Script" uid="uid://ccujthovl5rv7" path="res://Scripts/event_option.gd" id="1_opt"]
 [ext_resource type="Script" uid="uid://c8bk1dof3250" path="res://Scripts/event_data.gd" id="2_evt"]
 [ext_resource type="Script" uid="uid://chli81s5gxydu" path="res://Scripts/event_effect.gd" id="3_eff"]
 [ext_resource type="Script" uid="uid://b3mi542wlp4b0" path="res://Scripts/EventEffects/effect_cost_gold.gd" id="4_gold"]
-[ext_resource type="Script" uid="uid://b1ogi3xh5xakp" path="res://Scripts/condition.gd" id="4_u7v0o"]
-[ext_resource type="Resource" uid="uid://mheuqibxxawq" path="res://Thingys/broom_of_reform.tres" id="5_gd8af"]
 [ext_resource type="Script" uid="uid://cj25eabp5jigj" path="res://Scripts/EventEffects/effect_add_thingy.gd" id="5_thy"]
-[ext_resource type="Resource" uid="uid://c2xrf1pv6gxsb" path="res://Thingys/plot_armor.tres" id="6_armor"]
-[ext_resource type="Resource" uid="uid://cu07w36tcqxpg" path="res://Thingys/bullet_time.tres" id="6_sat5v"]
-[ext_resource type="Resource" uid="uid://bar2msv83fqy5" path="res://Thingys/montage.tres" id="7_5i2lg"]
 [ext_resource type="Script" uid="uid://b26b68w4tu72s" path="res://Scripts/leaky_purse.gd" id="7_wwtog"]
-[ext_resource type="Resource" uid="uid://ciod8shdudtso" path="res://Thingys/newtons_cradle.tres" id="8_va12n"]
 
 [sub_resource type="Resource" id="Res_sell"]
 script = ExtResource("4_gold")
-amount = -25
+amount = 25
 metadata/_custom_type_script = "uid://b3mi542wlp4b0"
 
 [sub_resource type="Resource" id="Resource_u7v0o"]
 script = ExtResource("5_thy")
-random_pool = Array[ExtResource("4_u7v0o")]([ExtResource("5_gd8af"), ExtResource("6_sat5v"), ExtResource("7_5i2lg"), ExtResource("8_va12n"), ExtResource("6_armor")])
+random_thingy = true
 metadata/_custom_type_script = "uid://cj25eabp5jigj"
 
 [sub_resource type="Resource" id="Res_optA"]
@@ -32,7 +26,7 @@ metadata/_custom_type_script = "uid://ccujthovl5rv7"
 
 [sub_resource type="Resource" id="Res_coin"]
 script = ExtResource("4_gold")
-amount = 50
+amount = -100
 metadata/_custom_type_script = "uid://b3mi542wlp4b0"
 
 [sub_resource type="Resource" id="Resource_wg5o2"]

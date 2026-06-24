@@ -1,7 +1,7 @@
 [gd_resource type="Resource" script_class="WereOstrichData" load_steps=3 format=3 uid="uid://d0jqhw35a5vs3"]
 
 [ext_resource type="Script" uid="uid://b84lcjd65hr2m" path="res://Scripts/were-ostrich.gd" id="2_elhfv"]
-[ext_resource type="Texture2D" uid="uid://c50c16qnyv3tl" path="res://Art/Walk (1).png" id="2_vgo0j"]
+[ext_resource type="Texture2D" uid="uid://bbhhvjkw485ux" path="res://Art/Characters/wereostrich.png" id="2_vgo0j"]
 
 [resource]
 script = ExtResource("2_elhfv")
@@ -17,6 +17,5 @@ damage = 5
 move_speed = null
 attack_range = null
 conditions = null
-noise_cost = null
 is_elite = true
 metadata/_custom_type_script = "uid://b84lcjd65hr2m"

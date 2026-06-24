@@ -1,10 +1,9 @@
-[gd_resource type="Resource" script_class="EventData" load_steps=15 format=3 uid="uid://dbones3evt01"]
+[gd_resource type="Resource" script_class="EventData" load_steps=14 format=3 uid="uid://dbones3evt01"]
 
 [ext_resource type="Script" uid="uid://ccujthovl5rv7" path="res://Scripts/event_option.gd" id="1_opt"]
 [ext_resource type="Script" uid="uid://c8bk1dof3250" path="res://Scripts/event_data.gd" id="2_evt"]
 [ext_resource type="Script" uid="uid://chli81s5gxydu" path="res://Scripts/event_effect.gd" id="3_eff"]
 [ext_resource type="Script" uid="uid://bggju16i5y2vm" path="res://Scripts/EventEffects/effect_cost_hp.gd" id="4_hp"]
-[ext_resource type="Script" uid="uid://b1ogi3xh5xakp" path="res://Scripts/condition.gd" id="5_2d3cu"]
 [ext_resource type="Script" uid="uid://vdwy0p0apc5" path="res://Scripts/EventEffects/effect_remove_card.gd" id="5_rem"]
 [ext_resource type="Script" uid="uid://cj25eabp5jigj" path="res://Scripts/EventEffects/effect_add_thingy.gd" id="6_thy"]
 [ext_resource type="Script" uid="uid://dluo7b273d1yw" path="res://Scripts/heat_curse.gd" id="7_xkulp"]

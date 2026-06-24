@@ -1,0 +1,68 @@
+[gd_resource type="Resource" script_class="EventData" load_steps=16 format=3 uid="uid://dwhetstone001"]
+
+[ext_resource type="Script" uid="uid://ccujthovl5rv7" path="res://Scripts/event_option.gd" id="1_opt"]
+[ext_resource type="Script" uid="uid://c8bk1dof3250" path="res://Scripts/event_data.gd" id="2_evt"]
+[ext_resource type="Script" uid="uid://chli81s5gxydu" path="res://Scripts/event_effect.gd" id="3_eff"]
+[ext_resource type="Script" uid="uid://bdr3fcs6uxkc1" path="res://Scripts/EventEffects/effect_add_action.gd" id="4_act"]
+[ext_resource type="Script" uid="uid://bggju16i5y2vm" path="res://Scripts/EventEffects/effect_cost_hp.gd" id="5_hp"]
+[ext_resource type="Script" uid="uid://clvjn77csx1a0" path="res://Scripts/AttackAction.gd" id="6_atk"]
+[ext_resource type="Script" uid="uid://cgrxhw8vqenhu" path="res://Scripts/ValueCalculator.gd" id="7_calc"]
+
+[sub_resource type="Resource" id="Calc_edge"]
+script = ExtResource("7_calc")
+formula = "4"
+metadata/_custom_type_script = "uid://cgrxhw8vqenhu"
+
+[sub_resource type="Resource" id="Atk_edge"]
+script = ExtResource("6_atk")
+damage_calculator = SubResource("Calc_edge")
+max_range = 4
+animation_type = 2
+metadata/_custom_type_script = "uid://clvjn77csx1a0"
+
+[sub_resource type="Resource" id="Res_pick"]
+script = ExtResource("4_act")
+action = SubResource("Atk_edge")
+count = 1
+random_cards = false
+metadata/_custom_type_script = "uid://bdr3fcs6uxkc1"
+
+[sub_resource type="Resource" id="Res_blood"]
+script = ExtResource("5_hp")
+amount = 8
+metadata/_custom_type_script = "uid://bggju16i5y2vm"
+
+[sub_resource type="Resource" id="Res_rand"]
+script = ExtResource("4_act")
+action = SubResource("Atk_edge")
+count = 2
+random_cards = true
+metadata/_custom_type_script = "uid://bdr3fcs6uxkc1"
+
+[sub_resource type="Resource" id="Res_optA"]
+script = ExtResource("1_opt")
+option_text = "Feed it a card."
+result_text = "You set one of your cards against the turning stone. Sparks fly, the thing shrieks with what might be pleasure, and what comes off the wheel is meaner than what went on."
+effects = Array[ExtResource("3_eff")]([SubResource("Res_pick")])
+metadata/_custom_type_script = "uid://ccujthovl5rv7"
+
+[sub_resource type="Resource" id="Res_optB"]
+script = ExtResource("1_opt")
+option_text = "Feed it your hand."
+result_text = "You press your palm flat to the spinning stone and let it take its due in blood. It works deeper for the offering — grabbing at your cards greedily, sharpening whatever it pleases. You don't get a say in which. The stone never gives you a say."
+effects = Array[ExtResource("3_eff")]([SubResource("Res_blood"), SubResource("Res_rand")])
+metadata/_custom_type_script = "uid://ccujthovl5rv7"
+
+[sub_resource type="Resource" id="Res_optC"]
+script = ExtResource("1_opt")
+option_text = "Leave it spinning."
+result_text = "You back away slow. The grindstone keeps turning behind you, throwing sparks at the empty air, waiting for the next fool with something worth ruining."
+metadata/_custom_type_script = "uid://ccujthovl5rv7"
+
+[resource]
+script = ExtResource("2_evt")
+event_title = "The Whetstone"
+event_description = "At the lip of a long-dry creek bed, a grindstone turns. There's no crank, no wheel, no water, no hand on it — just a heavy wet stone spinning on its own and throwing fat orange sparks into the dusk at absolutely nothing. As you draw near, it seems to turn a little faster, a little more eager, like a dog that's heard the cupboard open. It wants to sharpen something. You get the distinct sense it isn't particular about what."
+options = Array[ExtResource("1_opt")]([SubResource("Res_optA"), SubResource("Res_optB"), SubResource("Res_optC")])
+event_type = 3
+metadata/_custom_type_script = "uid://c8bk1dof3250"

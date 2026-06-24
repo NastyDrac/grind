@@ -1,0 +1,30 @@
+[gd_resource type="Resource" script_class="CardData" load_steps=8 format=3 uid="uid://b8frafoxvhevc"]
+
+[ext_resource type="Script" uid="uid://dhxff5egnsgrv" path="res://Scripts/action.gd" id="1_t11pm"]
+[ext_resource type="Script" uid="uid://cgrxhw8vqenhu" path="res://Scripts/ValueCalculator.gd" id="2_lmri5"]
+[ext_resource type="Script" uid="uid://0gsjrx47no8b" path="res://Scripts/card_data.gd" id="2_n6md4"]
+[ext_resource type="Script" uid="uid://clvjn77csx1a0" path="res://Scripts/AttackAction.gd" id="3_pth28"]
+
+[sub_resource type="Resource" id="Resource_nuwup"]
+script = ExtResource("2_lmri5")
+formula = "5"
+metadata/_custom_type_script = "uid://cgrxhw8vqenhu"
+
+[sub_resource type="Resource" id="Resource_ohcl8"]
+script = ExtResource("2_lmri5")
+formula = "1"
+metadata/_custom_type_script = "uid://cgrxhw8vqenhu"
+
+[sub_resource type="Resource" id="Resource_2k6qy"]
+script = ExtResource("3_pth28")
+damage_calculator = SubResource("Resource_nuwup")
+enemy_count_calculator = SubResource("Resource_ohcl8")
+max_range = 4
+animation_type = 1
+metadata/_custom_type_script = "uid://clvjn77csx1a0"
+
+[resource]
+script = ExtResource("2_n6md4")
+card_name = "Attack"
+actions = Array[ExtResource("1_t11pm")]([SubResource("Resource_2k6qy")])
+metadata/_custom_type_script = "uid://0gsjrx47no8b"

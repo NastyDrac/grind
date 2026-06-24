@@ -4,7 +4,7 @@
 [ext_resource type="Script" uid="uid://b2o6hip7peiwb" path="res://Scripts/move_pattern.gd" id="2_gat"]
 [ext_resource type="Script" uid="uid://tnxg66jw03v3" path="res://Scripts/enemy_data.gd" id="3_gat"]
 [ext_resource type="Script" uid="uid://rf04wb68htw8" path="res://Scripts/move_step.gd" id="4_gat"]
-[ext_resource type="Texture2D" uid="uid://b2rjhiy4rifig" path="res://icon.svg" id="5_gat"]
+[ext_resource type="Texture2D" uid="uid://cf7duhoesbaod" path="res://Art/gator.png" id="5_x0tua"]
 
 [sub_resource type="Resource" id="Resource_gat_attack"]
 script = ExtResource("4_gat")
@@ -24,7 +24,7 @@ metadata/_custom_type_script = "uid://b2o6hip7peiwb"
 [resource]
 script = ExtResource("3_gat")
 enemy_name = "The Gator"
-texture = ExtResource("5_gat")
+texture = ExtResource("5_x0tua")
 min_health = 40
 max_health = 52
 damage = 11

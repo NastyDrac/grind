@@ -1,0 +1,9 @@
+[gd_resource type="Resource" script_class="CombustibleLemons" load_steps=2 format=3 uid="uid://clemons00001"]
+
+[ext_resource type="Script" path="res://Scripts/combustible_lemons.gd" id="1_lmn"]
+
+[resource]
+script = ExtResource("1_lmn")
+condition_name = "Combustible Lemons"
+rarity = 1
+burn_per_hit = 1

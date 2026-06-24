@@ -4,7 +4,7 @@
 [ext_resource type="Script" uid="uid://tnxg66jw03v3" path="res://Scripts/enemy_data.gd" id="2_a5ju5"]
 [ext_resource type="Script" uid="uid://bpr8cwurcrxy3" path="res://Scripts/triggered_condition.gd" id="2_st4n4"]
 [ext_resource type="Script" uid="uid://dqr8kxmoc0iom" path="res://Scripts/burning.gd" id="3_87w5v"]
-[ext_resource type="Texture2D" uid="uid://b2rjhiy4rifig" path="res://icon.svg" id="5_5f5cc"]
+[ext_resource type="Texture2D" uid="uid://cxf0v880no7s1" path="res://Art/arsonist.png" id="5_st4n4"]
 
 [sub_resource type="Resource" id="Resource_q2prx"]
 script = ExtResource("3_87w5v")
@@ -22,7 +22,7 @@ metadata/_custom_type_script = "uid://bpr8cwurcrxy3"
 [resource]
 script = ExtResource("2_a5ju5")
 enemy_name = "The Arsonist"
-texture = ExtResource("5_5f5cc")
+texture = ExtResource("5_st4n4")
 min_health = 12
 max_health = 17
 damage = 4

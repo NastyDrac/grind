@@ -2,7 +2,7 @@
 
 [ext_resource type="Script" uid="uid://b1ogi3xh5xakp" path="res://Scripts/condition.gd" id="1_nro5p"]
 [ext_resource type="Script" uid="uid://tnxg66jw03v3" path="res://Scripts/enemy_data.gd" id="2_8nrnr"]
-[ext_resource type="Texture2D" uid="uid://b2rjhiy4rifig" path="res://icon.svg" id="3_8nrnr"]
+[ext_resource type="Texture2D" uid="uid://cjit35hf1www2" path="res://Art/juggernaut.png" id="3_8nrnr"]
 
 [resource]
 script = ExtResource("2_8nrnr")
@@ -10,5 +10,4 @@ texture = ExtResource("3_8nrnr")
 min_health = 60
 max_health = 80
 damage = 9
-noise_cost = 5
 metadata/_custom_type_script = "uid://tnxg66jw03v3"

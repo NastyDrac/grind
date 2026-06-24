@@ -1,0 +1,73 @@
+[gd_resource type="Resource" script_class="EventData" load_steps=17 format=3 uid="uid://drevival00001"]
+
+[ext_resource type="Script" uid="uid://ccujthovl5rv7" path="res://Scripts/event_option.gd" id="1_opt"]
+[ext_resource type="Script" uid="uid://c8bk1dof3250" path="res://Scripts/event_data.gd" id="2_evt"]
+[ext_resource type="Script" uid="uid://chli81s5gxydu" path="res://Scripts/event_effect.gd" id="3_eff"]
+[ext_resource type="Script" uid="uid://bggju16i5y2vm" path="res://Scripts/EventEffects/effect_cost_hp.gd" id="4_hp"]
+[ext_resource type="Script" uid="uid://cj25eabp5jigj" path="res://Scripts/EventEffects/effect_add_thingy.gd" id="5_thy"]
+[ext_resource type="Script" uid="uid://ckmlhw3dcvb0k" path="res://Scripts/EventEffects/effect_mod_stat.gd" id="6_mod"]
+[ext_resource type="Script" uid="uid://b2h1ochum01o" path="res://Scripts/stat.gd" id="7_stat"]
+
+[sub_resource type="Resource" id="Res_heal"]
+script = ExtResource("4_hp")
+amount = -15
+metadata/_custom_type_script = "uid://bggju16i5y2vm"
+
+[sub_resource type="Resource" id="Res_blessing"]
+script = ExtResource("5_thy")
+random_thingy = true
+count = 1
+metadata/_custom_type_script = "uid://cj25eabp5jigj"
+
+[sub_resource type="Resource" id="Stat_guts"]
+script = ExtResource("7_stat")
+stat_type = 2
+metadata/_custom_type_script = "uid://b2h1ochum01o"
+
+[sub_resource type="Resource" id="Res_gutsUp"]
+script = ExtResource("6_mod")
+stat_to_mod = SubResource("Stat_guts")
+modify_value = 2
+random_stat = false
+metadata/_custom_type_script = "uid://ckmlhw3dcvb0k"
+
+[sub_resource type="Resource" id="Res_flesh"]
+script = ExtResource("4_hp")
+amount = 10
+metadata/_custom_type_script = "uid://bggju16i5y2vm"
+
+[sub_resource type="Resource" id="Res_curse"]
+script = ExtResource("6_mod")
+modify_value = -1
+random_stat = true
+metadata/_custom_type_script = "uid://ckmlhw3dcvb0k"
+
+[sub_resource type="Resource" id="Res_optA"]
+script = ExtResource("1_opt")
+option_text = "Tithe generously."
+result_text = "You drop your coin in the plate and the preacher's whole face lights up like a struck match. He lays a calloused hand on your forehead, hollers a word you don't catch — and the road's aches melt out of you. Something else settles in to take their place. A gift, he calls it."
+effects = Array[ExtResource("3_eff")]([SubResource("Res_heal"), SubResource("Res_blessing")])
+gold_cost = 25
+metadata/_custom_type_script = "uid://ccujthovl5rv7"
+
+[sub_resource type="Resource" id="Res_optB"]
+script = ExtResource("1_opt")
+option_text = "Offer your flesh."
+result_text = "'The Lord don't take coin from a man who's got none,' the preacher says, 'but He'll take a pound of resolve and call it even.' It hurts. Lord, it hurts. But you stand up from the altar harder than you knelt at it."
+effects = Array[ExtResource("3_eff")]([SubResource("Res_flesh"), SubResource("Res_gutsUp")])
+metadata/_custom_type_script = "uid://ccujthovl5rv7"
+
+[sub_resource type="Resource" id="Res_optC"]
+script = ExtResource("1_opt")
+option_text = "Heckle the preacher."
+result_text = "You let him have it, good and loud, in front of the whole tent. He goes quiet. He smiles. He points one finger at you and says something soft that the crowd can't hear — and you feel it land somewhere deep, like a splinter you'll be a long time digging out."
+effects = Array[ExtResource("3_eff")]([SubResource("Res_curse")])
+metadata/_custom_type_script = "uid://ccujthovl5rv7"
+
+[resource]
+script = ExtResource("2_evt")
+event_title = "The Revival Tent"
+event_description = "Patched canvas strung between two dead trees, lit up gold from inside, and a voice rolling out of it that could strip paint. The preacher's mid-sermon about the end of the world and he sounds downright delighted about it. The tent's packed with the desperate and the hopeful, swaying. As you duck inside, his eyes find you instantly — the stranger, the doubter — and the collection plate begins its long, inevitable journey toward your row."
+options = Array[ExtResource("1_opt")]([SubResource("Res_optA"), SubResource("Res_optB"), SubResource("Res_optC")])
+event_type = 2
+metadata/_custom_type_script = "uid://c8bk1dof3250"

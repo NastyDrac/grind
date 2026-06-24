@@ -1,0 +1,63 @@
+[gd_resource type="Resource" script_class="EventData" load_steps=15 format=3 uid="uid://dgunsmith0001"]
+
+[ext_resource type="Script" uid="uid://ccujthovl5rv7" path="res://Scripts/event_option.gd" id="1_opt"]
+[ext_resource type="Script" uid="uid://c8bk1dof3250" path="res://Scripts/event_data.gd" id="2_evt"]
+[ext_resource type="Script" uid="uid://chli81s5gxydu" path="res://Scripts/event_effect.gd" id="3_eff"]
+[ext_resource type="Script" uid="uid://bdr3fcs6uxkc1" path="res://Scripts/EventEffects/effect_add_action.gd" id="4_act"]
+[ext_resource type="Script" path="res://Scripts/EventEffects/effect_card_flag.gd" id="5_flag"]
+[ext_resource type="Script" uid="uid://clvjn77csx1a0" path="res://Scripts/AttackAction.gd" id="6_atk"]
+[ext_resource type="Script" uid="uid://cgrxhw8vqenhu" path="res://Scripts/ValueCalculator.gd" id="7_calc"]
+
+[sub_resource type="Resource" id="Calc_bite"]
+script = ExtResource("7_calc")
+formula = "3"
+metadata/_custom_type_script = "uid://cgrxhw8vqenhu"
+
+[sub_resource type="Resource" id="Atk_bite"]
+script = ExtResource("6_atk")
+damage_calculator = SubResource("Calc_bite")
+max_range = 4
+animation_type = 2
+metadata/_custom_type_script = "uid://clvjn77csx1a0"
+
+[sub_resource type="Resource" id="Res_hone"]
+script = ExtResource("4_act")
+action = SubResource("Atk_bite")
+count = 1
+random_cards = false
+metadata/_custom_type_script = "uid://bdr3fcs6uxkc1"
+
+[sub_resource type="Resource" id="Res_unexhaust"]
+script = ExtResource("5_flag")
+flag = 0
+value = false
+count = 1
+
+[sub_resource type="Resource" id="Res_optA"]
+script = ExtResource("1_opt")
+option_text = "Pay him to hone a piece."
+result_text = "He takes the card without a word, holds it up to the light of his one good eye, and goes to work with a file that sings. When he hands it back it's got teeth it didn't have before."
+effects = Array[ExtResource("3_eff")]([SubResource("Res_hone")])
+gold_cost = 30
+metadata/_custom_type_script = "uid://ccujthovl5rv7"
+
+[sub_resource type="Resource" id="Res_optB"]
+script = ExtResource("1_opt")
+option_text = "Let him cut the weight."
+result_text = "'Some pieces are built to fire once and get tossed,' he grunts. 'Wasteful.' He shaves something off it, oils the action, works it loose — and now it'll come back to your hand as many times as you need it."
+effects = Array[ExtResource("3_eff")]([SubResource("Res_unexhaust")])
+metadata/_custom_type_script = "uid://ccujthovl5rv7"
+
+[sub_resource type="Resource" id="Res_optC"]
+script = ExtResource("1_opt")
+option_text = "Keep your hands off my iron."
+result_text = "'Suit yourself.' He's already turned back to the bench, filing at something that screams faintly under the steel. You decide not to ask."
+metadata/_custom_type_script = "uid://ccujthovl5rv7"
+
+[resource]
+script = ExtResource("2_evt")
+event_title = "The Gunsmith"
+event_description = "The shop smells of gun oil, scorched metal, and something underneath that you elect not to identify. Behind a bench worn smooth and black with use sits a one-eyed man who doesn't look up right away — he's busy coaxing a screaming edge onto something held in a vise. 'Hand me somethin' that shoots,' he says finally, 'and I'll make it mean. I do good work. I do it for a price, or for a favor, or' — he finally looks at you — 'for the pure joy of ruining a thing properly. Your pick.'"
+options = Array[ExtResource("1_opt")]([SubResource("Res_optA"), SubResource("Res_optB"), SubResource("Res_optC")])
+event_type = 1
+metadata/_custom_type_script = "uid://c8bk1dof3250"

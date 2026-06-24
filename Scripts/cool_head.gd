@@ -39,37 +39,42 @@ func setup(who, rm) -> void:
 	# Arm now if you're currently quiet: a relic at combat start (0 noise) arms
 	# turn 1; a card played while disciplined arms this turn too.
 	_armed = _is_quiet()
-	_spent_this_turn = false
-	if not Global.time_passed.is_connected(_on_time_passed):
-		Global.time_passed.connect(_on_time_passed)
+	_strikes_this_turn = 0
+	if not Global.noise_settled.is_connected(_on_noise_settled):
+		Global.noise_settled.connect(_on_noise_settled)
 	if not Global.card_played.is_connected(_on_card_played):
 		Global.card_played.connect(_on_card_played)
 
 
 func teardown() -> void:
-	if Global.time_passed.is_connected(_on_time_passed):
-		Global.time_passed.disconnect(_on_time_passed)
+	if Global.noise_settled.is_connected(_on_noise_settled):
+		Global.noise_settled.disconnect(_on_noise_settled)
 	if Global.card_played.is_connected(_on_card_played):
 		Global.card_played.disconnect(_on_card_played)
 	super()
 
 
 var _armed : bool = false
-var _spent_this_turn : bool = false
+## Strikes (cards containing an AttackAction) played this turn. card_played fires
+## when a card finishes, BEFORE its deferred damage lands, so counting here and
+## gating on the count keeps the bonus live across every hit/hop of the FIRST
+## strike card and drops it for the next one.
+var _strikes_this_turn : int = 0
 
 
-func _on_time_passed() -> void:
-	# Re-evaluate at every turn boundary: a quiet turn arms next turn's first
-	# strike, a loud turn clears it; reset the per-turn spend flag.
-	_armed = _is_quiet()
-	_spent_this_turn = false
+## Fired at the turn boundary with the turn's FULL noise (card costs + passive),
+## captured before the meter drains. Arm next turn's first strike iff that total
+## stayed at or under the threshold.
+func _on_noise_settled(total_noise: float) -> void:
+	_armed = total_noise <= quiet_threshold
+	_strikes_this_turn = 0
 
 
 func _on_card_played(card_data) -> void:
-	# Spend once the first STRIKE card resolves. A strike is any card carrying an
-	# AttackAction (or child); non-attacks leave the buff armed for a later strike.
-	if _armed and not _spent_this_turn and _card_is_strike(card_data):
-		_spent_this_turn = true
+	# Tally strike cards. The first one (count becomes 1) is the one that gets the
+	# bonus on all its hits; the second (count 2) no longer qualifies.
+	if _card_is_strike(card_data):
+		_strikes_this_turn += 1
 
 
 ## True if the card contains an AttackAction or any subclass of it.
@@ -82,14 +87,14 @@ func _card_is_strike(card_data) -> bool:
 	return false
 
 
-func _is_quiet() -> bool:
+func _current_noise() -> float:
 	if range_manager and ("noise_meter" in range_manager):
-		return range_manager.noise_meter <= quiet_threshold
-	return false
+		return range_manager.noise_meter
+	return 0.0
 
 
-func _buff_live() -> bool:
-	return _armed and not _spent_this_turn
+func _is_quiet() -> bool:
+	return _current_noise() <= quiet_threshold
 
 
 ## The current bonus, evaluated against the player. Returns 0 when the calc isn't
@@ -101,16 +106,19 @@ func _bonus() -> int:
 	return 0
 
 
-## PREVIEW (pure): strike cards preview the boosted number while the buff is live;
-## once a strike is played, every card reads base on the next render.
+## PREVIEW (pure): show the boosted number only before any strike is played this
+## turn, so the card you're about to play reads correctly and later cards don't.
 func preview_outgoing_damage(damage: int, _target, _action) -> int:
-	return damage + _bonus() if _buff_live() else damage
+	return damage + _bonus() if (_armed and _strikes_this_turn == 0) else damage
 
 
-## APPLY (at execute): same bonus on every hit while live. The spend happens in
-## _on_card_played, so the whole strike card — every Like a Shadow hop — is buffed.
+## APPLY (at execute): the FIRST strike card is in flight once its card_played has
+## bumped the count to 1; every hit/hop of that card lands while the count is still
+## 1, so they're all buffed. A later strike (count >= 2) gets nothing.
 func modify_outgoing_damage(damage: int, _target, _action) -> int:
-	return damage + _bonus() if _buff_live() else damage
+	if not (_armed and _strikes_this_turn <= 1):
+		return damage
+	return damage + _bonus()
 
 
 func get_description_with_values() -> String:

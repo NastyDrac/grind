@@ -1,4 +1,4 @@
-[gd_resource type="Resource" script_class="CharacterData" load_steps=22 format=3 uid="uid://cdrftchar001"]
+[gd_resource type="Resource" script_class="CharacterData" load_steps=25 format=3 uid="uid://cdrftchar001"]
 
 [ext_resource type="Script" uid="uid://dpayg0f6j5y2n" path="res://Scripts/character_data.gd" id="1_chardata"]
 [ext_resource type="Texture2D" uid="uid://b2rjhiy4rifig" path="res://icon.svg" id="1_yl1gw"]
@@ -7,6 +7,9 @@
 [ext_resource type="Script" uid="uid://b1ogi3xh5xakp" path="res://Scripts/condition.gd" id="4_cond"]
 [ext_resource type="Script" uid="uid://0gsjrx47no8b" path="res://Scripts/card_data.gd" id="5_carddata"]
 [ext_resource type="Script" uid="uid://b1sfbwje7kd7c" path="res://Scripts/momentum.gd" id="6_momentum"]
+[ext_resource type="Resource" uid="uid://b8frafoxvhevc" path="res://OOR Cards/attack.tres" id="7_e41p8"]
+[ext_resource type="Resource" uid="uid://bocjesq014je8" path="res://OOR Cards/evade.tres" id="8_phmh3"]
+[ext_resource type="Resource" uid="uid://d2u8cu2h5hvo3" path="res://Cards/cool_head.tres" id="9_wmdxb"]
 
 [sub_resource type="Resource" id="Calc_hp"]
 script = ExtResource("2_calc")
@@ -88,3 +91,4 @@ max_health = SubResource("Calc_hp")
 stats = Array[ExtResource("3_stat")]([SubResource("Resource_nr57k"), SubResource("Resource_e41p8"), SubResource("Resource_wmdxb"), SubResource("Resource_w6cdo"), SubResource("Stat_hustle"), SubResource("Stat_mojo")])
 gold = 100
 special_effects = Array[ExtResource("4_cond")]([SubResource("Cond_momentum")])
+starting_deck = Array[ExtResource("5_carddata")]([ExtResource("7_e41p8"), ExtResource("7_e41p8"), ExtResource("7_e41p8"), ExtResource("7_e41p8"), ExtResource("7_e41p8"), ExtResource("8_phmh3"), ExtResource("8_phmh3"), ExtResource("8_phmh3"), ExtResource("8_phmh3"), ExtResource("8_phmh3"), ExtResource("9_wmdxb")])

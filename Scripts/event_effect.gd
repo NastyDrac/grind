@@ -20,6 +20,18 @@ func get_description(run : RunManager) -> String:
 	return ""
 
 
+# ── Hover hooks for the event option button (both optional) ───────────────────
+## A card to render a copy of when the player hovers the option (add-card
+## effects return their CardData). Null = no card preview.
+func get_preview_card() -> CardData:
+	return null
+
+## Plain-text hover tooltip for the option (e.g. a relic's name + description).
+## "" = no text tooltip.
+func get_tooltip_text() -> String:
+	return ""
+
+
 # ── Shared multi-pick helper ──────────────────────────────────────────────────
 ## Opens the DeckViewer in SELECT mode up to [count] times, invoking [on_pick]
 ## with each chosen card. The player can Skip to end early. [cards_provider] is
